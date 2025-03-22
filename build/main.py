@@ -32,10 +32,12 @@ class PathObject:
 def get_spec_data(tkdnd_path: Path) -> str:
     return rf"""
 # -*- mode: python ; coding: utf-8 -*-
+import sys
+from PyInstaller.utils.hooks import collect_submodules
 
 a = Analysis(
     [r"{str(PathObject.TEMP_SOURCE / "main.py")}"],
-    pathex=["{str(PathObject.TEMP_SOURCE / "libraries")}"],
+    pathex=[r"{str(PathObject.TEMP_SOURCE / "libraries")}"],
     binaries=[],
     datas=[
         (r"{str(PathObject.TEMP_SOURCE / "modules")}", 'modules'),
@@ -43,7 +45,7 @@ a = Analysis(
         (r"{str(PathObject.TEMP_SOURCE / "config")}", 'config'),
         (r"{str(tkdnd_path)}", 'tkdnd')
     ],
-    hiddenimports=["customtkinter", "tkinterdnd2"],
+    hiddenimports=["tkinter", "customtkinter", "tkinterdnd2"],
     hookspath=[],
     hooksconfig={{}},
     runtime_hooks=[],
@@ -146,7 +148,6 @@ def main() -> None:
     if PathObject.TEMP.exists(): shutil.rmtree(PathObject.TEMP)
 
     print("[INFO] Done!")
-
 
 
 def pip_installed() -> bool:

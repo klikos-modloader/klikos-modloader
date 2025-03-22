@@ -1,0 +1,17 @@
+{
+    "appearance": "system",
+    "language": "default",
+
+    "check_for_updates": true,
+    "confirm_launch": true,
+    "disable_mods": false,
+    "disable_fastflags": false,
+	"deployment_info": false,
+
+    "mod_updater": false,
+    "multi_roblox": false
+    "discord_rpc": false,
+    "activity_joining": false,
+    "show_user_profile": false,
+    "bloxstrap_rpc": false
+}

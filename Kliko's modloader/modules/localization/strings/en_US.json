@@ -69,7 +69,7 @@
             "mods": "Mods",
             "marketplace": "Community Mods",
             "generator": "Mod Generator",
-            "clientsettings": "FastFlags",
+            "fastflags": "FastFlags",
             "globalbasicsettings": "GlobalBasicSettings",
             "launch_integrations": "Custom Integrations",
             "integrations": "Integrations",

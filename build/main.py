@@ -1,5 +1,4 @@
 import sys
-import shlex
 import subprocess
 from pathlib import Path
 import shutil
@@ -18,15 +17,75 @@ LIBRARIES: list[str] = [
 ]
 
 
-class Directory:
-    BUILD: Path = Path(__file__).parent
+class PathObject:
+    BUILD: Path = Path(__file__).parent.resolve()
     BIN: Path = BUILD / "bin"
     TEMP: Path = BUILD / "temp"
-    SOURCE: Path = Path(__file__).parent.parent / "Kliko's modloader"
+    SOURCE: Path = BUILD.parent / "Kliko's modloader"
+    SPEC_PATH: Path = TEMP / "Kliko's modloader.spec"
     TEMP_SOURCE: Path = TEMP / "source"
     MODULES: Path = TEMP_SOURCE / "modules"
     CONFIG: Path = TEMP_SOURCE / "config"
     LIBRARIES: Path = TEMP_SOURCE / "libraries"
+
+
+def get_spec_data(tkdnd_path: Path) -> str:
+    return rf"""
+# -*- mode: python ; coding: utf-8 -*-
+
+a = Analysis(
+    [r"{str(PathObject.TEMP_SOURCE / "main.py")}"],
+    pathex=["{str(PathObject.TEMP_SOURCE / "libraries")}"],
+    binaries=[],
+    datas=[
+        (r"{str(PathObject.TEMP_SOURCE / "modules")}", 'modules'),
+        (r"{str(PathObject.TEMP_SOURCE / "libraries")}", 'libraries'),
+        (r"{str(PathObject.TEMP_SOURCE / "config")}", 'config'),
+        (r"{str(tkdnd_path)}", 'tkdnd')
+    ],
+    hiddenimports=["customtkinter", "tkinterdnd2"],
+    hookspath=[],
+    hooksconfig={{}},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+pyz = PYZ(a.pure)
+splash = Splash(
+    r"{str(PathObject.BUILD / "splash.png")}",
+    binaries=a.binaries,
+    datas=a.datas,
+    text_pos=None,
+    text_size=12,
+    minify_script=True,
+    always_on_top=True,
+)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.datas,
+    splash,
+    splash.binaries,
+    [],
+    name="Kliko's modloader.exe",
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=[r"{str(PathObject.BUILD / "favicon.ico")}"],
+)
+"""
 
 
 def main() -> None:
@@ -49,26 +108,34 @@ def main() -> None:
         return
 
     print("[INFO] Preparing files...")
-    if Directory.TEMP.exists(): shutil.rmtree(Directory.TEMP)
-    if Directory.BIN.exists(): shutil.rmtree(Directory.BIN)
-    Directory.BIN.mkdir(parents=True, exist_ok=True)
-    Directory.TEMP.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(Directory.SOURCE, Directory.TEMP_SOURCE)
+    if PathObject.TEMP.exists(): shutil.rmtree(PathObject.TEMP)
+    if PathObject.BIN.exists(): shutil.rmtree(PathObject.BIN)
+    PathObject.BIN.mkdir(parents=True, exist_ok=True)
+    PathObject.TEMP.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(PathObject.SOURCE, PathObject.TEMP_SOURCE)
 
     print("[INFO] Installing libraries...")
-    Directory.LIBRARIES.mkdir(parents=True, exist_ok=True)
-    command = ["pip", "install", f"--target={str(Directory.LIBRARIES.resolve())}", "--upgrade", *LIBRARIES]
+    PathObject.LIBRARIES.mkdir(parents=True, exist_ok=True)
+    command = ["pip", "install", f"--target={str(PathObject.LIBRARIES)}", "--upgrade", *LIBRARIES]
     result = subprocess.run(command)
     if result.returncode != 0:
         print(f"\n[ERROR] Error while installing libraries!")
         return
+    
+    print("[INFO] Preparing files...")
+    sys.path.insert(0, str(PathObject.LIBRARIES))
+    import tkinterdnd2  # type: ignore
+    tkdnd_path: Path = Path(tkinterdnd2.__file__).parent / "tkdnd"
+    spec_data: str = get_spec_data(tkdnd_path)
+    with open(PathObject.SPEC_PATH, "w", encoding="utf-8") as file:
+        file.write(spec_data)
 
     print("[INFO] Running PyInstaller...")
-    Directory.TEMP.mkdir(parents=True, exist_ok=True)
+    PathObject.TEMP.mkdir(parents=True, exist_ok=True)
     command = [
-        "pyinstaller", str((Directory.BUILD / "Kliko's modloader.spec").resolve()),
-        f'--distpath={str(Directory.BIN.resolve())}',
-        f'--workpath={str(Directory.TEMP.resolve())}'
+        "pyinstaller", str((PathObject.SPEC_PATH)),
+        f'--distpath={str(PathObject.BIN)}',
+        f'--workpath={str(PathObject.TEMP)}'
     ]
     result = subprocess.run(command)
     if result.returncode != 0:
@@ -76,7 +143,7 @@ def main() -> None:
         return
     
     print("[INFO] Removing temporary files...")
-    if Directory.TEMP.exists(): shutil.rmtree(Directory.TEMP)
+    if PathObject.TEMP.exists(): shutil.rmtree(PathObject.TEMP)
 
     print("[INFO] Done!")
 

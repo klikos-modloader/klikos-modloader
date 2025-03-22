@@ -11,7 +11,7 @@ from modules.networking import requests, Api, Response
 from modules.info import NAME, VERSION, TAGLINE, LATEST
 from modules.frontend.widgets.fluent import FluentRootWindow, FluentNavigationFrame, FluentScrollableFrame, FluentLabel, FluentInAppNotification, set_root_instance, clear_root_instance, apply_color_theme
 
-from .sections import ModsSection, MarketplaceSection, GeneratorSection, FastFlagsSection, AboutSection
+from .sections import ModsSection, MarketplaceSection, GeneratorSection, FastFlagsSection, GlobalBasicSettingsSection, IntegrationsSection, LaunchIntegrationsSection, SettingsSection, AboutSection
 
 import customtkinter as ctk  # type: ignore
 from PIL import Image  # type: ignore
@@ -33,7 +33,11 @@ class App(FluentRootWindow):
     marketplace_section: MarketplaceSection
     generator_section: GeneratorSection
     fastflags_section: FastFlagsSection
+    globalbasicsettings_section: GlobalBasicSettingsSection
+    integrations_section: IntegrationsSection
+    launch_integrations_section: LaunchIntegrationsSection
 
+    settings_section: SettingsSection
     about_section: AboutSection
 
 
@@ -75,6 +79,30 @@ class App(FluentRootWindow):
             self.sections["fastflags"].grid_rowconfigure(0, weight=1)
             self.fastflags_section = FastFlagsSection(self, self.sections["fastflags"], self.RESOURCES)
 
+            # GlobalBasicSettings Editor
+            self.sections["globalbasicsettings"] = FluentScrollableFrame(self, toplevel=True)
+            self.sections["globalbasicsettings"].grid_columnconfigure(0, weight=1)
+            self.sections["globalbasicsettings"].grid_rowconfigure(0, weight=1)
+            self.globalbasicsettings_section = GlobalBasicSettingsSection(self, self.sections["globalbasicsettings"], self.RESOURCES)
+
+            # Integrations
+            self.sections["integrations"] = FluentScrollableFrame(self, toplevel=True)
+            self.sections["integrations"].grid_columnconfigure(0, weight=1)
+            self.sections["integrations"].grid_rowconfigure(0, weight=1)
+            self.integrations_section = IntegrationsSection(self, self.sections["integrations"], self.RESOURCES)
+
+            # Custom Integrations
+            self.sections["launch_integrations"] = FluentScrollableFrame(self, toplevel=True)
+            self.sections["launch_integrations"].grid_columnconfigure(0, weight=1)
+            self.sections["launch_integrations"].grid_rowconfigure(0, weight=1)
+            self.launch_integrations_section = LaunchIntegrationsSection(self, self.sections["launch_integrations"], self.RESOURCES)
+
+            # Settings
+            self.sections["settings"] = FluentScrollableFrame(self, toplevel=True)
+            self.sections["settings"].grid_columnconfigure(0, weight=1)
+            self.sections["settings"].grid_rowconfigure(0, weight=1)
+            self.settings_section = SettingsSection(self, self.sections["settings"], self.RESOURCES)
+
             # About Section
             self.sections["about"] = FluentScrollableFrame(self, toplevel=True)
             self.sections["about"].grid_columnconfigure(0, weight=1)
@@ -86,13 +114,13 @@ class App(FluentRootWindow):
                 {"text": Localizer.strings["menu.sidebar"]["navigation"]["mods"], "image": self._get_nav_icon("mods"), "command": lambda: self._change_active_section("mods")},
                 {"text": Localizer.strings["menu.sidebar"]["navigation"]["marketplace"], "image": self._get_nav_icon("marketplace"), "command": lambda: self._change_active_section("marketplace")},
                 {"text": Localizer.strings["menu.sidebar"]["navigation"]["generator"], "image": self._get_nav_icon("generator"), "command": lambda: self._change_active_section("generator")},
-                {"text": Localizer.strings["menu.sidebar"]["navigation"]["clientsettings"], "image": self._get_nav_icon("clientsettings"), "command": lambda: self._change_active_section("fastflags")},
-                {"text": Localizer.strings["menu.sidebar"]["navigation"]["globalbasicsettings"], "image": self._get_nav_icon("globalbasicsettings")},
-                {"text": Localizer.strings["menu.sidebar"]["navigation"]["integrations"], "image": self._get_nav_icon("integrations")},
-                {"text": Localizer.strings["menu.sidebar"]["navigation"]["launch_integrations"], "image": self._get_nav_icon("launch_integrations")}
+                {"text": Localizer.strings["menu.sidebar"]["navigation"]["fastflags"], "image": self._get_nav_icon("fastflags"), "command": lambda: self._change_active_section("fastflags")},
+                {"text": Localizer.strings["menu.sidebar"]["navigation"]["globalbasicsettings"], "image": self._get_nav_icon("globalbasicsettings"), "command": lambda: self._change_active_section("globalbasicsettings")},
+                {"text": Localizer.strings["menu.sidebar"]["navigation"]["integrations"], "image": self._get_nav_icon("integrations"), "command": lambda: self._change_active_section("integrations")},
+                {"text": Localizer.strings["menu.sidebar"]["navigation"]["launch_integrations"], "image": self._get_nav_icon("launch_integrations"), "command": lambda: self._change_active_section("launch_integrations")}
             )
             footer_buttons: tuple = (  # type: ignore
-                {"text": Localizer.strings["menu.sidebar"]["navigation"]["settings"], "image": self._get_nav_icon("settings")},
+                {"text": Localizer.strings["menu.sidebar"]["navigation"]["settings"], "image": self._get_nav_icon("settings"), "command": lambda: self._change_active_section("settings")},
                 {"text": Localizer.strings["menu.sidebar"]["navigation"]["about"], "image": self._get_nav_icon("about"), "command": lambda: self._change_active_section("about")},
             )
 

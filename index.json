@@ -3,60 +3,114 @@
         "name": "Kliko's mod",
         "id": "klikos-mod",
         "author": "TheKliko",
-        "description": "Gradient mod: #990000 -> #ff006e",
-        "has_thumbnail": true
-    },
-    {
-        "name": "Discord UI [WIP]",
-        "id": "discord-ui",
-        "author": "TheKliko",
-        "description": "Changes the icons to look like those found in Discord",
-        "has_thumbnail": true
-    },
-    {
-        "name": "Translucency",
-        "id": "translucency",
-        "author": "dooM",
-        "description": "Make UI elements transparent.",
-        "has_thumbnail": false
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/klikos-mod.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/klikos-mod.png",
+        "cache_id": "C92C6A05ECF69A8389FE200B3A380152"
     },
     {
         "name": "24K Gradient Gold Theme",
         "id": "24k-gradient-gold-theme",
         "author": "thefrenchguy4",
-        "description": "The golden theme for the elite",
-        "has_thumbnail": true
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/24k-gradient-gold-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/24k-gradient-gold-theme.png",
+        "cache_id": "FA18F558A9FF0781FB7D4DCB7939F93E"
+    },
+    {
+        "name": "Network's Red Theme",
+        "id": "networks-red-theme",
+        "author": "netsoftworks",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/networks-red-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/netwroks-red-theme.png",
+        "cache_id": "87CA66FC47A5C556E51DC869FF2AFAFC"
     },
     {
         "name": "Blue Star Theme",
         "id": "blue-star-theme",
         "author": "thefrenchguy4",
-        "has_thumbnail": true
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/blue-star-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/blue-star-theme.png",
+        "cache_id": "D45E90A57C363DEBE3CE0640B359DC84"
     },
     {
-        "name": "UBFF Theme",
-        "id": "ubff-theme",
+        "name": "Fishstrap Theme",
+        "id": "fishstrap-theme",
         "author": "TheKliko",
-        "description": "Gradient mod: #648bd9 -> #fa94d7",
-        "has_thumbnail": true
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/fishstrap-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/fishstrap-theme.png",
+        "cache_id": "A78350EA55ADB47A90565DD58993953A"
+    },
+    {
+        "name": "L337",
+        "id": "l337",
+        "author": "dooM",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/l337.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/l337.png",
+        "cache_id": "06410B01B931A94EA84D86D2BF988101"
+    },
+    {
+        "name": "Content Deleted",
+        "id": "content-deleted",
+        "author": "dooM",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/content-deleted.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/content-deleted.png",
+        "cache_id": "D6EBD5908BDA2712BA36EF8360605A41"
+    },
+    {
+        "name": "Translucency",
+        "id": "translucency",
+        "author": "dooM",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/translucency.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/translucency.png",
+        "cache_id": "F6FA56BA734E6DB8A42B552E440730F4"
     },
     {
         "name": "Bloxstrap theme",
         "id": "bloxstrap-theme",
         "author": "TheKliko",
-        "description": "Gradient mod: #a011fe -> #5460f9",
-        "has_thumbnail": true
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/bloxstrap-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/bloxstrap-theme.png",
+        "cache_id": "31071BC6A94D59BF3638E3F9F6E2A14F"
     },
     {
-        "name": "Bloxstrap theme [Premium]",
-        "id": "bloxstrap-theme-premium",
+        "name": "Pink Sky",
+        "id": "pink-sky",
         "author": "TheKliko",
-        "description": "Gradient mod: #feaa17 -> #f95455",
-        "has_thumbnail": true
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/pink-sky.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/pink-sky.png",
+        "cache_id": "75813FBA86E1A0AB2A0E50069D64FA9D"
     },
     {
-        "name": "Old Death Sound",
+        "name": "UBFF theme",
+        "id": "ubff-theme",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/ubff-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/ubff-theme.png",
+        "cache_id": "39D7C02B9EEDABDCF7106EDE3CA42F33"
+    },
+    {
+        "name": "Blue Emote Wheel",
+        "id": "blue-emote-wheel",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/blue-emote-wheel.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/blue-emote-wheel.png",
+        "cache_id": "5FC281C99F99711FF4DC6A68E26A26B2"
+    },
+    {
+        "name": "Old login screen (remake)",
+        "id": "old-login-screen",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/old-login-screen.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/old-login-screen.png",
+        "cache_id": "5BF9040E61FC639C2A4858C5E06843FC"
+    },
+    {
+        "name": "Old death sound",
         "id": "old-death-sound",
-        "has_thumbnail": false
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/old-death-sound.zip"
+    },
+    {
+        "name": "Wilhelm Scream (death sound)",
+        "id": "wilhelm-scream-death-sound",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/wilhelm-scream-death-sound.zip"
     }
 ]

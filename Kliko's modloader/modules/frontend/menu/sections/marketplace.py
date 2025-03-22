@@ -200,7 +200,7 @@ class MarketplaceSection:
             with BytesIO(response.content) as buffer:
                 image = Image.open(buffer)
                 image.load()
-            Directory.CACHE.mkdir(parents=True, exist_ok=True)
+            cache_directory.mkdir(parents=True, exist_ok=True)
             image.save(cached_image)
             return image
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="GitHub Files/Images/banner.png" alt="banner"/>
+<img src="GitHub Files/images/banner.png" alt="banner"/>
 
 [<img alt="GitHub License" src="https://img.shields.io/github/license/thekliko/klikos-modloader?style=for-the-badge&labelColor=cc0037&color=353639">](https://github.com/TheKliko/klikos-modloader/blob/main/LICENSE)
 [<img alt="GitHub Release" src="https://img.shields.io/github/v/release/thekliko/klikos-modloader?filter=!v*.*.*-beta&style=for-the-badge&labelColor=cc0037&color=353639">](https://github.com/thekliko/klikos-modloader/releases/latest)
@@ -14,9 +14,9 @@
 <h3>Roblox mods made easy</h3>
 
 
-Kliko's Modloader is an open-source modloader for <a href="https://www.roblox.com">Roblox</a>, allowing users to manage multiple mods with ease.
+Kliko's modloader is an open-source modloader for <a href="https://www.roblox.com">Roblox</a>, it serves as a replacement for Roblox's default launcher.
 
-<img src="GitHub Files/Images/preview-marketplace.png" alt="preview"/>
+<img src="GitHub Files/images/preview.png" alt="preview"/>
 
 
 
@@ -40,46 +40,20 @@ Kliko's Modloader is an open-source modloader for <a href="https://www.roblox.co
 
 <h2 id="features">Features</h2>
 
-<h3>Advanced Mod Mangaer</h3>
+<h3>Mods</h3>
+Each mod can be toggled on or off, change the load order to make sure your mods are applied in the right order.
 
-- Manage multiple mods at once
-- Enable/disable mods
-- Change load order
-- Import from .zip files
+<h3>Automatic mod updates</h3>
+I have integrated my <a href="https://github.com/TheKliko/klikos-modding-tool">modding tool</a> to automatically update compatible mods.
 
+<h3>Community mods</h3>
+Download community-made mods with the press of a button.
 
-<h3>Mod Generator</h3>
+<h3>Mod generator</h3>
+Don't know how to make mods yourself? Try out our mod generator, capable of generating mods with a 2-color gradient!
 
-- Creating mods has never been easier!
-- Generate mods with a single color or a two-color gradient
-
-
-<h3>Automatic Mod Updates</h3>
-
-- Keep you mods compatible with the latest version of Roblox
-
-
-<h3>Discord RPC</h3>
-
-- Shows your current game on Discord
-- Allow friends to join your server
-- Custom RPC using <a href="https://github.com/pizzaboxer/bloxstrap/wiki/Integrating-Bloxstrap-functionality-into-your-game">BloxstrapRPC SDK</a>
-
-
-<h3>Multi-Instance Support</h3>
-
-- Ability to launch multiple Roblox instances at once
-
-
-<h3>FastFlags Editor</h3>
-
-- Modify Roblox's client settings
-
-
-<h3>Free & Open Source</h3>
-
-- 100% free, forever
-- No paywalls, no hidden secrets
+<h3>Discord RPC and BloxstrapRPC SDK</h3>
+Replace Roblox's default rich presence to show more details. The <a href="https://github.com/pizzaboxer/bloxstrap/wiki/Integrating-Bloxstrap-functionality-into-your-game">BloxstrapRPC</a> allows games to set custom RPC data.
 
 
 

@@ -13,9 +13,17 @@ import platform
 #     print("Please check out the build folder for more information")
 #     input("\nPress Enter to exit...")
 #     sys.exit(1)
-ROOT: Path = Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).parent
-sys.path.insert(0, str((ROOT / "libraries").resolve()))
-sys.path.insert(0, str((ROOT / "forked_libraries").resolve()))
+
+FROZEN: bool = getattr(sys, "frozen", False)
+ROOT: Path = Path(sys.executable).parent if FROZEN else Path(__file__).parent
+if not FROZEN: sys.path.insert(0, str((ROOT / "libraries").resolve()))
+elif hasattr(sys, "_MEIPASS"): sys.path.insert(0, str((Path(sys._MEIPASS) / "libraries").resolve()))
+
+if FROZEN:
+    try:
+        import pyi_splash  # type: ignore
+        if pyi_splash.is_alive(): pyi_splash.close()
+    except (ImportError, ModuleNotFoundError): pass
 
 from modules.logger import Logger  # Initializes the logger
 from modules import exception_handler

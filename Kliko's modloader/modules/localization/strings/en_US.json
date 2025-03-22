@@ -1,0 +1,152 @@
+{
+    "buttons.yes": "Yes",
+    "buttons.no": "No",
+    "buttons.ok": "OK",
+    "buttons.cancel": "Cancel",
+    "buttons.open_crash_log": "Open crash log",
+    "buttons.open_mods_folder": "Open mods folder",
+    "buttons.github": "Source code",
+    "buttons.changelog": "Changelog",
+    "buttons.discord": "Join our Discord",
+
+    "errors": {
+        "global": {
+            "critical.title": "Something went wrong!",
+            "critical.message":"More information may be available in the latest log file"
+        },
+
+        "mods": {
+            "rename.title": "Failed to rename mod!",
+            "rename.permission_denied": "Write permission denied for {path}",
+            "rename.already_exists": "Another mod with the same name already exists!",
+            "rename.not_found": "Mod not found: {mod}",
+
+            "config.title": "Failed to update mod configuration!",
+            "config.permission_denied": "Write permission denied for {path}",
+
+            "import.title": "Mod import(s) failed!",
+            "import.unsupported_format": "File(s): {failed_imports}\n\nSupported file extensions: {supported_formats}",
+            "import.not_found": "File not found: {path}",
+            "import.permission_denied": "Write permission denied for {path}",
+
+            "delete.title": "Failed to remove mod!",
+            "delete.permission_denied": "Write permission denied for {path}",
+            "delete.not_found": "Mod not found: {mod}"
+        },
+
+        "marketplace": {
+            "download.title": "Mod download failed!",
+            "download.permission_denied": "Write permission denied for {path}",
+            "download.http_error": "HTTP error: {code} {reason}",
+            "download.connection_failed": "Failed to connect to the server. Please check your internet connection and try again.",
+            "download.connection_reset": "Connection reset.",
+            "download.ssl_handshake_failed": "SSL handshake failed.",
+            "download.timeout": "Failed to establish a connection after {timeout} seconds.",
+            "download.other": "Failed to download {mod} due to an unknown error.\n{error}"
+        }
+    },
+
+    "popups": {
+        "mods": {
+            "confirm_delete.title": "Are you sure you want to remove this mod: {mod}?",
+            "confirm_delete.message": "This action cannot be undone!"
+        },
+
+        "marketplace": {
+            "download_in_progress.title": "Another mod is already being downloaded!",
+            "download_in_progress.message": "Please wait for the current download to finish before starting a new one."
+        }
+    },
+
+    "notifications": {
+        "update.title": "Version {latest} is available",
+        "update.message": "Click here to update!"
+    },
+
+    "menu.sidebar": {
+        "version": "Version {version}",
+        "navigation": {
+            "mods": "Mods",
+            "marketplace": "Community Mods",
+            "generator": "Mod Generator",
+            "clientsettings": "FastFlags",
+            "globalbasicsettings": "GlobalBasicSettings",
+            "launch_integrations": "Custom Integrations",
+            "integrations": "Integrations",
+            "settings": "Settings",
+            "about": "About"
+        }
+    },
+
+    "menu.mods": {
+        "title": "Mods",
+        "tooltip.title": "Mod manager",
+        "tooltip.message": "{project_name} includes an advanced mod manager. Allowing users to enable, disable or adjust the load order for your mods.",
+
+        "dnd_frame": "Drag and drop to import mods",
+        "load_order": "Load order:",
+        "status.player": "Player:",
+        "status.studio": "Studio:"
+    },
+
+    "menu.marketplace": {
+        "title": "Community Mods",
+        "tooltip.title": null,
+        "tooltip.message": "Download your favorite mods with the press of a button.",
+
+        "failed_to_load": "Data failed to load!",
+        "author": "by {author}",
+        "author_unknown": "Unknown author",
+
+        "progress_window_title": "{project_name} - Mod Download Window",
+        "progress_window_message": "Downloading {mod}"
+    },
+
+    "menu.generator": {
+        "title": "Mod Generator",
+        "tooltip.title": null,
+        "tooltip.message": "Create mods with one color or a two-color gradient."
+    },
+
+    "menu.fastflags": {
+        "title": "FastFlags Manager",
+        "tooltip.title": null,
+        "tooltip.message": "Description"
+    },
+
+    "menu.globalbasicsettings": {
+        "title": "GlobalBasicSettings Editor",
+        "tooltip.title": null,
+        "tooltip.message": "Description"
+    },
+
+    "menu.integrations": {
+        "title": "Integrations",
+        "tooltip.title": null,
+        "tooltip.message": "Description"
+    },
+
+    "menu.launch_integrations": {
+        "title": "Custom Integrations",
+        "tooltip.title": null,
+        "tooltip.message": "Description"
+    },
+
+    "menu.settings": {
+        "title": "Settings",
+        "tooltip.title": null,
+        "tooltip.message": "Description"
+    },
+
+    "menu.about": {
+        "title": "About",
+        "tooltip.title": "About {project_name}",
+        "tooltip.message": "{project_name} is an open-source modloader for Roblox, allowing users to manage multiple mods with ease.",
+
+        "licenses": "Licenses",
+        "contributors": "Contributors",
+        "feature_suggestions": "Feature Suggestions",
+        "special_thanks": "Special Thanks",
+        "no_data": "To be added"
+    }
+}

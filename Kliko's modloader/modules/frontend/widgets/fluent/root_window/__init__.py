@@ -34,7 +34,6 @@ class FluentRootWindow(ctk.CTk, TkinterDnD.DnDWrapper):
 
     def __init__(self, title: str = "FluentRootWindow", icon: Path = Assets.DEFAULT_LOGO) -> None:
         super().__init__(fg_color=(Colors.Light.BackgroundColor.hex, Colors.Dark.BackgroundColor.hex))
-        self.TkdndVersion = TkinterDnD._require(self)
         set_root_instance(self)
 
         self.window_title = title

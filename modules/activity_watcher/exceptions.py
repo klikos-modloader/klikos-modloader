@@ -1,2 +1,0 @@
-class RobloxNotLaunched(Exception):
-    pass

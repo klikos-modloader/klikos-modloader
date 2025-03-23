@@ -2,15 +2,14 @@ from pathlib import Path
 import json
 
 
-METADATA: dict = {
-    "default": "en_US",
-    "available": {
-        "en_US": "English (United States)"
-    }
-}
-
-
 class Localizer:
+    METADATA: dict = {
+        "default": "en_US",
+        "available": {
+            "en_US": "English (United States)"
+        }
+    }
+
     DIRECTORY: Path = Path(__file__).parent / "strings"
     language: str | None = None
     strings: dict
@@ -18,17 +17,17 @@ class Localizer:
 
     @classmethod
     def initialize(cls, language: str = METADATA["default"]) -> None:
-        if language not in METADATA["available"]: raise ValueError(f"Language '{language}' unavailable! Available lanaguages are: {', '.join(METADATA['available'].keys())}")
+        if language not in cls.METADATA["available"]: raise ValueError(f"Language '{language}' unavailable! Available lanaguages are: {', '.join(cls.METADATA['available'].keys())}")
         if cls.language == language: return
 
         cls.language = language
 
-        default_filepath: Path = cls.DIRECTORY / f"{METADATA['default']}.json"
+        default_filepath: Path = cls.DIRECTORY / f"{cls.METADATA['default']}.json"
         filepath: Path = cls.DIRECTORY / f"{language}.json"
 
         cls.strings = cls._load_language(default_filepath)
 
-        if language != METADATA["default"]:
+        if language != cls.METADATA["default"]:
             cls.strings.update(cls._load_language(filepath))
 
 

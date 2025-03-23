@@ -43,6 +43,11 @@
             "download.ssl_handshake_failed": "SSL handshake failed.",
             "download.timeout": "Failed to establish a connection after {timeout} seconds.",
             "download.other": "Failed to download {mod} due to an unknown error.\n{error}"
+        },
+
+        "settings": {
+            "restore.title": "Failed to restore default settings!",
+            "restore.permission_denied": "Write permission denied for {path}"
         }
     },
 
@@ -123,7 +128,25 @@
     "menu.integrations": {
         "title": "Integrations",
         "tooltip.title": null,
-        "tooltip.message": "Description"
+        "tooltip.message": "Description",
+
+        "mod_updater.title": "Automatic Mod Updates",
+        "mod_updater.description": "Automatically updates compatible mods.",
+
+        "multi_roblox.title": "Multi-Instance Launching",
+        "multi_roblox.description": "Run multiple Roblox instances at the same time.",
+
+        "discord_rpc.title": "Discord RPC",
+        "discord_rpc.description": "Replace Roblox's default RPC to show more details.",
+
+        "bloxstrap_rpc.title": "BloxstrapRPC SDK",
+        "bloxstrap_rpc.description": "Allow games to customize your RPC status using the BloxstrapRPC SDK.",
+
+        "activity_joining.title": "Activity Joining",
+        "activity_joining.description": "Allow anyone to join your game through Discord.",
+
+        "show_user_profile.title": "Show profile in RPC",
+        "show_user_profile.description": "Show your Roblox avatar in Discord RPC."
     },
 
     "menu.launch_integrations": {
@@ -135,7 +158,32 @@
     "menu.settings": {
         "title": "Settings",
         "tooltip.title": null,
-        "tooltip.message": "Description"
+        "tooltip.message": "Description",
+
+        "appearance.title": "Appearance",
+        "appearance.light": "Light",
+        "appearance.dark": "Dark",
+        "appearance.system": "System",
+
+        "language.title": "Language",
+
+        "check_for_updates.title": "Check for updates",
+        "check_for_updates.description": "Check for updates when launching {project_name}.",
+
+        "confirm_launch.title": "Confirm Roblox launch",
+        "confirm_launch.description": "Ask for confirmation to kill existing Roblox instances.",
+
+        "disable_mods.title": "Disable all mods",
+        "disable_mods.description": "Prevents any mods from being loaded",
+
+        "disable_fastflags.title": "Disable FastFlags",
+        "disable_fastflags.description": "Prevents user-specified FastFlags from being applied.",
+
+        "deployment_info.title": "Show deployment info",
+        "deployment_info.description": "Show information about the current Roblox version when launching Roblox.",
+
+        "force_reinstall.title": "Force Roblox reinstallation",
+        "force_reinstall.description": "Force Roblox to be reinstalled on the next launch."
     },
 
     "menu.about": {

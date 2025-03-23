@@ -4,7 +4,6 @@ from typing import Callable, Iterable
 
 from ..button_frame import FluentButtonFrame
 
-# import winaccent  # type: ignore
 from PIL import Image  # type: ignore
 import customtkinter as ctk  # type: ignore
 
@@ -74,7 +73,6 @@ class FluentDropdown(ctk.CTkToplevel):
 
     def show(self) -> None:
         if self.visible: return
-        print("Appear!")
         self._set_geometry()
         self.deiconify()
         self.visible = True
@@ -84,7 +82,6 @@ class FluentDropdown(ctk.CTkToplevel):
 
     def hide(self) -> None:
         if not self.visible: return
-        print("Disappear!")
         self.withdraw()
         self.visible = False
 

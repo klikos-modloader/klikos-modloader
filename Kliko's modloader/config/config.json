@@ -1,6 +1,6 @@
 {
     "appearance": "system",
-    "language": "default",
+    "language": "en_US",
 
     "check_for_updates": true,
     "confirm_launch": true,
@@ -9,7 +9,7 @@
 	"deployment_info": false,
 
     "mod_updater": false,
-    "multi_roblox": false
+    "multi_roblox": false,
     "discord_rpc": false,
     "activity_joining": false,
     "show_user_profile": false,

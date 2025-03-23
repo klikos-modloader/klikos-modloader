@@ -19,6 +19,7 @@ class Localizer:
     @classmethod
     def initialize(cls, language: str = METADATA["default"]) -> None:
         if language not in METADATA["available"]: raise ValueError(f"Language '{language}' unavailable! Available lanaguages are: {', '.join(METADATA['available'].keys())}")
+        if cls.language == language: return
 
         cls.language = language
 

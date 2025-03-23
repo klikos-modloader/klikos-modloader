@@ -146,24 +146,31 @@ class FluentDropdownButton(FluentButtonFrame):
     _ICON_PADX: int = 10
     _LABEL_PADX: int = 12
     _INNGER_GAP: int = 7
+    _ICON_SIZE: tuple[int, int] = (16, 16)
 
     _icon: ctk.CTkImage
     _dropdown: FluentDropdown
 
 
-    def __init__(self, root, master, options: Iterable[str], active: str, command: Callable | None = None, threaded: bool = False, disabled: bool = False, toplevel: bool = False):
+    def __init__(self, root, master, options: Iterable[str], active: str, command: Callable | None = None, threaded: bool = False, disabled: bool = False, toplevel: bool = False, min_width: int = 0):
         super().__init__(master, height=32, command=self._show_dropdown, threaded=threaded, disabled=disabled, toplevel=toplevel)
-        self._icon = ctk.CTkImage(Image.open(Assets.LIGHT_ICON), Image.open(Assets.DARK_ICON), size=(16,16))
+        self._icon = ctk.CTkImage(Image.open(Assets.LIGHT_ICON), Image.open(Assets.DARK_ICON), size=self._ICON_SIZE)
         self._dropdown = FluentDropdown(root, self, options, command)
 
         font = ctk.CTkFont(family="Segoe UI")
         inner_label_width: int = max([font.measure(option) for option in options])
+        inner_label_width = max(inner_label_width, min_width - self._INNGER_GAP - self._ICON_PADX - self._LABEL_PADX - self._ICON_SIZE[0])
         self.text_label = ctk.CTkLabel(self, width=inner_label_width, text=active, image=None, font=font, justify="left", anchor="w")
         self.text_label.grid(column=0, row=0, padx=(self._LABEL_PADX, self._INNGER_GAP), pady=self._PADY)
         self.icon_label = ctk.CTkLabel(self, text="", image=self._icon)
         self.icon_label.grid(column=1, row=0, padx=(0, self._ICON_PADX), pady=self._PADY)
 
         self.bind_all_children()
+    
+
+    def set_width(self, width: int) -> None:
+        new_width: int = width - self._INNGER_GAP - self._ICON_PADX - self._LABEL_PADX - self._ICON_SIZE[0]
+        self.text_label.configure(width=new_width)
 
 
     def _show_dropdown(self) -> None:

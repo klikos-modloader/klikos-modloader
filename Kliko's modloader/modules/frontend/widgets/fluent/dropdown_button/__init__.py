@@ -4,6 +4,7 @@ from typing import Callable, Iterable
 
 from ..button_frame import FluentButtonFrame
 
+# import winaccent  # type: ignore
 from PIL import Image  # type: ignore
 import customtkinter as ctk  # type: ignore
 
@@ -67,6 +68,7 @@ class FluentDropdown(ctk.CTkToplevel):
         self.after(10, self._apply_rounded_corners)
 
     def _callback(self, option: str) -> None:
+        self.button.text_label.configure(text=option)
         if callable(self.command): self.command(option)
         self.hide()
 

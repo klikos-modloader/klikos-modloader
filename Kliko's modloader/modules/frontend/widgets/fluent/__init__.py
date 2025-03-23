@@ -18,6 +18,7 @@ from .tooltip import FluentToolTipButton
 from .in_app_notification import FluentInAppNotification
 from .progress_bar import FluentProgressBar
 from .toplevel import FluentToplevel
+from .dropdown_button import FluentDropdownButton
 
 # Methods
 from .color_theme import apply_color_theme

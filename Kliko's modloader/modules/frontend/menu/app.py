@@ -7,6 +7,7 @@ from packaging.version import parse as parse_version
 from modules.logger import Logger
 from modules import exception_handler
 from modules.localization import Localizer
+from modules.core.config_editor import ConfigEditor
 from modules.networking import requests, Api, Response
 from modules.info import NAME, VERSION, TAGLINE, LATEST
 from modules.frontend.widgets.fluent import FluentRootWindow, FluentNavigationFrame, FluentScrollableFrame, FluentLabel, FluentInAppNotification, set_root_instance, clear_root_instance, apply_color_theme
@@ -28,7 +29,7 @@ class App(FluentRootWindow):
     active_section: str = None  # type: ignore
     loaded_sections: dict
     sections: dict
-    
+
     mods_section: ModsSection
     marketplace_section: MarketplaceSection
     generator_section: GeneratorSection
@@ -42,6 +43,8 @@ class App(FluentRootWindow):
 
 
     def __init__(self):
+        appearance: str = ConfigEditor.get_appearance_mode()
+        ctk.set_appearance_mode(appearance)
         apply_color_theme()
         super().__init__(NAME, self.FAVICON)
         self.sections = {}

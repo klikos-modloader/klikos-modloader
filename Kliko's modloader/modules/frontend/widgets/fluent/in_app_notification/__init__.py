@@ -146,7 +146,7 @@ class FluentInAppNotification(ctk.CTkToplevel):
     def _loop(self) -> None:
         if not self.visible: return
         # self.lift()
-        if self.root.focus_get():
+        if self.root.focus_get() != self:
             self.lift()
         self._set_geometry()
         self.after(10, self._loop)

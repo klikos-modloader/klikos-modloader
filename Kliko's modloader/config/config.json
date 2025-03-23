@@ -6,7 +6,8 @@
     "confirm_launch": true,
     "disable_mods": false,
     "disable_fastflags": false,
-	"deployment_info": false,
+    "deployment_info": false,
+    "force_reinstall": false,
 
     "mod_updater": false,
     "multi_roblox": false,

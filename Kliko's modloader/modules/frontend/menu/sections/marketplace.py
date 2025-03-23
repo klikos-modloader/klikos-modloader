@@ -300,6 +300,7 @@ class MarketplaceSection:
 
         bottom_frame.grid(column=0, row=1, padx=self.ENTRY_INNER_PADX, pady=self.ENTRY_INNER_PADY, sticky="nsew")
 
+        frame.bind_all_children()
         frame.grid(column=column, row=row, pady=0 if row == 0 else (self.ENTRY_GAP, 0), sticky="nsew")
 
         # Debounce, without it everything breaks

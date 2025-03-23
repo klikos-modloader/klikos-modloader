@@ -8,7 +8,7 @@ from ..button_frame import FluentButtonFrame
 from PIL import Image  # type: ignore
 import customtkinter as ctk  # type: ignore
 
-/
+
 class Colors:
     class Dark:
         class BackgroundColor:

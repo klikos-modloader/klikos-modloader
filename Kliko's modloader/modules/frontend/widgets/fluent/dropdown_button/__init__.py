@@ -38,6 +38,7 @@ class FluentDropdown(ctk.CTkToplevel):
     options: Iterable[str]
     visible: bool = False
 
+    MIN_WIDTH: int = 165
     _GAP: int = 4
     _BUTTON_GAP: int = 4
     _PADX: int = 5
@@ -53,6 +54,7 @@ class FluentDropdown(ctk.CTkToplevel):
         self.options = options
         self.command = command
 
+        self.grid_columnconfigure(0, weight=1)
         button_container = ctk.CTkFrame(self, fg_color="transparent")
         button_container.grid(padx=self._PADX, pady=self._PADY, sticky="nsew")
         button_container.grid_columnconfigure(0, weight=1)
@@ -64,6 +66,8 @@ class FluentDropdown(ctk.CTkToplevel):
             ctk.CTkLabel(button_frame, text=option, font=font).grid(padx=12, pady=6)
             button_frame.bind_all_children()
             button_frame.grid(column=0, row=i, padx=0, pady=0 if i == 0 else (self._BUTTON_GAP, 0), sticky="ew")
+
+        self.update_idletasks()
 
         self.after(10, self._apply_rounded_corners)
 
@@ -103,7 +107,7 @@ class FluentDropdown(ctk.CTkToplevel):
 
 
     def _set_geometry(self) -> None:
-        w: int = self.winfo_reqwidth()
+        w: int = max(self.MIN_WIDTH, self.winfo_reqwidth())
         h: int = self.winfo_reqheight()
         button_x: int = self.button.winfo_rootx()
         button_y: int = self.button.winfo_rooty()

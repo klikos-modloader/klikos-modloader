@@ -137,7 +137,7 @@ class FluentButtonFrame(ctk.CTkFrame):
         self.bind("<Enter>", self._on_hover)
         self.bind("<Leave>", self._on_unhover)
 
-        self.after(10, self.bind_all_children)
+        # self.after(10, self.bind_all_children)
     
 
     def bind_all_children(self) -> None:

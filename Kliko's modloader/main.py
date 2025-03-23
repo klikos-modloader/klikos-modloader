@@ -41,7 +41,12 @@ def main() -> None:
         Logger.info("Initializing localization...")
         from modules.localization import Localizer
         Localizer.initialize()
-        
+
+        from modules.core.config_editor import ConfigEditor
+        language: str = ConfigEditor.get_active_language()
+        Logger.info(f"Selected language: {language}")
+        Localizer.initialize(language)
+
         match launch_mode.get():
             case "menu":
                 from modules.frontend.menu import App

@@ -1,7 +1,8 @@
+import json
 from pathlib import Path
 from threading import Lock
 from tempfile import NamedTemporaryFile
-import json
+from typing import Any
 from copy import deepcopy
 
 from modules.logger import Logger
@@ -24,6 +25,7 @@ class ConfigEditor:
         "disable_mods": False,
         "disable_fastflags": False,
         "deployment_info": False,
+        "force_reinstall": False,
 
         "mod_updater": False,
         "multi_roblox": False,
@@ -83,15 +85,72 @@ class ConfigEditor:
         except OSError as e:
             Logger.warning(f"Failed to load config due to OSError: {e}", prefix="ConfigEditor")
             raise
+
+
+    @classmethod
+    def restore_default_settings(cls) -> None:
+        data: dict = deepcopy(cls.DEFAULT_CONFIG)
+        cls.write_file(data)
     
+
+    @classmethod
+    def get_values(cls, *keys) -> Any | tuple[Any, ...]:
+        data: dict = cls.read_file()
+
+        if len(keys) == 1:
+            key: str = keys[0]
+            try:
+                return data[key]
+            except KeyError:
+                default_data: dict = deepcopy(cls.DEFAULT_CONFIG)
+                data[key] = default_data[key]
+                cls.write_file(data)
+                return data[key]
+
+        values: list = []
+        for key in keys:
+            try:
+                value = data[key]
+            except KeyError:
+                default_data = deepcopy(cls.DEFAULT_CONFIG)
+                data[key] = default_data[key]
+                cls.write_file(data)
+                value = data[key]
+            values.append(value)
+
+        return tuple(values)
+    
+
+    @classmethod
+    def set_value(cls, key: str, value: Any) -> None:
+        data: dict = cls.read_file()
+        data[key] = value
+        cls.write_file(data)
+
 
     @classmethod
     def get_active_language(cls) -> str:
         data: dict = cls.read_file()
-        try:
-            return data["language"]
+        try: return data["language"]
         except KeyError:
             default_data: dict = deepcopy(cls.DEFAULT_CONFIG)
             data["language"] = default_data["language"]
             cls.write_file(data)
             return data["language"]
+
+
+    @classmethod
+    def get_appearance_mode(cls) -> str:
+        data: dict = cls.read_file()
+        try:
+            appearance: str = data["appearance"]
+            if appearance.lower() in ["light", "dark", "system"]: return appearance
+            default_data: dict = deepcopy(cls.DEFAULT_CONFIG)
+            data["appearance"] = default_data["appearance"]
+            cls.write_file(data)
+            return data["appearance"]
+        except KeyError:
+            default_data = deepcopy(cls.DEFAULT_CONFIG)
+            data["appearance"] = default_data["appearance"]
+            cls.write_file(data)
+            return data["appearance"]

@@ -12,7 +12,7 @@ METADATA: dict = {
 
 class Localizer:
     DIRECTORY: Path = Path(__file__).parent / "strings"
-    language: str
+    language: str | None = None
     strings: dict
 
 

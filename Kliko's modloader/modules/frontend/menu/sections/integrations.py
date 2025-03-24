@@ -106,7 +106,7 @@ class IntegrationsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["mod_updater.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["mod_updater.description"].replace("{project_name}", NAME), font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="mod_updater": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=mod_updater, command=lambda value, key="mod_updater": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
 
         # endregion
@@ -119,7 +119,7 @@ class IntegrationsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["multi_roblox.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["multi_roblox.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="multi_roblox": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=multi_roblox, command=lambda value, key="multi_roblox": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -132,7 +132,7 @@ class IntegrationsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["discord_rpc.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["discord_rpc.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="discord_rpc": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=discord_rpc, command=lambda value, key="discord_rpc": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -145,7 +145,7 @@ class IntegrationsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["bloxstrap_rpc.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["bloxstrap_rpc.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="bloxstrap_rpc": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=bloxstrap_rpc, command=lambda value, key="bloxstrap_rpc": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -158,7 +158,7 @@ class IntegrationsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["activity_joining.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["activity_joining.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="activity_joining": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=activity_joining, command=lambda value, key="activity_joining": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -171,7 +171,7 @@ class IntegrationsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["show_user_profile.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.integrations"]["show_user_profile.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="show_user_profile": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=show_user_profile, command=lambda value, key="show_user_profile": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion

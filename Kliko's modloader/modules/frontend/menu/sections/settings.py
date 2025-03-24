@@ -87,6 +87,7 @@ class SettingsSection:
             language,
             check_for_updates,
             confirm_launch,
+            force_reinstall,
             disable_mods,
             disable_fastflags,
             deployment_info
@@ -95,6 +96,7 @@ class SettingsSection:
             "language",
             "check_for_updates",
             "confirm_launch",
+            "force_reinstall",
             "disable_mods",
             "disable_fastflags",
             "deployment_info"
@@ -147,7 +149,7 @@ class SettingsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["check_for_updates.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["check_for_updates.description"].replace("{project_name}", NAME), font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="check_for_updates": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=check_for_updates, command=lambda value, key="check_for_updates": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -160,7 +162,7 @@ class SettingsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["confirm_launch.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["confirm_launch.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="confirm_launch": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=confirm_launch, command=lambda value, key="confirm_launch": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -173,7 +175,7 @@ class SettingsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["force_reinstall.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["force_reinstall.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="force_reinstall": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=force_reinstall, command=lambda value, key="force_reinstall": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -186,7 +188,7 @@ class SettingsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["disable_mods.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["disable_mods.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="disable_mods": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=disable_mods, command=lambda value, key="disable_mods": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -199,7 +201,7 @@ class SettingsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["disable_fastflags.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["disable_fastflags.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="disable_fastflags": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=disable_fastflags, command=lambda value, key="disable_fastflags": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion
@@ -212,7 +214,7 @@ class SettingsSection:
         setting_frame.grid_columnconfigure(0, weight=1)
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["deployment_info.title"], font_size=self.ENTRY_TITLE_FONT_SIZE, font_weight="bold").grid(column=0, row=0, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(self.ENTRY_PADY, 0))
         FluentLabel(setting_frame, Localizer.strings["menu.settings"]["deployment_info.description"], font_size=self.ENTRY_DESCRIPTION_FONT_SIZE).grid(column=0, row=1, sticky="w", padx=(self.ENTRY_PADX, 0), pady=(0, self.ENTRY_PADY))
-        FluentToggleSwitch(setting_frame, command=lambda value, key="deployment_info": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
+        FluentToggleSwitch(setting_frame, value=deployment_info, command=lambda value, key="deployment_info": self._update_boolean_value(key, value)).grid(column=1, row=0, rowspan=2, padx=(0, self.ENTRY_PADX*2), pady=self.ENTRY_PADY)
         setting_frame.grid(column=0, row=row, sticky="nsew", pady=(self.ENTRY_GAP, 0))
         
         # endregion

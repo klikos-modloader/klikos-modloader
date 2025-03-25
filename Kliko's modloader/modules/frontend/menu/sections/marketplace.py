@@ -58,7 +58,7 @@ class MarketplaceSection:
         self.favicon = self.resources / "favicon.ico"
         self.download_light = Image.open(self.resources / "common" / "light" / "download.png")
         self.download_dark = Image.open(self.resources / "common" / "dark" / "download.png")
-        self.wifi_off = ctk.CTkImage(Image.open(self.resources / "marketplace" / "light" / "wifi_off.png"), Image.open(self.resources / "marketplace" / "dark" / "wifi_off.png"), size=(96, 96))
+        self.wifi_off = ctk.CTkImage(Image.open(self.resources / "large" / "light" / "wifi_off.png"), Image.open(self.resources / "large" / "dark" / "wifi_off.png"), size=(96, 96))
 
         self.thumbnail_mask = Image.open(self.resources / "marketplace" / "mask.png")
         self.placeholder_light = Image.open(self.resources / "marketplace" / "light" / "placeholder.png")

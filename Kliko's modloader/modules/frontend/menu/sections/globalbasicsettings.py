@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from modules.localization import Localizer
-from modules.frontend.widgets.fluent import FluentLabel, FluentToolTipButton, get_root_instance
+from modules.frontend.widgets.fluent import FluentLabel, FluentFrame, FluentToolTipButton, get_root_instance
 
 import customtkinter as ctk  # type: ignore
 from PIL import Image  # type: ignore
@@ -12,6 +12,7 @@ class GlobalBasicSettingsSection:
     PADDING_Y: int = 16
 
     resources: Path
+    file_not_found: ctk.CTkImage
 
     master: ctk.CTkFrame
     content: ctk.CTkFrame | ctk.CTkScrollableFrame
@@ -25,6 +26,7 @@ class GlobalBasicSettingsSection:
         self.root = root
         self.master = master
         self.resources = resources
+        self.file_not_found = ctk.CTkImage(Image.open(self.resources / "large" / "light" / "file_not_found.png"), Image.open(self.resources / "large" / "dark" / "file_not_found.png"), size=(96, 96))
 
 
     def refresh(self) -> None:
@@ -42,7 +44,7 @@ class GlobalBasicSettingsSection:
         self.active = False
         self.tooltip_button.disable()
 
-    
+
     def _clear(self) -> None:
         for widget in self.master.winfo_children():
             widget.destroy()
@@ -68,10 +70,18 @@ class GlobalBasicSettingsSection:
 
         return frame
 
-    
+
     def _get_content(self) -> ctk.CTkFrame:
         frame = ctk.CTkFrame(self.content, fg_color="transparent")
         frame.grid_columnconfigure(0, weight=1)
+
+        data = None
+        if not data:
+            frame.grid_columnconfigure(0, weight=1)
+            content_frame = FluentFrame(frame)
+            content_frame.grid(column=0, row=0, sticky="nsew")
+            FluentLabel(content_frame, Localizer.strings["menu.globalbasicsettings"]["failed_to_load"], image=self.file_not_found, font_size=24, font_weight="bold", compound="left", padx=16).place(relx=0.5, rely=0.5, anchor="center")
+            return frame
 
         return frame
 

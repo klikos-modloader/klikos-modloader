@@ -96,7 +96,7 @@
 
     "menu.marketplace": {
         "title": "Community Mods",
-        "tooltip.title": null,
+        "tooltip.title": "",
         "tooltip.message": "Download your favorite mods with the press of a button.",
 
         "failed_to_load": "Data failed to load!",
@@ -109,25 +109,27 @@
 
     "menu.generator": {
         "title": "Mod Generator",
-        "tooltip.title": null,
+        "tooltip.title": "",
         "tooltip.message": "Create mods with one color or a two-color gradient."
     },
 
     "menu.fastflags": {
         "title": "FastFlags Manager",
-        "tooltip.title": null,
+        "tooltip.title": "",
         "tooltip.message": "Description"
     },
 
     "menu.globalbasicsettings": {
         "title": "GlobalBasicSettings Editor",
-        "tooltip.title": null,
-        "tooltip.message": "Description"
+        "tooltip.title": "",
+        "tooltip.message": "Configure global Roblox settings. It's recommended that you do not change these settings unless you know what you're doing.",
+
+        "failed_to_load": "File not found!"
     },
 
     "menu.integrations": {
         "title": "Integrations",
-        "tooltip.title": null,
+        "tooltip.title": "",
         "tooltip.message": "Description",
 
         "mod_updater.title": "Automatic Mod Updates",
@@ -151,13 +153,13 @@
 
     "menu.launch_integrations": {
         "title": "Custom Integrations",
-        "tooltip.title": null,
+        "tooltip.title": "",
         "tooltip.message": "Description"
     },
 
     "menu.settings": {
         "title": "Settings",
-        "tooltip.title": null,
+        "tooltip.title": "",
         "tooltip.message": "Description",
 
         "appearance.title": "Appearance",

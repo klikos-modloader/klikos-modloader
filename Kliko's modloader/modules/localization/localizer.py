@@ -17,7 +17,8 @@ class Localizer:
 
     @classmethod
     def initialize(cls, language: str = METADATA["default"]) -> None:
-        if language not in cls.METADATA["available"]: raise ValueError(f"Language '{language}' unavailable! Available lanaguages are: {', '.join(cls.METADATA['available'].keys())}")
+        if language not in cls.METADATA["available"]:
+            raise ValueError(f"Language '{language}' unavailable! Available lanaguages are: {', '.join(cls.METADATA['available'].keys())}")
         if cls.language == language: return
 
         cls.language = language
@@ -28,7 +29,7 @@ class Localizer:
         cls.strings = cls._load_language(default_filepath)
 
         if language != cls.METADATA["default"]:
-            cls.strings.update(cls._load_language(filepath))
+            cls.strings = cls._deep_merge(cls.strings, cls._load_language(filepath))
 
 
     @classmethod
@@ -36,3 +37,12 @@ class Localizer:
         with open(filepath, "r", encoding="utf-8") as file:
             data: dict = json.load(file)
         return data
+
+
+    @classmethod
+    def _deep_merge(cls, dict1: dict, dict2: dict) -> dict:
+        for key, value in dict2.items():
+            if isinstance(value, dict) and key in dict1 and isinstance(dict1[key], dict):
+                dict1[key] = cls._deep_merge(dict1[key], value)
+            else: dict1[key] = value
+        return dict1

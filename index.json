@@ -72,6 +72,14 @@
         "cache_id": "31071BC6A94D59BF3638E3F9F6E2A14F"
     },
     {
+        "name": "Bloxstrap theme (old)",
+        "id": "bloxstrap-theme-old",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/bloxstrap-theme-old.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/bloxstrap-theme-old.png",
+        "cache_id": "CE65ECD7FEF2F4F9C7A56ABBBB05AD64"
+    },
+    {
         "name": "Pink Sky",
         "id": "pink-sky",
         "author": "TheKliko",

@@ -289,6 +289,7 @@ class FluentToggleSwitch(ctk.CTkLabel):
 
     def set(self, value: bool) -> None:
         self.value = value
+        self._set_image_object()
 
 
     def _toggle_value(self) -> None:

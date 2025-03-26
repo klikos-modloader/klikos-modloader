@@ -1,3 +1,4 @@
+import os
 import sys
 import traceback
 import shutil
@@ -25,13 +26,14 @@ def run(e: Exception) -> None:
 
     display_message: str = f"{display_traceback}\n\n{display_note}"
 
-    messagebox.show_error(title=display_header, message=display_message, additional_buttons=({"text": Localizer.strings["buttons.open_crash_log"], "command": lambda: _open_crash_log(directory)},))
+    messagebox.show_error(title=display_header, message=display_message, additional_buttons=({"text": Localizer.strings["buttons.open_crash_log"], "command": lambda: _open_crash_log(directory, Logger.filename)},))
 
     _exit()
 
 
-def _open_crash_log(directory: Path) -> None:
-    open(directory)
+def _open_crash_log(directory: Path, file: str) -> None:
+    os.startfile(directory / file)
+    # open(directory)
 
 
 def _exit() -> None:

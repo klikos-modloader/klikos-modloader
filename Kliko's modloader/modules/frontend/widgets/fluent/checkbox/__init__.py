@@ -254,6 +254,7 @@ class FluentCheckBox(ctk.CTkLabel):
 
     def set(self, value: bool) -> None:
         self.value = value
+        self._set_image_object()
 
 
     def _set_state(self, _) -> None:

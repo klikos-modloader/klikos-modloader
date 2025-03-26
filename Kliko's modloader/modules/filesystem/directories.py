@@ -12,3 +12,6 @@ class Directory:
     CONFIG: Path = ROOT / "config"
     MODS: Path = ROOT / "Mods"
     CACHE: Path = ROOT / "cache"
+    
+    LOCALAPPDATA: Path = Path.home() / "AppData" / "Local"
+    ROBLOX: Path = LOCALAPPDATA / "Roblox"

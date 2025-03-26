@@ -3,8 +3,11 @@
     "buttons.no": "No",
     "buttons.ok": "OK",
     "buttons.cancel": "Cancel",
+    "buttons.refresh": "Refresh",
     "buttons.open_crash_log": "Open crash log",
     "buttons.open_mods_folder": "Open mods folder",
+    "buttons.create_fastflag_profile": "New profile",
+    "buttons.fastflag_presets": "Presets",
     "buttons.github": "Source code",
     "buttons.changelog": "Changelog",
     "buttons.discord": "Join our Discord",
@@ -89,7 +92,7 @@
     "menu.mods": {
         "title": "Mods",
         "tooltip.title": "Mod manager",
-        "tooltip.message": "{project_name} includes an advanced mod manager. Allowing users to enable, disable or adjust the load order for your mods.",
+        "tooltip.message": "{project_name} includes an advanced mod manager. Allowing you to enable, disable or adjust the load order for your mods.",
 
         "dnd_frame": "Drag and drop to import mods",
         "load_order": "Load order:",
@@ -143,7 +146,7 @@
     "menu.integrations": {
         "title": "Integrations",
         "tooltip.title": "",
-        "tooltip.message": "Description",
+        "tooltip.message": "Configure extended functionality.",
 
         "mod_updater.title": "Automatic Mod Updates",
         "mod_updater.description": "Automatically updates compatible mods.",
@@ -173,7 +176,7 @@
     "menu.settings": {
         "title": "Settings",
         "tooltip.title": "",
-        "tooltip.message": "Description",
+        "tooltip.message": "Configure core functionality.",
 
         "appearance.title": "Appearance",
         "appearance.light": "Light",

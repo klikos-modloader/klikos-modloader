@@ -8,5 +8,6 @@ class File:
 
     CONFIG: Path = Directory.CONFIG / "config.json"
     MODS_CONFIG: Path = Directory.CONFIG / "mods.json"
+    FASTFLAGS_CONFIG: Path = Directory.CONFIG / "fastflags.json"
 
     GLOBALBASICSETTINGS: Path = Directory.ROBLOX / "GlobalBasicSettings_13.xml"

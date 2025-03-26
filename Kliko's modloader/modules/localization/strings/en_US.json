@@ -45,9 +45,12 @@
             "download.other": "Failed to download {mod} due to an unknown error.\n{error}"
         },
 
-        "settings": {
-            "restore.title": "Failed to restore default settings!",
-            "restore.permission_denied": "Write permission denied for {path}"
+        "globalbasicsettings": {
+            "update_value.title": "Failed update value!",
+            "update_value.not_an_integer": "Value is not an integer: {value}",
+            "update_value.not_a_float": "Value is not a float: {value}",
+            "update_value.key_error": "Element not found: {element}",
+            "update_value.permission_denied": "Write permission denied for {path}"
         }
     },
 
@@ -122,9 +125,19 @@
     "menu.globalbasicsettings": {
         "title": "GlobalBasicSettings Editor",
         "tooltip.title": "",
-        "tooltip.message": "Configure global Roblox settings. It's recommended that you do not change these settings unless you know what you're doing.",
+        "tooltip.message": "Configure global Roblox settings. You shouldn't change these settings unless you know what you're doing.",
 
-        "failed_to_load": "File not found!"
+        "failed_to_load": "Data failed to load!",
+
+        "element.string": "String",
+        "element.bool": "Boolean",
+        "element.token": "Token",
+        "element.int": "Integer",
+        "element.float": "Float",
+        "element.vector2": "Vector2",
+
+        "element.vector2_x": "X:",
+        "element.vector2_y": "Y:"
     },
 
     "menu.integrations": {

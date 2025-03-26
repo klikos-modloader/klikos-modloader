@@ -174,13 +174,13 @@ class FluentTextBox(ctk.CTkFrame):
         self.insert(0, string)
 
 
-    def delete(self, first_index: int | Literal["end", "insert"], last_index: int | Literal["end", "insert"] | None = None) -> str:
-        return self.entry.delete(first_index, last_index)
+    def delete(self, first_index: int | Literal["end", "insert"], last_index: int | Literal["end", "insert"] | None = None) -> None:
+        self.entry.delete(first_index, last_index)
 
 
-    def insert(self, index: int | Literal["end", "insert"], string: str) -> str:
-        return self.entry.insert(index, string)
-    
+    def insert(self, index: int | Literal["end", "insert"], string: str) -> None:
+        self.entry.insert(index, string)
+
 
     def _set_focus(self, _) -> None:
         if self.focused: return

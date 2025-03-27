@@ -23,12 +23,10 @@ class ProfileError(FastFlagManagerError):
 
 class ProfileAlreadyExistsError(ProfileError):
     name: str
-    path: Path
 
-    def __init__(self, name: str, path: Path) -> None:
-        super().__init__(f"Another directory with the same name already exists: {path.resolve()}")
+    def __init__(self, name: str) -> None:
+        super().__init__(f"FastFlag profile already exists: {name}")
         self.name = name
-        self.path = path
 
 
 class FastFlagManagerPermissionsError(FastFlagManagerError):

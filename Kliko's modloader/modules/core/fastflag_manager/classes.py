@@ -19,7 +19,6 @@ class Profile:
     """
 
     name: str
-    description: str | None
     data: dict
     player: bool
     studio: bool
@@ -31,17 +30,14 @@ class Profile:
             raise ValueError(f"Failed to load FastFlag profile! Name required:\n{json.dumps(data, indent=4)}")
 
         fastflags: dict = data.get("data")  # type: ignore
-        description: str | None = data.get("description")  # type: ignore
         player: bool = data.get("enabled")  # type: ignore
         studio: bool = data.get("enabled_studio")  # type: ignore
 
         if not isinstance(fastflags, dict): fastflags = {}
-        if not isinstance(description, str) and description is not None: description = None
         if not isinstance(player, bool): player = False
         if not isinstance(studio, bool): studio = False
 
         self.name = name
-        self.description = description
         self.data = fastflags
         self.player = player
         self.studio = studio
@@ -90,7 +86,18 @@ class ProfileConfigEditor:
 
         data = cls.read_file()
         data = [item for item in data if item.get("name") != name]
-        data.append({"name": profile.name, "description": profile.description, "enabled": profile.player, "enabled_studio": profile.studio, "data": profile.data})
+        data.append({"name": profile.name, "enabled": profile.player, "enabled_studio": profile.studio, "data": profile.data})
+        cls.write_file(data)
+    
+
+    @classmethod
+    def add_item(cls, name: str) -> None:
+        data = cls.read_file()
+        if name in [item.get("name") for item in data]:
+            raise ProfileAlreadyExistsError(name)
+
+        profile = Profile({"name": name})
+        data.append({"name": profile.name, "enabled": profile.player, "enabled_studio": profile.studio, "data": profile.data})
         cls.write_file(data)
 
 

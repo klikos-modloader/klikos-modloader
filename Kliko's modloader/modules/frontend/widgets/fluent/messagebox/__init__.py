@@ -87,7 +87,7 @@ class FluentMessageBox(ctk.CTkToplevel):
         WARNING: Literal["warning"] = "warning"
         QUESTION: Literal["question"] = "question"
 
-    def __init__(self, title: str | None = None, message: str | None = None, mode: Literal["error", "warning", "question"] | None = None, additional_buttons: Iterable[dict] = tuple(), _on_ok: Callable | None = None, _on_cancel: Callable | None = None) -> None:
+    def __init__(self, title: str | None = None, message: str | None = None, mode: Literal["error", "warning", "question"] | None = None, additional_buttons: Iterable[dict] = tuple(), _on_ok: Callable | None = None, _on_cancel: Callable | None = None, ok_text: str = "OK", cancel_text: str = "Cancel", close_text: str = "Close") -> None:
         if not title and not message:
             raise ValueError("FluentMessageBox: A title or a message is required!")
         
@@ -179,14 +179,14 @@ class FluentMessageBox(ctk.CTkToplevel):
             i += 1
 
         if mode == "question":
-            button1: FluentButton = FluentButton(self.button_frame, text="Ok", width=78, command=lambda: self._on_ok(_on_ok))
+            button1: FluentButton = FluentButton(self.button_frame, text=ok_text, width=78, command=lambda: self._on_ok(_on_ok))
             button1.grid(column=0, row=0, sticky="e", padx=(button_outer_padding if i == 0 else button_gap//2, button_gap//2), pady=button_outer_padding)
             i += 1
-            button2: FluentButton = FluentButton(self.button_frame, text="Cancel", width=78, command=lambda: self._on_cancel(_on_cancel))
+            button2: FluentButton = FluentButton(self.button_frame, text=cancel_text, width=78, command=lambda: self._on_cancel(_on_cancel))
             button2.grid(column=1, row=0, sticky="e", padx=(button_gap//2, button_outer_padding), pady=button_outer_padding//2)
             i += 1
         else:
-            button: FluentButton = FluentButton(self.button_frame, text="Close", width=78, command=self._on_close)
+            button: FluentButton = FluentButton(self.button_frame, text=close_text, width=78, command=self._on_close)
             button.grid(column=1, row=0, sticky="e", padx=(button_outer_padding if i == 0 else button_gap//2, button_outer_padding), pady=button_outer_padding)
             i += 1
 
@@ -331,25 +331,25 @@ class FluentMessageBox(ctk.CTkToplevel):
         return False
 
 
-def show_error(title: str, message: str, additional_buttons: Iterable[dict] = tuple(), blocking: bool = True) -> None:
-    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode="error", additional_buttons=additional_buttons)
+def show_error(title: str, message: str, additional_buttons: Iterable[dict] = tuple(), blocking: bool = True, close_text: str = "Close") -> None:
+    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode="error", additional_buttons=additional_buttons, close_text=close_text)
     if blocking: message_box.wait_until_closed()
 
 
-def show_warning(title: str, message: str, additional_buttons: Iterable[dict] = tuple(), blocking: bool = True) -> None:
-    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode="warning", additional_buttons=additional_buttons)
+def show_warning(title: str, message: str, additional_buttons: Iterable[dict] = tuple(), blocking: bool = True, close_text: str = "Close") -> None:
+    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode="warning", additional_buttons=additional_buttons, close_text=close_text)
     if blocking: message_box.wait_until_closed()
 
 
-def show_info(title: str, message: str, additional_buttons: Iterable[dict] = tuple(), blocking: bool = True) -> None:
-    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode=None, additional_buttons=additional_buttons)
+def show_info(title: str, message: str, additional_buttons: Iterable[dict] = tuple(), blocking: bool = True, close_text: str = "Close") -> None:
+    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode=None, additional_buttons=additional_buttons, close_text=close_text)
     if blocking: message_box.wait_until_closed()
 
 
-def ask_ok_cancel(title: str, message: str) -> bool:
-    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode="question")
+def ask_ok_cancel(title: str, message: str, ok_text: str = "Ok", cancel_text: str = "Cancel") -> bool:
+    message_box: FluentMessageBox = FluentMessageBox(title=title, message=message, mode="question", ok_text=ok_text, cancel_text=cancel_text)
     return message_box.wait_until_closed() or False
 
 
-def ask_ok_cancel_nonblocking(title: str, message: str, on_ok: Callable | None = None, on_cancel: Callable | None = None) -> None:
-    FluentMessageBox(title=title, message=message, mode="question", _on_ok=on_ok, _on_cancel=on_cancel)
+def ask_ok_cancel_nonblocking(title: str, message: str, on_ok: Callable | None = None, on_cancel: Callable | None = None, ok_text: str = "Ok", cancel_text: str = "Cancel") -> None:
+    FluentMessageBox(title=title, message=message, mode="question", _on_ok=on_ok, _on_cancel=on_cancel, ok_text=ok_text, cancel_text=cancel_text)

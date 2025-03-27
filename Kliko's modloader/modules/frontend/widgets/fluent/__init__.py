@@ -20,6 +20,7 @@ from .progress_bar import FluentProgressBar
 from .toplevel import FluentToplevel
 from .dropdown_button import FluentDropdownButton
 from .toggle_switch import FluentToggleSwitch
+from .input_dialog import FluentInputDialog
 
 # Methods
 from .color_theme import apply_color_theme

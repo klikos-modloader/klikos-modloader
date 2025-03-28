@@ -79,6 +79,8 @@ Follow these instructions to install Kliko's modloader.
 
 <h3>Join our discord server</h3>
 
+https://discord.gg/nEjUwdSP9
+<br>
 This is the official support server for Kliko's modloader, join our community to give feedback, ask for help, share your mods, and talk with other mod creators.
 
 <h3>Support</h3>

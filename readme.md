@@ -99,3 +99,8 @@ Find more mods — or share your own — in our #mod-sharing channel.
 
 This project is inspired by <a href='https://github.com/pizzaboxer/bloxstrap'>Bloxstrap</a>, an alternative bootstrapper for Roblox with a bunch of
 extra features. Bloxstrap is what introduced me to the world of Roblox modding and what led to me creating my own mods. However, at the time of writing this, Bloxstrap’s mod support is very limited, even more so when you are managing and developing many different mods at the same time. Because of this, I’ve decided to build my own software dedicated to Roblox modding.
+
+
+<h2 id="disclaimer">Disclaimer</h2>
+
+Kliko’s Modloader is an independently developed project by TheKliko. It is not affiliated with, endorsed by, or associated with Kliko Groep B.V. in any way.

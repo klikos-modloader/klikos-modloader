@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="GitHub Files/images/banner.png" alt="banner"/>
+<img src="images/banner.png" alt="banner"/>
 
 [<img alt="GitHub License" src="https://img.shields.io/github/license/thekliko/klikos-modloader?style=for-the-badge&labelColor=cc0037&color=353639">](https://github.com/TheKliko/klikos-modloader/blob/main/LICENSE)
 [<img alt="GitHub Release" src="https://img.shields.io/github/v/release/thekliko/klikos-modloader?filter=!v*.*.*-beta&style=for-the-badge&labelColor=cc0037&color=353639">](https://github.com/thekliko/klikos-modloader/releases/latest)
@@ -14,9 +14,9 @@
 <h3>Roblox mods made easy</h3>
 
 
-Kliko's modloader is an open-source modloader for <a href="https://www.roblox.com">Roblox</a>, it serves as a replacement for Roblox's default launcher.
+Kliko's modloader is an open-source modloader for <a href="https://www.roblox.com">Roblox</a>, it serves as a replacement for Roblox's default launcher. If you have any questions, please read the FAQ, [check the wiki](https://github.com/klikos-modloader/klikos-modloader/wiki) or join our official [support server](https://discord.gg/nEjUwdSP9P).
 
-<img src="GitHub Files/images/preview.png" alt="preview"/>
+<img src="images/preview.png" alt="preview"/>
 
 
 
@@ -32,7 +32,7 @@ Kliko's modloader is an open-source modloader for <a href="https://www.roblox.co
         <a href="#support-server">Support Server</a>
     </li>
     <li>
-        <a href="#goals-inspiration">Goals & Inspiration</a>
+        <a href="inspiration">Inspiration</a>
     </li>
 </ul>
 
@@ -79,8 +79,6 @@ Follow these instructions to install Kliko's modloader.
 
 <h3>Join our discord server</h3>
 
-https://discord.gg/nEjUwdSP9
-<br>
 This is the official support server for Kliko's modloader, join our community to give feedback, ask for help, share your mods, and talk with other mod creators.
 
 <h3>Support</h3>
@@ -97,22 +95,7 @@ Find more mods — or share your own — in our #mod-sharing channel.
 
 
 
-<h2 id="goals-inspiration">Goals & Inspiration</h2>
+<h2 id="inspiration">Inspiration</h2>
 
-<h3>Goals</h3>
-My goals for this project are:
-<ul>
-    <li>
-        Getting more experience in Python
-    </li>
-    <li>
-        Making Roblox mods accessible to everyone
-    </li>
-    <li>
-        Making a website 😎
-    </li>
-
-</ul>
-
-<h3>Inspiration</h3>
-This project was inspired by <a href='https://github.com/pizzaboxer/bloxstrap'>Bloxstrap</a>, an open-source, alternative bootstrapper for Roblox. Bloxstrap is what introduced me to the Roblox modding community. This project, my Roblox mods and my modding tool would not have existed without it.
+This project is inspired by <a href='https://github.com/pizzaboxer/bloxstrap'>Bloxstrap</a>, an alternative bootstrapper for Roblox with a bunch of
+extra features. Bloxstrap is what introduced me to the world of Roblox modding and what led to me creating my own mods. However, at the time of writing this, Bloxstrap’s mod support is very limited, even more so when you are managing and developing many different mods at the same time. Because of this, I’ve decided to build my own software dedicated to Roblox modding.

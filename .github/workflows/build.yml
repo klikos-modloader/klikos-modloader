@@ -34,7 +34,7 @@ jobs:
           git clone --depth 1 https://github.com/klikos-modloader/CTkFluentWidgets temp_ctkfluentwidgets
           mkdir -p "Kliko's modloader/libraries"
           cp -r temp_ctkfluentwidgets/ctkfluentwidgets "Kliko's modloader/libraries/"
-          rm -rf temp_ctkfluentwidgets
+          Remove-Item -Recurse -Force temp_ctkfluentwidgets
 
       - name: Build (build/ci-build.py)
         run: python build/ci-build.py

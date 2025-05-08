@@ -42,6 +42,7 @@ a = Analysis(
     binaries=[],
     datas=[
         (r"{str(PathObject.TEMP_SOURCE / "modules")}", 'modules'),
+        (r"{str(PathObject.TEMP_SOURCE / "resources")}", 'resources'),
         (r"{str(PathObject.TEMP_SOURCE / "libraries")}", 'libraries'),
         (r"{str(tkdnd_path)}", 'tkdnd')
     ],

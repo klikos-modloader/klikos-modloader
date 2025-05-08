@@ -264,6 +264,7 @@ class ModsSection(ScrollableFrame):
 
 
     def import_mods(self, files_or_directories: tuple[Path, ...]) -> None:
+        Directories.MODS.mkdir(parents=True, exist_ok=True)
         for path in files_or_directories:
             path = path.resolve()
 
@@ -306,7 +307,6 @@ class ModsSection(ScrollableFrame):
                 continue
 
             try:
-                Directories.MODS.mkdir(parents=True, exist_ok=True)
                 if is_font: self._import_font_mod(path)
                 elif mod.archive: filesystem.extract(path, Directories.MODS / mod.name)
                 else: shutil.copytree(path, Directories.MODS / mod.name)

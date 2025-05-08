@@ -7,6 +7,7 @@ License: MIT
 import sys
 import platform
 import argparse
+from pathlib import Path
 
 
 parser = argparse.ArgumentParser()
@@ -31,20 +32,70 @@ if FROZEN:
         if pyi_splash.is_alive(): pyi_splash.close()
     except (ImportError, ModuleNotFoundError): pass
 
+ROOT: Path = Path(__file__).parent.resolve()
+sys.path.insert(0, str(ROOT / "libraries"))
 
-from modules.logger import Logger  # Initialize on import
-from modules.project_data import ProjectData
+
+try:
+    from modules.logger import Logger
+    from modules.project_data import ProjectData
+    from modules.localization import Localizer
+    from modules.interfaces.config import ConfigInterface
+    from modules.filesystem import Directories
+    from modules import exception_handler
+except (ImportError, ModuleNotFoundError) as e:
+    print(f"[CRITICAL] Missing requires libraries!\n{type(e).__name__}: {e}")
+    input("\nPress enter to exit")
+    sys.exit(1)
 
 
 def log_debug_info() -> None:
-    if not FROZEN: Logger.warning("Running in development mode!")
+    if not FROZEN: Logger.warning("Environment not frozen!")
+    if ConfigInterface.dev_mode_enabled(): Logger.debug("Running in developer mode...")
     Logger.debug(f"{ProjectData.NAME} v{ProjectData.VERSION}")
     Logger.debug(f"Platform: {platform.system()} {platform.release()}")
-    Logger.debug(f"Launch arguments: {str(args).removeprefix("Namespace(").removesuffix(")")}")
+    Logger.debug(f"Launch mode: {'menu' if args.menu else 'player' if args.player else 'studio' if args.studio else 'presence' if args.presence else 'undefined'}")
+
+
+def initialize_localization() -> None:
+    Logger.info("Initializing localization...")
+    language: str = ConfigInterface.get_language()
+    Localizer.initialize()
+
+    if ConfigInterface.dev_mode_enabled():
+        Localizer.add_strings_directory(Directories.DEV_TRANSLATIONS)
+
+    try: Localizer.set_language(language)
+    except ValueError:
+        Logger.error(f"Unsupported language: '{language}', reverting to default language")
+        Localizer.set_language(Localizer.Metadata.DEFAULT_LANGUAGE)
 
 
 def main() -> None:
+    Logger.initialize()
+    ConfigInterface.verify_file_integrity()
     log_debug_info()
+
+    try:
+        initialize_localization()
+        if args.menu:
+            from modules.frontend import menu
+            menu.run()
+
+        elif args.player:
+            pass
+
+        elif args.studio:
+            pass
+
+        elif args.presence:
+            pass
+
+    except Exception as e: exception_handler.run(e)
+
+    else:
+        Logger.info("Exit Code 0")
+        sys.exit(0)
 
 
 if __name__ == "__main__":

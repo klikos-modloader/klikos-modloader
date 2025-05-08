@@ -306,6 +306,7 @@ class ModsSection(ScrollableFrame):
                 continue
 
             try:
+                Directories.MODS.mkdir(parents=True, exist_ok=True)
                 if is_font: self._import_font_mod(path)
                 elif mod.archive: filesystem.extract(path, Directories.MODS / mod.name)
                 else: shutil.copytree(path, Directories.MODS / mod.name)

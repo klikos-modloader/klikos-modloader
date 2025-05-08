@@ -26,7 +26,6 @@ class PathObject:
     SPEC_PATH: Path = TEMP / "Kliko's modloader.spec"
     TEMP_SOURCE: Path = TEMP / "source"
     MODULES: Path = TEMP_SOURCE / "modules"
-    CONFIG: Path = TEMP_SOURCE / "config"
     LIBRARIES: Path = TEMP_SOURCE / "libraries"
 
 
@@ -43,7 +42,6 @@ a = Analysis(
     datas=[
         (r"{str(PathObject.TEMP_SOURCE / "modules")}", 'modules'),
         (r"{str(PathObject.TEMP_SOURCE / "libraries")}", 'libraries'),
-        (r"{str(PathObject.TEMP_SOURCE / "config")}", 'config'),
         (r"{str(tkdnd_path)}", 'tkdnd')
     ],
     hiddenimports=["tkinter", "customtkinter", "tkinterdnd2"],

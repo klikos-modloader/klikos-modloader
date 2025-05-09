@@ -2,7 +2,6 @@ from tkinter import TclError, BooleanVar
 from typing import Optional, Callable, TYPE_CHECKING
 
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, ToggleSwitch
-from modules.frontend.functions import get_ctk_image
 from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
 
@@ -84,8 +83,8 @@ class IntegrationsSection(ScrollableFrame):
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
         frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
-        Label(frame, "menu.integrations.content.mod_updates.title", style="body_strong").grid(column=0, row=0, sticky="sw", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
-        Label(frame, "menu.integrations.content.mod_updates.description", style="caption").grid(column=0, row=1, sticky="nw", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.mod_updates.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.mod_updates.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value: bool = ConfigInterface.get("mod_updates")
         switch_var: BooleanVar = BooleanVar(value=value)
         ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("mod_updates", var.get(), "menu.integrations.content.mod_updates.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
@@ -96,8 +95,8 @@ class IntegrationsSection(ScrollableFrame):
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
         frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
-        Label(frame, "menu.integrations.content.multi_instance_launching.title", style="body_strong").grid(column=0, row=0, sticky="sw", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
-        Label(frame, "menu.integrations.content.multi_instance_launching.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption").grid(column=0, row=1, sticky="nw", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.multi_instance_launching.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.multi_instance_launching.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("multi_instance_launching")
         switch_var = BooleanVar(value=value)
         ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("multi_instance_launching", var.get(), "menu.integrations.content.multi_instance_launching.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
@@ -108,8 +107,8 @@ class IntegrationsSection(ScrollableFrame):
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
         frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
-        Label(frame, "menu.integrations.content.discord_rpc.title", style="body_strong").grid(column=0, row=0, sticky="sw", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
-        Label(frame, "menu.integrations.content.discord_rpc.description", style="caption").grid(column=0, row=1, sticky="nw", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.discord_rpc.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.discord_rpc.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("discord_rpc")
         switch_var = BooleanVar(value=value)
         ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("discord_rpc", var.get(), "menu.integrations.content.discord_rpc.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
@@ -120,8 +119,8 @@ class IntegrationsSection(ScrollableFrame):
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
         frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
-        Label(frame, "menu.integrations.content.activity_joining.title", style="body_strong").grid(column=0, row=0, sticky="sw", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
-        Label(frame, "menu.integrations.content.activity_joining.description", style="caption").grid(column=0, row=1, sticky="nw", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.activity_joining.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.activity_joining.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("activity_joining")
         switch_var = BooleanVar(value=value)
         ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("activity_joining", var.get(), "menu.integrations.content.activity_joining.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
@@ -132,8 +131,8 @@ class IntegrationsSection(ScrollableFrame):
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
         frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
-        Label(frame, "menu.integrations.content.show_user_in_rpc.title", style="body_strong").grid(column=0, row=0, sticky="sw", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
-        Label(frame, "menu.integrations.content.show_user_in_rpc.description", style="caption").grid(column=0, row=1, sticky="nw", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.show_user_in_rpc.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.show_user_in_rpc.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("show_user_in_rpc")
         switch_var = BooleanVar(value=value)
         ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("show_user_in_rpc", var.get(), "menu.integrations.content.show_user_in_rpc.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
@@ -144,8 +143,8 @@ class IntegrationsSection(ScrollableFrame):
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
         frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
-        Label(frame, "menu.integrations.content.bloxstrap_rpc_sdk.title", style="body_strong").grid(column=0, row=0, sticky="sw", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
-        Label(frame, "menu.integrations.content.bloxstrap_rpc_sdk.description", style="caption").grid(column=0, row=1, sticky="nw", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.bloxstrap_rpc_sdk.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.integrations.content.bloxstrap_rpc_sdk.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("bloxstrap_rpc_sdk")
         switch_var = BooleanVar(value=value)
         ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("bloxstrap_rpc_sdk", var.get(), "menu.integrations.content.bloxstrap_rpc_sdk.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))

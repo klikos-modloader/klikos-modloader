@@ -7,7 +7,7 @@ from modules.filesystem import Resources
 from modules.interfaces.config import ConfigInterface
 from modules.frontend.functions import get_ctk_image
 
-from .sections import ModsSection, IntegrationsSection, SettingsSection
+from .sections import ModsSection, MarketplaceSection, ModGeneratorSection, FastFlagsSection, GlobalBasicSettingsSection, IntegrationsSection, CustomIntegrationsSection, SettingsSection, AboutSection
 
 from customtkinter import CTkImage  # type: ignore
 
@@ -18,8 +18,14 @@ class App(Root):
     sidebar: Frame
 
     mods_section: ModsSection
+    marketplace_section: MarketplaceSection
+    mod_generator_section: ModGeneratorSection
+    fastflags_section: FastFlagsSection
+    global_basic_settings_section: GlobalBasicSettingsSection
     integrations_section: IntegrationsSection
+    custom_integrations_section: CustomIntegrationsSection
     settings_section: SettingsSection
+    about_section: AboutSection
 
     _NAV_ICON_SIZE: int = 24
     _SIDEBAR_MIN_WIDTH: int = 286
@@ -40,8 +46,14 @@ class App(Root):
 
         # Initialize sections
         self.mods_section = ModsSection(self)
+        self.marketplace_section = MarketplaceSection(self)
+        self.mod_generator_section = ModGeneratorSection(self)
+        self.fastflags_section = FastFlagsSection(self)
+        self.global_basic_settings_section = GlobalBasicSettingsSection(self)
         self.integrations_section = IntegrationsSection(self)
+        self.custom_integrations_section = CustomIntegrationsSection(self)
         self.settings_section = SettingsSection(self)
+        self.about_section = AboutSection(self)
 
         # Default section
         self._set_active_section("mods")

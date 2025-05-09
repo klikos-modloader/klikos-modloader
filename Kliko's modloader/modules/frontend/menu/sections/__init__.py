@@ -1,9 +1,9 @@
 from .mods import ModsSection
-# from .marketplace import MarketplaceSection
-# from .mod_generator import ModGeneratorSection
-# from .fastflags import FastFlagsSection
-# from .global_basic_settings import GlobalBasicSettingsSection
+from .marketplace import MarketplaceSection
+from .mod_generator import ModGeneratorSection
+from .fastflags import FastFlagsSection
+from .global_basic_settings import GlobalBasicSettingsSection
 from .integrations import IntegrationsSection
-# from .custom_integrations import CustomIntegrationsSection
+from .custom_integrations import CustomIntegrationsSection
 from .settings import SettingsSection
-# from .about import AboutSection
+from .about import AboutSection

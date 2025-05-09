@@ -1,6 +1,6 @@
 from .info import NAME, VERSION, DISCORD, REPOSITORY, WIKI, RELEASES, LATEST_RELEASE
-from .licenses import LICENSES
-from .contributors import CONTRIBUTORS, FEATURE_SUGGESTIONS, SPECIAL_THANKS
+from .licenses import LICENSES, License
+from .contributors import CONTRIBUTORS, FEATURE_SUGGESTIONS, SPECIAL_THANKS, Contributor
 
 class ProjectData:
     NAME: str = NAME
@@ -10,7 +10,7 @@ class ProjectData:
     WIKI: str = WIKI
     RELEASES: str = RELEASES
     LATEST_RELEASE: str = LATEST_RELEASE
-    LICENSES: list[dict] = LICENSES
-    CONTRIBUTORS: list[dict] = CONTRIBUTORS
-    FEATURE_SUGGESTIONS: list[dict] = FEATURE_SUGGESTIONS
-    SPECIAL_THANKS: list[dict] = SPECIAL_THANKS
+    LICENSES: list[License] = LICENSES
+    CONTRIBUTORS: list[Contributor] = CONTRIBUTORS
+    FEATURE_SUGGESTIONS: list[Contributor] = FEATURE_SUGGESTIONS
+    SPECIAL_THANKS: list[Contributor] = SPECIAL_THANKS

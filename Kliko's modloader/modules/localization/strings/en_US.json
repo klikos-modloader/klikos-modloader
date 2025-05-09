@@ -149,5 +149,12 @@
 
 
     "menu.about.header.title": "About",
-    "menu.about.header.description": "{app.name} is an open-source modloader for Roblox, allowing users to manage multiple mods with ease."
+    "menu.about.header.description": "{app.name} is an open-source modloader for Roblox, allowing users to manage multiple mods with ease.",
+    "menu.about.header.button.discord": "Join our Discord",
+    "menu.about.header.button.github": "Source Code",
+    "menu.about.header.button.releases": "Changelog",
+    "menu.about.content.licenses": "Licenses",
+    "menu.about.content.contributors": "Contributors",
+    "menu.about.content.feature_suggestions": "Feature Suggestions",
+    "menu.about.content.special_thanks": "Special Thanks"
 }

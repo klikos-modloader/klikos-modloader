@@ -1,17 +1,21 @@
-CONTRIBUTORS: list[dict] = []
+from typing import Optional
 
-FEATURE_SUGGESTIONS: list[dict] = [
-    {
-        "text": "Vortex",
-        "url": r"https://github.com/VolVortex"
-    },
-    {
-        "text": "return_request",
-        "url": r"https://github.com/returnrqt"
-    },
-    {
-        "text": "kw_roblox"
-    }
+
+class Contributor:
+    name: str
+    url: Optional[str]
+
+    def __init__(self, name: str, url: Optional[str] = None):
+        self.name = name
+        self.url = url
+
+
+CONTRIBUTORS: list[Contributor] = []
+
+FEATURE_SUGGESTIONS: list[Contributor] = [
+    Contributor("Vortex", r"https://github.com/VolVortex"),
+    Contributor("return_request", r"https://github.com/returnrqt"),
+    Contributor("kw_roblox")
 ]
 
-SPECIAL_THANKS: list[dict] = []
+SPECIAL_THANKS: list[Contributor] = []

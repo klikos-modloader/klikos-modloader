@@ -52,6 +52,7 @@ class Button(LocalizedCTkButton):
         if "text_color" not in kwargs: kwargs["text_color"] = ("#1A1A1A", "#FFFFFF")
         if "corner_radius" not in kwargs: kwargs["corner_radius"] = 4
         if "height" not in kwargs: kwargs["height"] = 32
+        if "width" not in kwargs: kwargs["width"] = 0
         super().__init__(master, key=key, modification=modification, **kwargs)
         self.secondary = secondary
         self.transparent = transparent

@@ -92,6 +92,7 @@ class Resources:
             INFO: Path = Directories.RESOURCES / "common" / "light" / "info.png"
             CLOSE: Path = Directories.RESOURCES / "common" / "light" / "close.png"
             FOLDER: Path = Directories.RESOURCES / "common" / "light" / "folder.png"
+            ARROW_RIGHT: Path = Directories.RESOURCES / "common" / "light" / "arrow_right.png"
         class Dark:
             BIN: Path = Directories.RESOURCES / "common" / "dark" / "bin.png"
             SUCCESS: Path = Directories.RESOURCES / "common" / "dark" / "success.png"
@@ -101,6 +102,7 @@ class Resources:
             INFO: Path = Directories.RESOURCES / "common" / "dark" / "info.png"
             CLOSE: Path = Directories.RESOURCES / "common" / "dark" / "close.png"
             FOLDER: Path = Directories.RESOURCES / "common" / "dark" / "folder.png"
+            ARROW_RIGHT: Path = Directories.RESOURCES / "common" / "dark" / "arrow_right.png"
 
     class Navigation:
         class Light:
@@ -123,3 +125,14 @@ class Resources:
             CUSTOM_INTEGRATIONS: Path = Directories.RESOURCES / "nav" / "dark" / "custom_integrations.png"
             SETTINGS: Path = Directories.RESOURCES / "nav" / "dark" / "settings.png"
             ABOUT: Path = Directories.RESOURCES / "nav" / "dark" / "about.png"
+
+    class Brands:
+        class Light:
+            GITHUB: Path = Directories.RESOURCES / "brands" / "light" / "github.png"
+            DISCORD: Path = Directories.RESOURCES / "brands" / "light" / "discord.png"
+        class Dark:
+            GITHUB: Path = Directories.RESOURCES / "brands" / "dark" / "github.png"
+            DISCORD: Path = Directories.RESOURCES / "brands" / "dark" / "discord.png"
+        class Normal:
+            GITHUB: Path = Directories.RESOURCES / "brands" / "normal" / "github.png"
+            DISCORD: Path = Directories.RESOURCES / "brands" / "normal" / "discord.png"

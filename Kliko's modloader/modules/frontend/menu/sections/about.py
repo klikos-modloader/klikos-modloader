@@ -19,6 +19,10 @@ class AboutSection(ScrollableFrame):
     _SECTION_PADX: int | tuple[int, int] = (8, 4)
     _SECTION_PADY: int | tuple[int, int] = 8
 
+    _ENTRY_GAP: int = 8
+    _ENTRY_PADDING: tuple[int, int] = (16, 16)
+    _ENTRY_INNER_GAP: int = 8
+
 
     def __init__(self, master):
         super().__init__(master, transparent=False, round=True, border=True, layer=1)
@@ -71,4 +75,23 @@ class AboutSection(ScrollableFrame):
         wrapper.grid_columnconfigure(0, weight=1)
         wrapper.grid_rowconfigure(1, weight=1)
         wrapper.grid(column=0, row=1, sticky="nsew")
+        row_counter: int = -1
+
+        # Banner
+        row_counter += 1
+        banner_frame: Frame = Frame(wrapper, transparent=True)
+        banner_frame.grid(column=0, row=row_counter, sticky="ns", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
+
+        banner_image: CTkImage = get_ctk_image(Resources.BANNER, size=(500, "auto"))
+        Label(banner_frame, image=banner_image).grid(column=0, row=0, sticky="s")
+
+        button_wrapper: Frame = Frame(banner_frame, transparent=True)
+        button_wrapper.grid(column=0, row=1, sticky="n")
+
+        folder_image: CTkImage = get_ctk_image(Resources.Common.Light.FOLDER, Resources.Common.Dark.FOLDER, size=24)
+        Button(button_wrapper, "menu.mods.header.button.open_mods_folder", secondary=True, image=folder_image).grid(column=0, row=0)
+        folder_image = get_ctk_image(Resources.Common.Light.FOLDER, Resources.Common.Dark.FOLDER, size=24)
+        Button(button_wrapper, "menu.mods.header.button.open_mods_folder", secondary=True, image=folder_image).grid(column=1, row=0, padx=(8, 0))
+        folder_image = get_ctk_image(Resources.Common.Light.FOLDER, Resources.Common.Dark.FOLDER, size=24)
+        Button(button_wrapper, "menu.mods.header.button.open_mods_folder", secondary=True, image=folder_image).grid(column=2, row=0, padx=(8, 0))
 # endregion

@@ -75,14 +75,14 @@ class IntegrationsSection(ScrollableFrame):
         wrapper.grid_columnconfigure(0, weight=1)
         wrapper.grid_rowconfigure(1, weight=1)
         wrapper.grid(column=0, row=1, sticky="nsew")
-        row_counter: int = 0
+        row_counter: int = -1
 
 
         # Mod updates
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.integrations.content.mod_updates.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.integrations.content.mod_updates.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value: bool = ConfigInterface.get("mod_updates")
@@ -94,7 +94,7 @@ class IntegrationsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.integrations.content.multi_instance_launching.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.integrations.content.multi_instance_launching.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("multi_instance_launching")
@@ -106,7 +106,7 @@ class IntegrationsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.integrations.content.discord_rpc.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.integrations.content.discord_rpc.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("discord_rpc")
@@ -118,7 +118,7 @@ class IntegrationsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.integrations.content.activity_joining.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.integrations.content.activity_joining.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("activity_joining")
@@ -130,7 +130,7 @@ class IntegrationsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.integrations.content.show_user_in_rpc.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.integrations.content.show_user_in_rpc.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("show_user_in_rpc")
@@ -142,7 +142,7 @@ class IntegrationsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.integrations.content.bloxstrap_rpc_sdk.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.integrations.content.bloxstrap_rpc_sdk.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("bloxstrap_rpc_sdk")

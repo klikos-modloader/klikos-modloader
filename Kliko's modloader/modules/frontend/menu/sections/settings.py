@@ -91,14 +91,14 @@ class SettingsSection(ScrollableFrame):
         wrapper.grid_columnconfigure(0, weight=1)
         wrapper.grid_rowconfigure(1, weight=1)
         wrapper.grid(column=0, row=1, sticky="nsew")
-        row_counter: int = 0
+        row_counter: int = -1
 
 
         # Appearance & Language
         row_counter += 1
         row: Frame = Frame(wrapper, transparent=True)
         row.grid_columnconfigure((0, 1), weight=1, uniform="group")
-        row.grid(column=0, row=row_counter, sticky="nsew")
+        row.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
 
         # Appearance mode
         frame: Frame = Frame(row, layer=2)
@@ -132,7 +132,7 @@ class SettingsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.settings.content.check_for_updates.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.settings.content.check_for_updates.description", lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value: bool = ConfigInterface.get("check_for_updates")
@@ -144,7 +144,7 @@ class SettingsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.settings.content.confirm_launch.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.settings.content.confirm_launch.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("confirm_launch")
@@ -156,7 +156,7 @@ class SettingsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.settings.content.deployment_info.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.settings.content.deployment_info.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("deployment_info")
@@ -168,7 +168,7 @@ class SettingsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.settings.content.force_reinstall.title", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.settings.content.force_reinstall.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("force_reinstall")
@@ -180,7 +180,7 @@ class SettingsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.settings.content.disable_mods.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.settings.content.disable_mods.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("disable_mods")
@@ -192,7 +192,7 @@ class SettingsSection(ScrollableFrame):
         row_counter += 1
         frame = Frame(wrapper, layer=2)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid(column=0, row=row_counter, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
         Label(frame, "menu.settings.content.disable_fastflags.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
         Label(frame, "menu.settings.content.disable_fastflags.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
         value = ConfigInterface.get("disable_fastflags")

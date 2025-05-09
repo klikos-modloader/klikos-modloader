@@ -80,6 +80,7 @@ class Files:
 class Resources:
     FAVICON: Path = Directories.RESOURCES / "favicon.ico"
     LOGO: Path = Directories.RESOURCES / "logo.png"
+    BANNER: Path = Directories.RESOURCES / "banner.png"
 
     class Common:
         class Light:

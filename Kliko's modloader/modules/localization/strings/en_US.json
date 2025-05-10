@@ -90,6 +90,11 @@
 
     "menu.marketplace.header.title": "Community Mods",
     "menu.marketplace.header.description": "Browse mods made by the community",
+    "menu.marketplace.content.failed_to_load.title": "Data failed to load!",
+    "menu.marketplace.content.failed_to_load.message": "Please try again later",
+
+    "menu.marketplace.exception.title.failed_to_load": "Unable to load content",
+    "menu.marketplace.exception.message.unknown": "{exception.type}: {exception.message}",
 
 
     "menu.mod_generator.header.title": "Mod Generator",

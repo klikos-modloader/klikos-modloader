@@ -471,7 +471,7 @@ class ModsSection(ScrollableFrame):
 
         if value not in {none_value, player_value, studio_value, both_value}:
             self.root.send_banner(
-                title_key="menu.mods.exception.title.change_priority",
+                title_key="menu.mods.exception.title.change_status",
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": mod.name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": "ValueError", "{exception.message}": f'Bad value: "{value}". Expected one of "{none_value}", "{player_value}", "{studio_value}", "{both_value}"'}),
@@ -486,7 +486,7 @@ class ModsSection(ScrollableFrame):
 
         except Exception as e:
             self.root.send_banner(
-                title_key="menu.mods.exception.title.change_priority",
+                title_key="menu.mods.exception.title.change_status",
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": mod.name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),

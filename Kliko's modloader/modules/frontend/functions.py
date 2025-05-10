@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional, Literal
 
-from PIL import Image  # type: ignore
+from PIL import Image, ImageDraw  # type: ignore
 from customtkinter import CTkImage  # type: ignore
 
 
@@ -24,3 +24,31 @@ def get_ctk_image(light: Optional[str | Path | Image.Image] = None, dark: Option
 
 def get_image(path: str | Path) -> Image.Image:
     return Image.open(path)
+
+def apply_rounded_corners(image: Image.Image, radius: int = 4) -> Image.Image:
+        diameter: int = radius * 2
+        image = image.convert("RGBA")
+
+        mask: Image.Image = Image.new("L", (diameter, diameter))
+        draw: ImageDraw.ImageDraw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0, diameter, diameter), fill=255)
+        # with Image.open(Assets.RoundedRectangle.Radius4px.BACKGROUND) as mask:
+        #      mask = mask.split()[-1]
+        mask_w, mask_h = mask.size
+        corner_w, corner_h = mask_w//2, mask_h//2
+
+        top_left = mask.crop((0, 0, corner_w, corner_h))
+        top_right = mask.crop((corner_w, 0, mask_w, corner_h))
+        bottom_left = mask.crop((0, corner_h, corner_w, mask_h))
+        bottom_right = mask.crop((corner_w, corner_h, mask_w, mask_h))
+
+        image_w, image_h = image.size
+        final_mask = Image.new("L", (image_w, image_h), 255)
+        final_mask.paste(top_left, (0, 0))
+        final_mask.paste(top_right, (image_w - corner_w, 0))
+        final_mask.paste(bottom_left, (0, image_h - corner_h))
+        final_mask.paste(bottom_right, (image_w - corner_w, image_h - corner_h))
+
+        rounded = Image.new("RGBA", (image_w, image_h))
+        rounded.paste(image, (0, 0), final_mask)
+        return rounded

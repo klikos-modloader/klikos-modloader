@@ -62,6 +62,7 @@ class Directories:
     MODS: Path = ROOT / "Mods"
     VERSIONS: Path = ROOT / "Versions"
     CACHE: Path = ROOT / "cache"
+    MARKETPLACE_CACHE: Path = CACHE / "marketplace"
     MEIPASS: Optional[Path] = Path(sys._MEIPASS) if FROZEN else None  # type: ignore
     RESOURCES: Path = (MEIPASS if FROZEN else ROOT) / "resources"  # type: ignore
 
@@ -75,6 +76,7 @@ class Files:
     CONFIG: Path = Directories.CONFIG / "config.json"
     STATE: Path = Directories.CONFIG / "state.json"
     MOD_CONFIG: Path = Directories.CONFIG / "mods.json"
+    MARKETPLACE_CACHE_INDEX: Path = Directories.MARKETPLACE_CACHE / "index.json"
 
 
 class Resources:
@@ -99,6 +101,7 @@ class Resources:
             CLOSE: Path = Directories.RESOURCES / "common" / "light" / "close.png"
             FOLDER: Path = Directories.RESOURCES / "common" / "light" / "folder.png"
             ARROW_RIGHT: Path = Directories.RESOURCES / "common" / "light" / "arrow_right.png"
+            DOWNLOAD: Path = Directories.RESOURCES / "common" / "light" / "download.png"
         class Dark:
             BIN: Path = Directories.RESOURCES / "common" / "dark" / "bin.png"
             SUCCESS: Path = Directories.RESOURCES / "common" / "dark" / "success.png"
@@ -109,6 +112,7 @@ class Resources:
             CLOSE: Path = Directories.RESOURCES / "common" / "dark" / "close.png"
             FOLDER: Path = Directories.RESOURCES / "common" / "dark" / "folder.png"
             ARROW_RIGHT: Path = Directories.RESOURCES / "common" / "dark" / "arrow_right.png"
+            DOWNLOAD: Path = Directories.RESOURCES / "common" / "dark" / "download.png"
 
     class Navigation:
         class Light:
@@ -131,6 +135,19 @@ class Resources:
             CUSTOM_INTEGRATIONS: Path = Directories.RESOURCES / "nav" / "dark" / "custom_integrations.png"
             SETTINGS: Path = Directories.RESOURCES / "nav" / "dark" / "settings.png"
             ABOUT: Path = Directories.RESOURCES / "nav" / "dark" / "about.png"
+
+    class Large:
+        class Light:
+            WIFI_OFF: Path = Directories.RESOURCES / "large" / "light" / "wifi_off.png"
+        class Dark:
+            WIFI_OFF: Path = Directories.RESOURCES / "large" / "dark" / "wifi_off.png"
+
+    class Marketplace:
+        MASK: Path = Directories.RESOURCES / "marketplace" / "mask.png"
+        class Light:
+            PLACEHOLDER: Path = Directories.RESOURCES / "marketplace" / "light" / "placeholder.png"
+        class Dark:
+            PLACEHOLDER: Path = Directories.RESOURCES / "marketplace" / "dark" / "placeholder.png"
 
     class Brands:
         class Light:

@@ -1,1 +1,1 @@
-from .color_picker import ColorPicker
+from .flex_box import FlexBox

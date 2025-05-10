@@ -86,6 +86,7 @@ class Resources:
         STUDIO: Path = Directories.RESOURCES / "logo" / "studio.png"
         CHRISTMAS: Path = Directories.RESOURCES / "logo" / "christmas.png"
         VALENTINE: Path = Directories.RESOURCES / "logo" / "valentine.png"
+        TOAST: Path = Directories.RESOURCES / "logo" / "toast.png"
 
     class Common:
         class Light:

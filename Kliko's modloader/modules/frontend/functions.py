@@ -16,9 +16,10 @@ def get_ctk_image(light: Optional[str | Path | Image.Image] = None, dark: Option
     else:
         width, height = light.size
         ratio: float = width / height
-        if size[0] == "auto": (size[1], int(size[1]*ratio))
+        if size[0] == "auto": size = (int(size[1]*ratio), size[1])
         elif size[1] == "auto": size = (size[0], int(size[0]/ratio))
-    return CTkImage(light, dark, size)  # type: ignore
+    image: CTkImage = CTkImage(light, dark, size)
+    return image  # type: ignore
 
 
 def get_image(path: str | Path) -> Image.Image:

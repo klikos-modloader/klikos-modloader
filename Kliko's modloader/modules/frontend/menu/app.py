@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Any
 from datetime import datetime
 
 from modules.project_data import ProjectData
@@ -30,6 +30,8 @@ class App(Root):
 
     _NAV_ICON_SIZE: int = 24
     _SIDEBAR_MIN_WIDTH: int = 286
+    _SIDEBAR_LOGO_SIZE: Any = ("auto", 48)
+    _sidebar_easter_egg_click_counter: int = 0
 
 
     def __init__(self) -> None:
@@ -84,10 +86,21 @@ class App(Root):
             month: int = date.month
             day: int = date.day
             try:
-                if month == 12 and day in {24, 25, 26}: return get_ctk_image(Resources.Logo.CHRISTMAS, size=48)
-                elif month == 2 and day == 14: return get_ctk_image(Resources.Logo.VALENTINE, size=48)
+                if month == 12 and day in {24, 25, 26}: return get_ctk_image(Resources.Logo.CHRISTMAS, size=self._SIDEBAR_LOGO_SIZE)
+                elif month == 2 and day == 14: return get_ctk_image(Resources.Logo.VALENTINE, size=self._SIDEBAR_LOGO_SIZE)
             except FileNotFoundError: pass
-            return get_ctk_image(Resources.Logo.DEFAULT, size=48)
+            return get_ctk_image(Resources.Logo.DEFAULT, size=self._SIDEBAR_LOGO_SIZE)
+
+        def sidebar_easter_egg(logo_label: Label, appname_label: Label, appversion_label: Label) -> None:
+            self._sidebar_easter_egg_click_counter += 1
+            if self._sidebar_easter_egg_click_counter != 5: return
+            try:
+                logo_label.configure(image=get_ctk_image(Resources.Logo.TOAST, size=self._SIDEBAR_LOGO_SIZE))
+                appname_label.configure(text="ToastLoader")
+                appname_label._localizer_string_key = "ToastLoader"
+                appversion_label.configure(text="#CATSARETHEBEST")
+                appversion_label._localizer_string_key = "#CATSARETHEBEST"
+            except Exception: pass
 
         self.sidebar.grid_columnconfigure(0, weight=1)
         self.sidebar.grid_rowconfigure(1, weight=1)
@@ -97,9 +110,13 @@ class App(Root):
         header.grid_columnconfigure(1, weight=1)
         header.grid(column=0, row=0, sticky="nsew", padx=16, pady=16)
         logo: CTkImage = get_sidebar_logo()
-        Label(header, image=logo, width=48, height=48).grid(column=0, row=0, rowspan=2, sticky="nsew", padx=(0, 12))
-        Label(header, key=ProjectData.NAME, style="subtitle").grid(column=1, row=0, sticky="ew")
-        Label(header, key="menu.sidebar.version", modification=lambda string: Localizer.format(string, {"{app.version}": ProjectData.VERSION}), style="caption").grid(column=1, row=1, sticky="ew")
+        logo_label: Label = Label(header, image=logo)
+        logo_label.grid(column=0, row=0, rowspan=2, padx=(0, 12), sticky="nsew")
+        appname_label: Label = Label(header, key=ProjectData.NAME, style="subtitle")
+        appname_label.grid(column=1, row=0, sticky="ew")
+        appversion_label: Label = Label(header, key="menu.sidebar.version", modification=lambda string: Localizer.format(string, {"{app.version}": ProjectData.VERSION}), style="caption")
+        appversion_label.grid(column=1, row=1, sticky="ew")
+        logo_label.bind("<ButtonPress-1>", lambda _: sidebar_easter_egg(logo_label, appname_label, appversion_label))
 
         # Main navigation
         navigation: Frame = Frame(self.sidebar, transparent=True)
@@ -115,32 +132,34 @@ class App(Root):
 
 
     def _get_nav_icon(self, key: Literal["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations", "settings", "about"]) -> CTkImage | None:
-        match key:
-            case "mods":
-                try: return get_ctk_image(Resources.Navigation.Light.MODS, Resources.Navigation.Dark.MODS, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "mod_generator":
-                try: return get_ctk_image(Resources.Navigation.Light.MOD_GENERATOR, Resources.Navigation.Dark.MOD_GENERATOR, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "marketplace":
-                try: return get_ctk_image(Resources.Navigation.Light.MARKETPLACE, Resources.Navigation.Dark.MARKETPLACE, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "fastflags":
-                try: return get_ctk_image(Resources.Navigation.Light.FASTFLAGS, Resources.Navigation.Dark.FASTFLAGS, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "global_basic_settings":
-                try: return get_ctk_image(Resources.Navigation.Light.GLOBAL_BASIC_SETTINGS, Resources.Navigation.Dark.GLOBAL_BASIC_SETTINGS, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "integrations":
-                try: return get_ctk_image(Resources.Navigation.Light.INTEGRATIONS, Resources.Navigation.Dark.INTEGRATIONS, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "custom_integrations":
-                try: return get_ctk_image(Resources.Navigation.Light.CUSTOM_INTEGRATIONS, Resources.Navigation.Dark.CUSTOM_INTEGRATIONS, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "settings":
-                try: return get_ctk_image(Resources.Navigation.Light.SETTINGS, Resources.Navigation.Dark.SETTINGS, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case "about":
-                try: return get_ctk_image(Resources.Navigation.Light.ABOUT, Resources.Navigation.Dark.ABOUT, self._NAV_ICON_SIZE)
-                except Exception: return None
-            case _: return None
+        try: return get_ctk_image(getattr(Resources.Navigation.Light, key.upper(), None), getattr(Resources.Navigation.Dark, key.upper(), None), self._NAV_ICON_SIZE)
+        except ValueError: return None
+        # match key:
+        #     case "mods":
+        #         try: return get_ctk_image(Resources.Navigation.Light.MODS, Resources.Navigation.Dark.MODS, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "mod_generator":
+        #         try: return get_ctk_image(Resources.Navigation.Light.MOD_GENERATOR, Resources.Navigation.Dark.MOD_GENERATOR, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "marketplace":
+        #         try: return get_ctk_image(Resources.Navigation.Light.MARKETPLACE, Resources.Navigation.Dark.MARKETPLACE, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "fastflags":
+        #         try: return get_ctk_image(Resources.Navigation.Light.FASTFLAGS, Resources.Navigation.Dark.FASTFLAGS, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "global_basic_settings":
+        #         try: return get_ctk_image(Resources.Navigation.Light.GLOBAL_BASIC_SETTINGS, Resources.Navigation.Dark.GLOBAL_BASIC_SETTINGS, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "integrations":
+        #         try: return get_ctk_image(Resources.Navigation.Light.INTEGRATIONS, Resources.Navigation.Dark.INTEGRATIONS, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "custom_integrations":
+        #         try: return get_ctk_image(Resources.Navigation.Light.CUSTOM_INTEGRATIONS, Resources.Navigation.Dark.CUSTOM_INTEGRATIONS, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "settings":
+        #         try: return get_ctk_image(Resources.Navigation.Light.SETTINGS, Resources.Navigation.Dark.SETTINGS, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case "about":
+        #         try: return get_ctk_image(Resources.Navigation.Light.ABOUT, Resources.Navigation.Dark.ABOUT, self._NAV_ICON_SIZE)
+        #         except Exception: return None
+        #     case _: return None

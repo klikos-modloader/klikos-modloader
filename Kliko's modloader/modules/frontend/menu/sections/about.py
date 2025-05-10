@@ -75,11 +75,11 @@ class AboutSection(ScrollableFrame):
         button_wrapper.grid(column=0, row=2, sticky="w", pady=(8, 0))
 
         github_image: CTkImage = get_ctk_image(Resources.Brands.Light.GITHUB, Resources.Brands.Dark.GITHUB, size=20)
-        Button(button_wrapper, "menu.about.header.button.github", secondary=True, image=github_image).grid(column=0, row=0)
-        Button(button_wrapper, "menu.about.header.button.releases", secondary=True, image=github_image).grid(column=1, row=0, padx=(8, 0))
+        Button(button_wrapper, "menu.about.header.button.github", secondary=True, image=github_image, command=lambda: webbrowser.open_new_tab(ProjectData.REPOSITORY)).grid(column=0, row=0)
+        Button(button_wrapper, "menu.about.header.button.releases", secondary=True, image=github_image, command=lambda: webbrowser.open_new_tab(ProjectData.RELEASES)).grid(column=1, row=0, padx=(8, 0))
 
         discord_image: CTkImage = get_ctk_image(Resources.Brands.Light.DISCORD, Resources.Brands.Dark.DISCORD, size=20)
-        Button(button_wrapper, "menu.about.header.button.discord", secondary=True, image=discord_image).grid(column=2, row=0, padx=(8, 0))
+        Button(button_wrapper, "menu.about.header.button.discord", secondary=True, image=discord_image, command=lambda: webbrowser.open_new_tab(ProjectData.DISCORD)).grid(column=2, row=0, padx=(8, 0))
 
 
     def _load_content(self, master) -> None:

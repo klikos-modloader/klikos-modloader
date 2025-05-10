@@ -55,7 +55,7 @@
 
 
     "menu.mods.header.title": "Mods",
-    "menu.mods.header.description": "Configure your mods",
+    "menu.mods.header.description": "Manage your mods",
     "menu.mods.header.button.open_mods_folder": "Open mods folder",
     "menu.mods.content.dnd_target_frame": "Drag and drop to import mods",
     "menu.mods.content.load_order": "Load order",
@@ -89,23 +89,23 @@
 
 
     "menu.marketplace.header.title": "Community Mods",
-    "menu.marketplace.header.description": "Description",
+    "menu.marketplace.header.description": "Browse mods made by the community",
 
 
     "menu.mod_generator.header.title": "Mod Generator",
-    "menu.mod_generator.header.description": "Description",
+    "menu.mod_generator.header.description": "Creating mods has never been easier",
 
 
     "menu.fastflags.header.title": "FastFlags",
-    "menu.fastflags.header.description": "Description",
+    "menu.fastflags.header.description": "Customize your {roblox.common} experience by adjusting client settings",
 
 
     "menu.global_basic_settings.header.title": "Global Basic Settings",
-    "menu.global_basic_settings.header.description": "Description",
+    "menu.global_basic_settings.header.description": "Configure global {roblox.common} settings",
 
 
     "menu.integrations.header.title": "Integrations",
-    "menu.integrations.header.description": "Description",
+    "menu.integrations.header.description": "Configure extended functionality",
     "menu.integrations.content.mod_updates.title": "Automatic Mod Updates",
     "menu.integrations.content.mod_updates.description": "Automatically update compatible mods",
     "menu.integrations.content.multi_instance_launching.title": "Multi-Instance Launching",
@@ -121,11 +121,11 @@
 
 
     "menu.custom_integrations.header.title": "Custom Integrations",
-    "menu.custom_integrations.header.description": "Description",
+    "menu.custom_integrations.header.description": "Add your own integrations",
 
 
     "menu.settings.header.title": "Settings",
-    "menu.settings.header.description": "Description",
+    "menu.settings.header.description": "Configure your settings",
     "menu.settings.content.appearance.title": "Appearance Mode",
     "menu.settings.content.appearance.light": "{appearance.light}",
     "menu.settings.content.appearance.dark": "{appearance.dark}",
@@ -154,7 +154,8 @@
     "menu.about.header.button.github": "Source Code",
     "menu.about.header.button.releases": "Changelog",
     "menu.about.content.licenses": "Licenses",
-    "menu.about.content.contributors": "Contributors",
-    "menu.about.content.feature_suggestions": "Feature Suggestions",
-    "menu.about.content.special_thanks": "Special Thanks"
+    "menu.about.content.credits": "Credits",
+    "menu.about.content.credits.contributors": "Contributors",
+    "menu.about.content.credits.feature_suggestions": "Feature Suggestions",
+    "menu.about.content.credits.special_thanks": "Special Thanks"
 }

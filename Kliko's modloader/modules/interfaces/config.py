@@ -28,12 +28,12 @@ class ConfigInterface:
             "h": 600
         },
 
-        "mod_updates": False,
+        "mod_updates": True,
         "multi_instance_launching": False,
-        "discord_rpc": False,
+        "discord_rpc": True,
         "activity_joining": False,
         "show_user_in_rpc": False,
-        "bloxstrap_rpc_sdk": False
+        "bloxstrap_rpc_sdk": True
     }
 
 

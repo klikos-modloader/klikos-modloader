@@ -1,4 +1,5 @@
 from typing import Literal
+from datetime import datetime
 
 from modules.project_data import ProjectData
 from modules.localization import Localizer
@@ -78,6 +79,16 @@ class App(Root):
 
 
     def configure_sidebar(self) -> None:
+        def get_sidebar_logo() -> CTkImage:
+            date: datetime = datetime.now()
+            month: int = date.month
+            day: int = date.day
+            try:
+                if month == 12 and day in {24, 25, 26}: return get_ctk_image(Resources.Logo.CHRISTMAS, size=48)
+                elif month == 2 and day == 14: return get_ctk_image(Resources.Logo.VALENTINE, size=48)
+            except FileNotFoundError: pass
+            return get_ctk_image(Resources.Logo.DEFAULT, size=48)
+
         self.sidebar.grid_columnconfigure(0, weight=1)
         self.sidebar.grid_rowconfigure(1, weight=1)
 
@@ -85,7 +96,7 @@ class App(Root):
         header: Frame = Frame(self.sidebar, transparent=True)
         header.grid_columnconfigure(1, weight=1)
         header.grid(column=0, row=0, sticky="nsew", padx=16, pady=16)
-        logo: CTkImage = get_ctk_image(Resources.LOGO, size=48)
+        logo: CTkImage = get_sidebar_logo()
         Label(header, image=logo, width=48, height=48).grid(column=0, row=0, rowspan=2, sticky="nsew", padx=(0, 12))
         Label(header, key=ProjectData.NAME, style="subtitle").grid(column=1, row=0, sticky="ew")
         Label(header, key="menu.sidebar.version", modification=lambda string: Localizer.format(string, {"{app.version}": ProjectData.VERSION}), style="caption").grid(column=1, row=1, sticky="ew")

@@ -63,7 +63,7 @@ class GlobalBasicSettingsSection(ScrollableFrame):
         header.grid(column=0, row=0, sticky="nsew", pady=(0,16))
 
         Label(header, "menu.global_basic_settings.header.title", style="title", autowrap=True).grid(column=0, row=0, sticky="ew")
-        Label(header, "menu.global_basic_settings.header.description", style="caption", autowrap=True).grid(column=0, row=1, sticky="ew")
+        Label(header, "menu.global_basic_settings.header.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="ew")
 
 
     def _load_content(self, master) -> None:

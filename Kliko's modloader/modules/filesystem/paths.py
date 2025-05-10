@@ -79,8 +79,13 @@ class Files:
 
 class Resources:
     FAVICON: Path = Directories.RESOURCES / "favicon.ico"
-    LOGO: Path = Directories.RESOURCES / "logo.png"
     BANNER: Path = Directories.RESOURCES / "banner.png"
+
+    class Logo:
+        DEFAULT: Path = Directories.RESOURCES / "logo" / "default.png"
+        STUDIO: Path = Directories.RESOURCES / "logo" / "studio.png"
+        CHRISTMAS: Path = Directories.RESOURCES / "logo" / "christmas.png"
+        VALENTINE: Path = Directories.RESOURCES / "logo" / "valentine.png"
 
     class Common:
         class Light:

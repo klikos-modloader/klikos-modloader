@@ -2,7 +2,7 @@ from tkinter import TclError
 from typing import TYPE_CHECKING
 import webbrowser
 
-from modules.project_data import ProjectData, License, Contributor
+from modules.project_data import ProjectData, License
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button
 from modules.frontend.functions import get_ctk_image
 from modules.localization import Localizer
@@ -20,6 +20,7 @@ class AboutSection(ScrollableFrame):
     _SECTION_PADX: int | tuple[int, int] = (8, 4)
     _SECTION_PADY: int | tuple[int, int] = 8
 
+    _SECTION_GAP: int = 16
     _ENTRY_GAP: int = 8
     _ENTRY_PADDING: tuple[int, int] = (16, 16)
     _ENTRY_INNER_GAP: int = 8
@@ -86,15 +87,24 @@ class AboutSection(ScrollableFrame):
         wrapper.grid_columnconfigure(0, weight=1)
         wrapper.grid_rowconfigure(1, weight=1)
         wrapper.grid(column=0, row=1, sticky="nsew")
-        row_counter: int = -1
+        section_counter: int = -1
+
+
+        # # Banner
+        # section_counter += 1
+        # banner_frame = Frame(wrapper, transparent=True)
+        # banner_frame.grid(column=0, row=section_counter, sticky="ns", pady=0 if section_counter == 0 else (self._SECTION_GAP, 0))
+
+        # banner_image: CTkImage = get_ctk_image(Resources.BANNER, size=(500, "auto"))
+        # Label(banner_frame, image=banner_image).grid(column=0, row=0)
 
 
         # Licenses
         if ProjectData.LICENSES:
-            row_counter += 1
+            section_counter += 1
             licenses_frame: Frame = Frame(wrapper, transparent=True)
             licenses_frame.grid_columnconfigure(0, weight=1)
-            licenses_frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
+            licenses_frame.grid(column=0, row=section_counter, sticky="nsew", pady=0 if section_counter == 0 else (self._SECTION_GAP, 0))
 
             Label(licenses_frame, "menu.about.content.licenses", style="subtitle", autowrap=True).grid(column=0, row=0, sticky="nsew")
 
@@ -110,7 +120,7 @@ class AboutSection(ScrollableFrame):
                     box.grid(column=0, row=i, sticky="nsew", pady=0 if i == 0 else (self._ENTRY_GAP, 0))
 
             else:
-                license_wrapper.grid_columnconfigure((0, 1), weight=1)
+                license_wrapper.grid_columnconfigure((0, 1), weight=1, uniform="group")
                 for i, license in enumerate(ProjectData.LICENSES):
                     column: int = i % 2
                     row: int = i // 2
@@ -123,48 +133,51 @@ class AboutSection(ScrollableFrame):
         has_feature_suggestions: bool = bool(ProjectData.FEATURE_SUGGESTIONS)
         has_special_thanks: bool = bool(ProjectData.SPECIAL_THANKS)
         if has_contributors or has_feature_suggestions or has_special_thanks:
-            row_counter += 1
+            section_counter += 1
             contributor_suggestion_thanks_wrapper = Frame(wrapper, transparent=True)
-            contributor_suggestion_thanks_wrapper.grid_columnconfigure(list(range(sum([has_contributors, has_feature_suggestions, has_special_thanks]))), weight=1, uniform="group")
-            contributor_suggestion_thanks_wrapper.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
+            contributor_suggestion_thanks_wrapper.grid_columnconfigure(list(range(int(has_contributors) + int(has_feature_suggestions) + int(has_special_thanks))), weight=1, uniform="group")
+            contributor_suggestion_thanks_wrapper.grid(column=0, row=section_counter, sticky="nsew", pady=0 if section_counter == 0 else (self._SECTION_GAP, 0))
 
+            Label(contributor_suggestion_thanks_wrapper, "menu.about.content.credits", style="subtitle", autowrap=True).grid(column=0, row=0, sticky="nsew", pady=(0, self._ENTRY_GAP))
+            column = -1
             if has_contributors:
+                column += 1
                 contributors_box: Frame = Frame(contributor_suggestion_thanks_wrapper, layer=2)
                 contributors_box.grid_columnconfigure(0, weight=1)
-                contributors_box.grid(column=0, row=0, sticky="nsew")
+                contributors_box.grid(column=0, row=1, sticky="nsew")
 
                 column_wrapper: Frame = Frame(contributors_box, transparent=True)
                 column_wrapper.grid_columnconfigure(0, weight=1)
                 column_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._ENTRY_PADDING[0], pady=self._ENTRY_PADDING[1])
 
-                Label(column_wrapper, "menu.about.content.contributors", style="subtitle", autowrap=True).grid(column=0, row=0, sticky="nsew")
-                pass
+                Label(column_wrapper, "menu.about.content.credits.contributors", style="body_strong", autowrap=True).grid(column=0, row=0, columnspan=3, sticky="nsew")
+                for i, contributor in enumerate(ProjectData.CONTRIBUTORS): Label(column_wrapper, contributor.name, style="body", autowrap=True, url=contributor.url).grid(column=column, row=i+1, pady=(4, 0), sticky="ew")
 
             if has_feature_suggestions:
-                column = 1 if has_contributors else 0
+                column += 1
                 feature_suggestions_box: Frame = Frame(contributor_suggestion_thanks_wrapper, layer=2)
                 feature_suggestions_box.grid_columnconfigure(0, weight=1)
-                feature_suggestions_box.grid(column=column, row=0, sticky="nsew", padx=0 if column == 0 else (self._ENTRY_GAP, 0))
+                feature_suggestions_box.grid(column=column, row=1, sticky="nsew", padx=0 if column == 0 else (self._ENTRY_GAP, 0))
 
                 column_wrapper = Frame(feature_suggestions_box, transparent=True)
                 column_wrapper.grid_columnconfigure(0, weight=1)
                 column_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._ENTRY_PADDING[0], pady=self._ENTRY_PADDING[1])
 
-                Label(column_wrapper, "menu.about.content.feature_suggestions", style="subtitle", autowrap=True).grid(column=0, row=0, sticky="nsew")
-                pass
+                Label(column_wrapper, "menu.about.content.credits.feature_suggestions", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="nsew")
+                for i, contributor in enumerate(ProjectData.FEATURE_SUGGESTIONS): Label(column_wrapper, contributor.name, style="body", autowrap=True, url=contributor.url).grid(column=0, row=i+1, pady=(4, 0), sticky="ew")
 
             if has_special_thanks:
-                column = 2 if has_contributors and has_feature_suggestions else 1 if has_contributors or has_feature_suggestions else 0
+                column += 1
                 special_thanks_box: Frame = Frame(contributor_suggestion_thanks_wrapper, layer=2)
                 special_thanks_box.grid_columnconfigure(0, weight=1)
-                special_thanks_box.grid(column=2, row=0, sticky="nsew", padx=0 if column == 0 else (self._ENTRY_GAP, 0))
+                special_thanks_box.grid(column=column, row=1, sticky="nsew", padx=0 if column == 0 else (self._ENTRY_GAP, 0))
 
                 column_wrapper = Frame(special_thanks_box, transparent=True)
                 column_wrapper.grid_columnconfigure(0, weight=1)
                 column_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._ENTRY_PADDING[0], pady=self._ENTRY_PADDING[1])
 
-                Label(column_wrapper, "menu.about.content.special_thanks", style="subtitle", autowrap=True).grid(column=0, row=0, sticky="nsew")
-                pass
+                Label(column_wrapper, "menu.about.content.credits.special_thanks", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="nsew")
+                for i, contributor in enumerate(ProjectData.SPECIAL_THANKS): Label(column_wrapper, contributor.name, style="body", autowrap=True, url=contributor.url).grid(column=0, row=i+1, pady=(4, 0), sticky="ew")
 # endregion
 
 

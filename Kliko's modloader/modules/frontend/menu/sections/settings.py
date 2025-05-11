@@ -224,7 +224,7 @@ class SettingsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{setting.name}": Localizer.Key("menu.settings.content.appearance.title")}),
                 message_key="menu.settings.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": "ValueError", "{exception.message}": f'Bad value: "{value}". Expected one of "{light_value}", "{dark_value}", "{system_value}"'}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
             return
 
@@ -239,7 +239,7 @@ class SettingsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{setting.name}": Localizer.Key("menu.settings.content.appearance.title")}),
                 message_key="menu.settings.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 
 
@@ -256,7 +256,7 @@ class SettingsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{setting.name}": Localizer.Key("menu.settings.content.language.title")}),
                 message_key="menu.settings.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 
 
@@ -274,6 +274,6 @@ class SettingsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{setting.name}": name}),
                 message_key="menu.settings.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 # endregion

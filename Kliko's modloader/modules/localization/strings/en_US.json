@@ -102,6 +102,11 @@
     "menu.marketplace.mod_window.window_title": "{app.name} | Mod Browser",
     "menu.marketplace.mod_window.mod_author": "By {mod.author}",
     "menu.marketplace.mod_window.mod_author_unknown": "Unknown creator",
+    "menu.marketplace.mod_window.popup.mod_exists.message": "Another mod with the same name already exists, do you want to replace it?",
+    "menu.marketplace.banner.download_success.title": "Mod download complete!",
+    "menu.marketplace.banner.download_success.message": "\"{mod.name}\" has been added to your mods folder",
+    "menu.marketplace.banner.download_failed.title": "Mod download failed: \"{mod.name}\"",
+    "menu.marketplace.banner.download_failed.message": "{exception.type}: {exception.message}",
 
     "menu.marketplace.exception.title.failed_to_load": "Unable to load content",
     "menu.marketplace.exception.message.unknown": "{exception.type}: {exception.message}",

@@ -16,7 +16,7 @@ import requests  # type: ignore
 from requests import Response, HTTPError, RequestException, ConnectionError  # type: ignore
 
 
-def get(url: str, timeout: int | tuple[int, int] = (5, 10), attempts: int = 3, cache: bool = True, ignore_cache: bool = False) -> Response:
+def get(url: str, timeout: int | tuple[int, int] = (5, 10), stream: bool = False, attempts: int = 3, cache: bool = True, ignore_cache: bool = False) -> Response:
     """
     Makes a HTTP GET request to the specified URL.
 
@@ -28,7 +28,7 @@ def get(url: str, timeout: int | tuple[int, int] = (5, 10), attempts: int = 3, c
         ignore_cache (bool, optional): Whether the cached responses should be ignored. Default is False.
     """
 
-    last_exception = None
+    last_exception: Exception | None = None
 
     for i in range(1, attempts+1):
         try:
@@ -36,7 +36,7 @@ def get(url: str, timeout: int | tuple[int, int] = (5, 10), attempts: int = 3, c
                 return Cache.get(url)
 
             start: float = time.time()
-            response: Response = requests.get(url, timeout=timeout)
+            response: Response = requests.get(url, timeout=timeout, stream=stream)
             response.raise_for_status()
             duration: float = (time.time() - start) * 1000
 
@@ -56,7 +56,6 @@ def get(url: str, timeout: int | tuple[int, int] = (5, 10), attempts: int = 3, c
             Logger.warning(f"GET {url} -> ConnectionError: {e} (Attempt {i}/{attempts})")
 
         except RequestException as e:
-            response = getattr(e, "response", None)
             last_exception = e
             Logger.warning(f"GET {url} -> RequestException {type(e).__name__}: {e} (Attempt {i}/{attempts})")
 
@@ -77,7 +76,7 @@ def get(url: str, timeout: int | tuple[int, int] = (5, 10), attempts: int = 3, c
 #         ignore_cache (bool, optional): Whether the cached responses should be ignored. Default is False.
 #     """
 
-#     last_exception = None
+#     last_exception: Exception | None = None
 
 #     for i in range(1, attempts+1):
 #         try:
@@ -105,7 +104,6 @@ def get(url: str, timeout: int | tuple[int, int] = (5, 10), attempts: int = 3, c
 #             Logger.warning(f"HEAD {url} -> ConnectionError: {e} (Attempt {i}/{attempts})")
 
 #         except RequestException as e:
-#             response = getattr(e, "response", None)
 #             last_exception = e
 #             Logger.warning(f"HEAD {url} -> RequestException {type(e).__name__}: {e} (Attempt {i}/{attempts})")
 

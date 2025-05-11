@@ -19,6 +19,134 @@ from customtkinter import CTkImage  # type: ignore
 from PIL import Image  # ype: ignore
 
 
+TEST_DATA: list[dict] = [
+    {
+        "id": "klikos-mod",
+        "name": "Kliko's mod",
+        "author": "TheKliko",
+        "description": "This mod changes the Roblox UI by giving it a red-pink gradient.\n\n- Gradient: #FF006E -> #990000 (45°)\n- Menu icons\n- Avatar editor\n- Skybox\n- Controller, VR and High-Res support",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/klikos-mod.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/klikos-mod.png"
+    },
+    {
+        "id": "24k-gradient-gold-theme",
+        "name": "24K Gradient Gold Theme",
+        "author": "thefrenchguy4",
+        "description": "The golden theme for the elite.\n\nWhat does it contain?\n- The theme itself\n - Golden Skybox\n - High quality icons (the same quality as the default ones)\n - Support for VR (I have no clue)\n - Custom Avatar Editor (RX Tower)\n - 2013 Angular cursor (in Misc folder)",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/24k-gradient-gold-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/24k-gradient-gold-theme.png"
+    },
+    {
+        "id": "networks-red-theme",
+        "name": "Network's Red Theme",
+        "author": "netsoftworks",
+        "description": "This is basically my previous theme that was discontinuted and now I'm reviving it back with a fresh branding.",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/networks-red-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/networks-red-theme.png"
+    },
+    {
+        "id": "blue-star-theme",
+        "name": "Blue Star Theme",
+        "author": "thefrenchguy4",
+        "description": "After multiple requests for a blue theme and seeing most of the blue themes were deprecated, I delivered.\n\nWhat does it contain?\n- The theme itself (obviously)\n- A variant of the emote wheel (in the Miscellaneous folder)",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/blue-star-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/blue-star-theme.png"
+    },
+    {
+        "id": "fishstrap-theme",
+        "name": "Fishstrap Theme",
+        "description": "This mod changes the Roblox UI by giving it a Fishstrap-themed gradient.\n\n- Gradient: #0A293E -> #1B699C\n- Menu icons\n- Controller, VR and High-Res support",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/fishstrap-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/fishstrap-theme.png"
+    },
+    {
+        "id": "l337",
+        "name": "L337",
+        "author": "dooM",
+        "description": "Experience Roblox like a true haxx0r! Converts all text into basic leet.",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/l337.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/l337.png"
+    },
+    {
+        "id": "content-deleted",
+        "name": "Content Deleted",
+        "author": "dooM",
+        "description": "Are you tired of seeing words? Do you ever picture a perfect future in which free speech is abolished in favor of censorship? Look no further! Introducing cutting-edge technologies specifically created for our Chinese Communist Party.",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/content-deleted.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/content-deleted.png"
+    },
+    {
+        "id": "translucency",
+        "name": "Translucency",
+        "author": "dooM",
+        "description": "Make UI elements transparent.",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/translucency.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/translucency.png"
+    },
+    {
+        "id": "bloxstrap-theme",
+        "name": "Bloxstrap theme",
+        "description": "This mod changes the Roblox UI by giving it a Bloxstrap-themed gradient.\n\n- Gradient: #DB59AB -> #3D38C0\n- Menu icons\n- Controller, VR and High-Res support",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/bloxstrap-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/bloxstrap-theme.png"
+    },
+    {
+        "id": "bloxstrap-theme-old",
+        "name": "Bloxstrap theme (old)",
+        "description": "This mod changes the Roblox UI by giving it the old Bloxstrap gradient.\n\n- Gradient: #A011FE -> #5460F9\n- Menu icons\n- Controller and VR support",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/bloxstrap-theme-old.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/bloxstrap-theme-old.png"
+    },
+    {
+        "id": "pink-sky",
+        "name": "Pink Sky",
+        "author": "TheKliko",
+        "description": "Adds a pink skybox",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/pink-sky.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/pink-sky.png"
+    },
+    {
+        "id": "ubff-theme",
+        "name": "UBFF theme",
+        "description": "Based on the Useful Bloxstrap FF's community server.\n\n- Gradient: #648BD9 -> #FA94D7\n- Menu icons\n- Controller and VR support",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/ubff-theme.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/ubff-theme.png"
+    },
+    {
+        "id": "blue-emote-wheel",
+        "name": "Blue Emote Wheel",
+        "description": "Adds a blue emote wheel",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/blue-emote-wheel.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/blue-emote-wheel.png"
+    },
+    {
+        "id": "old-login-screen",
+        "name": "Old login screen (remake)",
+        "description": "A remake of the 2017 login screen",
+        "author": "TheKliko",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/old-login-screen.zip",
+        "thumbnail": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/thumbnails/old-login-screen.png"
+    },
+    {
+        "id": "old-death-sound",
+        "name": "Old death sound",
+        "description": "Brings back the classic 'OOF' death sound",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/old-death-sound.zip"
+    },
+    {
+        "id": "wilhelm-scream-death-sound",
+        "name": "Wilhelm Scream (death sound)",
+        "description": "Adds the iconic 'Wilhelm Scream' death sound",
+        "download": "https://github.com/TheKliko/klikos-modloader/raw/refs/heads/marketplace-v2/mods/wilhelm-scream-death-sound.zip"
+    }
+]
+
+
 # region MarketplaceSection
 class MarketplaceSection(ScrollableFrame):
     loaded: bool = False
@@ -93,8 +221,9 @@ class MarketplaceSection(ScrollableFrame):
 
     def _fetch_community_mods(self, wrapper: Frame) -> None:
         try:
-            response: Response = requests.get(Api.GitHub.MARKETPLACE)
-            data: list[dict] = response.json()
+            # response: Response = requests.get(Api.GitHub.MARKETPLACE)
+            # data: list[dict] = response.json()
+            data = TEST_DATA
             mods: list[CommunityMod] = []
             for item in data:
                 try: mods.append(CommunityMod(item, self.placeholder_thumbnail))
@@ -117,7 +246,7 @@ class MarketplaceSection(ScrollableFrame):
             title_key="menu.marketplace.exception.title.failed_to_load",
             message_key="menu.marketplace.exception.message.unknown",
             message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(error).__module__}.{type(error).__qualname__}", "{exception.message}": str(error)}),
-            mode="error"
+            mode="error", auto_close_after_ms=6000
         )
 
 

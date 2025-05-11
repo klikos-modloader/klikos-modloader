@@ -137,7 +137,7 @@ class BannerSystem(Toplevel):
     def close_banner(self, banner_or_id: str | Banner) -> None:
         if isinstance(banner_or_id, str): id: str = banner_or_id
         else: id = banner_or_id.id
-        banner: Banner | None = self._banners.pop(id)
+        banner: Banner | None = self._banners.pop(id, None)
         if banner is not None and banner.winfo_exists(): banner.destroy()
         if not self._banners: self._active = False
 

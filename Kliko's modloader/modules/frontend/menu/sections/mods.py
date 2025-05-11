@@ -274,7 +274,7 @@ class ModsSection(ScrollableFrame):
                     title_modification=lambda string: Localizer.format(string, {"{mod.name}": path.stem}),
                     message_key="menu.mods.exception.message.file_not_found",
                     message_modification=lambda string: Localizer.format(string, {"{path}": str(path)}),
-                    mode="warning"
+                    mode="warning", auto_close_after_ms=6000
                 )
                 continue
 
@@ -292,7 +292,7 @@ class ModsSection(ScrollableFrame):
                         title_modification=lambda string: Localizer.format(string, {"{mod.name}": path.stem}),
                         message_key="menu.mods.exception.message.unsupported_filetype",
                         message_modification=lambda string: Localizer.format(string, {"{filetype}": path.suffix}),
-                        mode="warning"
+                        mode="warning", auto_close_after_ms=6000
                     )
                     continue
 
@@ -302,7 +302,7 @@ class ModsSection(ScrollableFrame):
                     title_key="menu.mods.exception.title.import",
                     title_modification=lambda string: Localizer.format(string, {"{mod.name}": target_name}),
                     message_key="menu.mods.exception.message.mod_exists",
-                    mode="warning"
+                    mode="warning", auto_close_after_ms=6000
                 )
                 continue
 
@@ -317,7 +317,7 @@ class ModsSection(ScrollableFrame):
                     title_modification=lambda string: Localizer.format(string, {"{mod.name}": target_name}),
                     message_key="menu.mods.exception.message.unknown",
                     message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                    mode="error"
+                    mode="error", auto_close_after_ms=6000
                 )
                 continue
 
@@ -343,7 +343,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": mod.name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 # endregion
 
@@ -365,26 +365,26 @@ class ModsSection(ScrollableFrame):
                 title_key="menu.mods.exception.title.rename",
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": old_name}),
                 message_key="menu.mods.exception.message.empty_filename",
-                mode="warning"
+                mode="warning", auto_close_after_ms=6000
             )
 
-        except FileNotFoundError:  # TODO
+        except FileNotFoundError:
             event.widget.set(old_name)
             self.root.send_banner(
                 title_key="menu.mods.exception.title.rename",
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": old_name}),
                 message_key="menu.mods.exception.file_not_found",
                 message_modification=lambda string: Localizer.format(string, {"{path}": str(old_path)}),
-                mode="warning"
+                mode="warning", auto_close_after_ms=6000
             )
 
-        except FileExistsError:  # TODO
+        except FileExistsError:
             event.widget.set(old_name)
             self.root.send_banner(
                 title_key="menu.mods.exception.title.rename",
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": old_name}),
                 message_key="menu.mods.exception.message.mod_exists",
-                mode="warning"
+                mode="warning", auto_close_after_ms=6000
             )
 
         except ReservedFileNameError:
@@ -394,7 +394,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": old_name}),
                 message_key="menu.mods.exception.message.reserved_filename",
                 message_modification=lambda string: Localizer.format(string, {"{value}": new_name.upper()}),
-                mode="warning"
+                mode="warning", auto_close_after_ms=6000
             )
 
         except TrailingDotError:
@@ -403,7 +403,7 @@ class ModsSection(ScrollableFrame):
                 title_key="menu.mods.exception.title.rename",
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": old_name}),
                 message_key="menu.mods.exception.message.trailing_dot_filename",
-                mode="warning"
+                mode="warning", auto_close_after_ms=6000
             )
 
         except InvalidFileNameError:
@@ -413,7 +413,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": old_name}),
                 message_key="menu.mods.exception.message.invalid_filename",
                 message_modification=lambda string: Localizer.format(string, {"{value}": new_name.upper()}),
-                mode="warning"
+                mode="warning", auto_close_after_ms=6000
             )
 
         except Exception as e:
@@ -423,7 +423,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": old_name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 # endregion
 
@@ -444,7 +444,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": mod.name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": "ValueError", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 
         if old_value == new_value: return
@@ -457,7 +457,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": mod.name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 # endregion
 
@@ -475,7 +475,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": mod.name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": "ValueError", "{exception.message}": f'Bad value: "{value}". Expected one of "{none_value}", "{player_value}", "{studio_value}", "{both_value}"'}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
             return
         
@@ -490,7 +490,7 @@ class ModsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{mod.name}": mod.name}),
                 message_key="menu.mods.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 # endregion
 # endregion

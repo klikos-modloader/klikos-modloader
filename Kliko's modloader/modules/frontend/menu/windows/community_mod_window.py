@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING
-from tkinter import TclError
+from tkinter import TclError, messagebox
+import shutil
 
 from modules.project_data import ProjectData
 from modules.localization import Localizer
-from modules.filesystem import Resources
+from modules.filesystem import Resources, DownloadStream, Directories
 from modules.frontend.widgets import Toplevel, Frame, Label, Button, ProgressBar
 from modules.frontend.widgets.basic.utils import FontStorage, WinAccentTracker
 if TYPE_CHECKING: from modules.frontend.widgets import Root
@@ -31,6 +32,8 @@ class CommunityModWindow(Toplevel):
 
     _progress_bar: ProgressBar
     _downloading: bool = False
+    _current_progress: float = 0
+    _progress_update_threshold: float = 0.05
 
 
     def __init__(self, master: "Root", mod: CommunityMod):
@@ -134,9 +137,68 @@ class CommunityModWindow(Toplevel):
     def download(self) -> None:
         if self._downloading: return
         self._downloading = True
-        self.progress_bar.set(0)
+
+        # Check existing mods
+        if Directories.MODS.exists():
+            existing_mods = {(path.stem.lower() if path.is_file() else path.name.lower()): path for path in Directories.MODS.iterdir()}
+            if self.mod.name.lower() in existing_mods:
+                if not messagebox.askokcancel(ProjectData.NAME, Localizer.Strings["menu.marketplace.mod_window.popup.mod_exists.message"], parent=self):
+                    self._downloading = False
+                    return
+
+                existing_mod: Path = existing_mods[self.mod.name.lower()]
+                if existing_mod.is_dir(): shutil.rmtree(existing_mod)
+                else: existing_mod.unlink()
+        else:
+            Directories.MODS.mkdir(parents=True, exist_ok=True)
+
+
+        self._current_progress = 0
+        self.progress_bar.set(self._current_progress)
         self.show_progress_bar()
 
+        target: Path = Directories.MODS / f"{self.mod.name}.zip"
+        stream: DownloadStream = DownloadStream(on_progress=self._on_progress, on_success=self._on_success, on_error=self._on_error, on_cancel=self._on_cancel)
+        stream.download_file(self.mod.download_url, target)
+
+
+    def _on_progress(self, downloaded: int, total: int) -> None:
+        if total <= 0: return
+        progress: float = max(0, min(1, downloaded / total))
+        if abs(progress - self._current_progress) >= self._progress_update_threshold:
+            self._current_progress = progress
+            self.progress_bar.set(self._current_progress)
+        elif downloaded == total:
+            self._current_progress = 1
+            self.progress_bar.set(self._current_progress)
+
+
+    def _on_success(self) -> None:
+        self.hide_progress_bar()
+        self._downloading = False
+
+        self.root.send_banner(
+            title_key="menu.marketplace.banner.download_success.title",
+            message_key="menu.marketplace.banner.download_success.message",
+            message_modification=lambda string: Localizer.format(string, {"{mod.name}": self.mod.name}),
+            mode="success", auto_close_after_ms=3000
+        )
+
+
+    def _on_error(self, error: Exception) -> None:
+        self.hide_progress_bar()
+        self._downloading = False
+
+        self.root.send_banner(
+            title_key="menu.marketplace.banner.download_failed.title",
+            title_modification=lambda string: Localizer.format(string, {"{mod.name}": self.mod.name}),
+            message_key="menu.marketplace.banner.download_failed.message",
+            message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(error).__module__}.{type(error).__qualname__}", "{exception.message}": str(error)}),
+            mode="error", auto_close_after_ms=6000
+        )
+
+
+    def _on_cancel(self) -> None:
         self.hide_progress_bar()
         self._downloading = False
 # endregion

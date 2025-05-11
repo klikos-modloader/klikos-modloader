@@ -166,6 +166,6 @@ class IntegrationsSection(ScrollableFrame):
                 title_modification=lambda string: Localizer.format(string, {"{setting.name}": name}),
                 message_key="menu.integrations.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
-                mode="error"
+                mode="error", auto_close_after_ms=6000
             )
 # endregion

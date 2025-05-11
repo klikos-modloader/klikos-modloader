@@ -10,3 +10,4 @@ from .label import Label
 from .scrollable_frame import ScrollableFrame
 from .textbox import Textbox
 from .toggle_switch import ToggleSwitch
+from .progress_bar import ProgressBar

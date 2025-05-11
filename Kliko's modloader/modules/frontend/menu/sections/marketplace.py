@@ -1,131 +1,22 @@
 from tkinter import TclError
 from threading import Thread
-from typing import Optional, TYPE_CHECKING
-from io import BytesIO
-from pathlib import Path
-import json
-import time
-import hashlib
+from typing import TYPE_CHECKING
 
 from modules.logger import Logger
 from modules.project_data import ProjectData
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button, FlexBox
-from modules.frontend.functions import get_ctk_image, apply_rounded_corners
+if TYPE_CHECKING: from modules.frontend.widgets import Root
+from modules.frontend.functions import get_ctk_image, crop_to_fit
 from modules.localization import Localizer
-from modules.filesystem import Files, Directories, Resources
-from modules import filesystem
+from modules.filesystem import Resources
 from modules.networking import requests, Response, Api
 
-if TYPE_CHECKING: from modules.frontend.widgets import Root
+from ..dataclasses import CommunityMod
+from ..windows import CommunityModWindow
+
 
 from customtkinter import CTkImage  # type: ignore
 from PIL import Image  # ype: ignore
-
-
-# region CommunityMod
-class CommunityMod:
-    id: str
-    name: str
-    download_url: str
-    description: Optional[str]
-    owner: Optional[str]
-    thumbnail_url: Optional[str]
-
-    _thumbnail_placeholder: tuple[Image.Image, Image.Image]
-    _THUMBNAIL_CACHE_DURATION: int = 604800  # 7 days
-
-
-    def __init__(self, data: dict, placeholder_thumbnail: tuple[Image.Image, Image.Image]):
-        id: str | None = data.get("id")
-        name: str | None = data.get("name")
-        download_url: str | None = data.get("download")
-
-        if id is None: raise ValueError("Mod ID cannot be None")
-        if name is None: raise ValueError("Mod name cannot be None")
-        if download_url is None: raise ValueError("Mod download URL cannot be None")
-
-        self.id = id
-        self.name = name
-        self.download_url = download_url
-
-        self.description = data.get("description")
-        self.author = data.get("author")
-        self.thumbnail_url = data.get("thumbnail")
-        self._thumbnail_placeholder = placeholder_thumbnail
-
-
-# region thumbnail
-    def get_thumbnail(self) -> Image.Image | tuple[Image.Image, Image.Image]:
-        if not self.thumbnail_url: return self._thumbnail_placeholder
-
-        target: Path = Directories.MARKETPLACE_CACHE / f"{self.id}.png"
-        if not target.exists() or not Files.MARKETPLACE_CACHE_INDEX.exists():
-            return self._attempt_thumbnail_download()
-
-        with open(Files.MARKETPLACE_CACHE_INDEX) as file:
-            data: dict = json.load(file)
-        item: dict | None = data.get(self.id)
-        if not item: return self._attempt_thumbnail_download()
-
-        url: str | None = item.get("url")
-        md5: str | None = item.get("md5")
-        timestamp: int | None = item.get("timestamp")
-
-        if (
-            not url or
-            not md5 or
-            not timestamp or
-            url != self.thumbnail_url or
-            md5 != self._get_md5(target) or
-            timestamp < (time.time() - self._THUMBNAIL_CACHE_DURATION)
-        ): return self._attempt_thumbnail_download()
-
-        try: return Image.open(target)
-        except Exception: return self._thumbnail_placeholder
-
-
-    def _attempt_thumbnail_download(self) -> Image.Image | tuple[Image.Image, Image.Image]:
-        try: return self._download_thumbnail()
-        except Exception as e:
-            Logger.warning(f"Failed to download thumbnail: '{self.id}'! {type(e).__name__}: {e}", prefix="marketplace")
-            return self._thumbnail_placeholder
-
-
-    def _download_thumbnail(self) -> Image.Image:
-        Logger.info(f"Downloading thumbnail: '{self.id}'...", prefix="marketplace")
-
-        response: Response = requests.get(self.thumbnail_url, attempts=1, cache=False)  # type: ignore
-
-        with BytesIO(response.content) as buffer:
-            image: Image.Image = Image.open(buffer)
-            image.load()
-        Directories.MARKETPLACE_CACHE.mkdir(parents=True, exist_ok=True)
-        target: Path = Directories.MARKETPLACE_CACHE / f"{self.id}.png"
-        image.save(target)
-        
-        if Files.MARKETPLACE_CACHE_INDEX.exists():
-            with open(Files.MARKETPLACE_CACHE_INDEX) as file:
-                data: dict = json.load(file)
-        else: data = {}
-
-        md5: str = hashlib.md5(response.content).hexdigest().upper()
-        timestamp: int = int(time.time())
-        data[self.id] = {"url": self.thumbnail_url, "md5": md5, "timestamp": timestamp}
-
-        with open(Files.MARKETPLACE_CACHE_INDEX, "w") as file:
-            json.dump(data, file, indent=4)
-
-        return image
-
-
-    def _get_md5(self, path: Path) -> str:
-            hasher = hashlib.md5()
-            with open(path, "rb") as file:
-                for chunk in iter(lambda: file.read(4096), b""):
-                    hasher.update(chunk)
-            return hasher.hexdigest().upper()
-# endregion
-# endregion
 
 
 # region MarketplaceSection
@@ -142,9 +33,8 @@ class MarketplaceSection(ScrollableFrame):
     _ENTRY_INNER_GAP: int = 8
     _COLUMN_WIDTH: int = 255
     _ENTRY_INNER_WIDTH: int = _COLUMN_WIDTH - 2 * _ENTRY_PADDING[0]
-    _ENTRY_THUMBNAIL_ASPECT_RATIO: float = 16/9
-    _ENTRY_THUMBNAIL_SIZE: tuple[int, int] = (_ENTRY_INNER_WIDTH, int(_ENTRY_INNER_WIDTH/_ENTRY_THUMBNAIL_ASPECT_RATIO))
-    _ROW_HEIGHT: int = _ENTRY_THUMBNAIL_SIZE[1]+2*_ENTRY_PADDING[1]+_ENTRY_INNER_GAP*2+28*2+32  # 28 = label, 32 = button
+    _ENTRY_THUMBNAIL_SIZE: tuple[int, int] = (_ENTRY_INNER_WIDTH, int(_ENTRY_INNER_WIDTH/CommunityMod.THUMBNAIL_ASPECT_RATIO))
+    _ROW_HEIGHT: int = _ENTRY_THUMBNAIL_SIZE[1]+2*_ENTRY_PADDING[1]+_ENTRY_INNER_GAP*2+28+32  # 28 = label, 32 = button
 
 
     def __init__(self, master):
@@ -236,7 +126,7 @@ class MarketplaceSection(ScrollableFrame):
         wrapper.grid_columnconfigure(0, weight=1)
         flexbox.grid(column=0, row=0, sticky="nsew")
 
-        download_image: CTkImage = get_ctk_image(Resources.Common.Light.DOWNLOAD, Resources.Common.Dark.DOWNLOAD, size=24)
+        button_image: CTkImage = get_ctk_image(Resources.Common.Light.OPEN_EXTERNAL, Resources.Common.Dark.OPEN_EXTERNAL, size=24)
 
         for mod in mods:
             frame: Frame = flexbox.add_item()
@@ -249,36 +139,23 @@ class MarketplaceSection(ScrollableFrame):
             image_label.grid(column=0, row=0, sticky="nsew")
 
             Label(content, mod.name, style="body_strong", autowrap=False, wraplength=self._ENTRY_INNER_WIDTH).grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_INNER_GAP, 0))
-            Label(content, mod.author, style="caption", autowrap=False, wraplength=self._ENTRY_INNER_WIDTH).grid(column=0, row=2, sticky="nsew")
-            Button(content, width=self._ENTRY_INNER_WIDTH, height=32, image=download_image).grid(column=0, row=3, sticky="nsew", pady=(self._ENTRY_INNER_GAP, 0))
+            Button(content, width=self._ENTRY_INNER_WIDTH, height=32, image=button_image, secondary=True, command=lambda mod=mod: self.show_mod_window(mod)).grid(column=0, row=3, sticky="nsew", pady=(self._ENTRY_INNER_GAP, 0))
 
             self.after(100, self._load_mod_thumbnail, mod, image_label)
         return
 
 
     def _load_mod_thumbnail(self, mod: CommunityMod, image_label: Label) -> None:
-        def resize_and_crop(image: Image.Image, size: tuple[int, int]) -> Image.Image:
-            if size == image.size: return image.copy()
-            w, h = image.size
-            ratio = w/h
-            new_h = int(size[0]/ratio)
-            method = Image.Resampling.LANCZOS if w > size[0] else Image.Resampling.BICUBIC
-            resized = image.resize((size[0], new_h), method)
-            if new_h > size[1]:
-                excess = new_h - size[1]
-                margin = int(excess/2)
-                resized = resized.crop((0, margin, size[0], size[1]+margin))
-            return resized
-
-
         thumbnail: Image.Image | tuple[Image.Image, Image.Image] = mod.get_thumbnail()
         thumbnail_size: tuple[int, int] = self._ENTRY_THUMBNAIL_SIZE
-        if isinstance(thumbnail, tuple): image: CTkImage = get_ctk_image(resize_and_crop(thumbnail[0], thumbnail_size), resize_and_crop(thumbnail[1], thumbnail_size), size=thumbnail_size)
-        else: image = get_ctk_image(resize_and_crop(thumbnail, thumbnail_size), size=thumbnail_size)
+        if isinstance(thumbnail, tuple): image: CTkImage = get_ctk_image(crop_to_fit(thumbnail[0], mod.THUMBNAIL_ASPECT_RATIO), crop_to_fit(thumbnail[1], mod.THUMBNAIL_ASPECT_RATIO), size=thumbnail_size)
+        else: image = get_ctk_image(crop_to_fit(thumbnail, mod.THUMBNAIL_ASPECT_RATIO), size=thumbnail_size)
         image_label.configure(image=image, width=thumbnail_size[0], height=thumbnail_size[1])
 # endregion
 
 
 # region functions
+    def show_mod_window(self, mod: CommunityMod) -> None:
+        CommunityModWindow(self.root, mod)
 # endregion
 # endregion

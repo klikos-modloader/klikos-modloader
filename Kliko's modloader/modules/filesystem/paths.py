@@ -102,6 +102,7 @@ class Resources:
             FOLDER: Path = Directories.RESOURCES / "common" / "light" / "folder.png"
             ARROW_RIGHT: Path = Directories.RESOURCES / "common" / "light" / "arrow_right.png"
             DOWNLOAD: Path = Directories.RESOURCES / "common" / "light" / "download.png"
+            OPEN_EXTERNAL: Path = Directories.RESOURCES / "common" / "light" / "open_external.png"
         class Dark:
             BIN: Path = Directories.RESOURCES / "common" / "dark" / "bin.png"
             SUCCESS: Path = Directories.RESOURCES / "common" / "dark" / "success.png"
@@ -113,6 +114,7 @@ class Resources:
             FOLDER: Path = Directories.RESOURCES / "common" / "dark" / "folder.png"
             ARROW_RIGHT: Path = Directories.RESOURCES / "common" / "dark" / "arrow_right.png"
             DOWNLOAD: Path = Directories.RESOURCES / "common" / "dark" / "download.png"
+            OPEN_EXTERNAL: Path = Directories.RESOURCES / "common" / "dark" / "open_external.png"
 
     class Navigation:
         class Light:

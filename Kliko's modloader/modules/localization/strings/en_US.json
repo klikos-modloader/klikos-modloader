@@ -21,6 +21,7 @@
 
 
 
+
     "launcher.deployment_info.channel": "Channel: {value}",
     "launcher.deployment_info.version": "Version: {value}",
     "launcher.deployment_info.guid": "GUID: {value}",
@@ -42,6 +43,7 @@
 
 
 
+
     "menu.sidebar.version": "Version {app.version}",
     "menu.sidebar.navigation.mods": "Mods",
     "menu.sidebar.navigation.marketplace": "Community Mods",
@@ -52,6 +54,8 @@
     "menu.sidebar.navigation.custom_integrations": "Custom Integrations",
     "menu.sidebar.navigation.settings": "Settings",
     "menu.sidebar.navigation.about": "About",
+
+
 
 
     "menu.mods.header.title": "Mods",
@@ -88,25 +92,39 @@
     "menu.mods.exception.message.unknown": "{exception.type}: {exception.message}",
 
 
+
+
     "menu.marketplace.header.title": "Community Mods",
     "menu.marketplace.header.description": "Browse mods made by the community",
     "menu.marketplace.content.failed_to_load.title": "Data failed to load!",
     "menu.marketplace.content.failed_to_load.message": "Please try again later",
 
+    "menu.marketplace.mod_window.window_title": "{app.name} | Mod Browser",
+    "menu.marketplace.mod_window.mod_author": "By {mod.author}",
+    "menu.marketplace.mod_window.mod_author_unknown": "Unknown creator",
+
     "menu.marketplace.exception.title.failed_to_load": "Unable to load content",
     "menu.marketplace.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
 
 
     "menu.mod_generator.header.title": "Mod Generator",
     "menu.mod_generator.header.description": "Creating mods has never been easier",
 
 
+
+
     "menu.fastflags.header.title": "FastFlags",
     "menu.fastflags.header.description": "Customize your {roblox.common} experience by adjusting client settings",
 
 
+
+
     "menu.global_basic_settings.header.title": "Global Basic Settings",
     "menu.global_basic_settings.header.description": "Configure global {roblox.common} settings",
+
+
 
 
     "menu.integrations.header.title": "Integrations",
@@ -125,8 +143,12 @@
     "menu.integrations.content.bloxstrap_rpc_sdk.description": "Allow games to customize your RPC status",
 
 
+
+
     "menu.custom_integrations.header.title": "Custom Integrations",
     "menu.custom_integrations.header.description": "Add your own integrations",
+
+
 
 
     "menu.settings.header.title": "Settings",
@@ -151,6 +173,8 @@
 
     "menu.settings.exception.title.failed_to_update": "Unable to update setting: \"{setting.name}\"",
     "menu.settings.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
 
 
     "menu.about.header.title": "About",

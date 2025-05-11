@@ -3,7 +3,7 @@ from pathlib import Path
 
 from .root_extensions import Banner, BannerSystem
 
-from customtkinter import CTk, set_appearance_mode  # type: ignore
+from customtkinter import CTk, ScalingTracker, set_appearance_mode  # type: ignore
 from tkinterdnd2 import TkinterDnD  # type: ignore
 
 
@@ -27,6 +27,7 @@ class Root(CTk, TkinterDnD.DnDWrapper):
         else: self.geometry(f"{width}x{height}")
 
         self.bind("<ButtonPress-1>", lambda event: event.widget.focus_set())
+        # ScalingTracker.add_window(self._on_scaling_change, self)
 
 
     def send_banner(self, title_key: Optional[str] = None, title_modification: Optional[Callable[[str], str]] = None, message_key: Optional[str] = None, message_modification: Optional[Callable[[str], str]] = None, mode: Literal["success", "warning", "error", "attention", "info", "neutral"] = "neutral", icon_visible: bool = True, can_close: bool = True, auto_close_after_ms: int = 0) -> str:
@@ -37,3 +38,10 @@ class Root(CTk, TkinterDnD.DnDWrapper):
     def close_banner(self, banner_or_id: str | Banner) -> None:
         if self.BannerSystem is None: raise RuntimeError("Root: BannerSystem was not initialized!")
         return self.BannerSystem.close_banner(banner_or_id=banner_or_id)
+
+
+    # def _on_scaling_change(self, widget_scaling: float, window_scaling: float) -> None:
+    #     self.update_idletasks()
+    #     width: int = int(self.winfo_width() / window_scaling)
+    #     height: int = int(self.winfo_height() / window_scaling)
+    #     self.geometry(f"{width}x{height}")

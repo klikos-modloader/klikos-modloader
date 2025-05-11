@@ -24,3 +24,24 @@ def get_ctk_image(light: Optional[str | Path | Image.Image] = None, dark: Option
 
 def get_image(path: str | Path) -> Image.Image:
     return Image.open(path)
+
+
+
+def crop_to_fit(image: Image.Image, target_ratio: float) -> Image.Image:
+    w, h = image.size
+    ratio = w/h
+    if ratio == target_ratio: return image.copy()
+
+    if ratio > target_ratio:
+        new_h: int = h
+        new_w: int = int(target_ratio * new_h)
+
+    else:
+        new_w = w
+        new_h = int(new_w / target_ratio)
+
+    resized: Image.Image = Image.new("RGBA", (new_w, new_h))
+    paste_x: int = int((new_w - w)/2)
+    paste_y: int = int((new_h - h)/2)
+    resized.paste(image, (paste_x, paste_y))
+    return resized

@@ -39,6 +39,7 @@ class CommunityModWindow(Toplevel):
     def __init__(self, master: "Root", mod: CommunityMod):
         window_title: str = Localizer.format(Localizer.Strings["menu.marketplace.mod_window.window_title"], {"{app.name}": ProjectData.NAME})
         super().__init__(window_title, icon=Resources.FAVICON, centered=False, hidden=True)
+        self.resizable(False, False)
         self.root = master
         self.mod = mod
 

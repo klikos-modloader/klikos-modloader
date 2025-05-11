@@ -92,7 +92,7 @@ class CommunityModWindow(Toplevel):
 
 
         # Show window
-        self.center_window()
+        self.center_on_root()
         self.deiconify()
         self.focus()
         self.lift(aboveThis=self.root)
@@ -108,6 +108,22 @@ class CommunityModWindow(Toplevel):
         width: int = int(self.winfo_reqwidth() / ScalingTracker.get_window_scaling(self))
         height: int = int(self.winfo_reqheight() / ScalingTracker.get_window_scaling(self))
         self.geometry(f"{width}x{height}+{(self.winfo_screenwidth() - width)//2}+{(self.winfo_screenheight() - height)//2}")
+
+
+    def center_on_root(self) -> None:
+        self.root.update_idletasks()
+        self.update_idletasks()
+        root_scaling: float = ScalingTracker.get_window_scaling(self.root)
+        self_scaling: float = ScalingTracker.get_window_scaling(self)
+
+        root_x: int = self.root.winfo_rootx()
+        root_y: int = self.root.winfo_rooty()
+        root_w: int = int(self.root.winfo_width() / root_scaling)
+        root_h: int = int(self.root.winfo_height() / root_scaling)
+        width: int = int(self.winfo_reqwidth() / self_scaling)
+        height: int = int(self.winfo_reqheight() / self_scaling)
+
+        self.geometry(f"{width}x{height}+{root_x + int((root_w - width) / 2)}+{root_y + int((root_h - height) / 2)}")
 
 
     def _on_scaling_change(self, widget_scaling: float, window_scaling: float) -> None:

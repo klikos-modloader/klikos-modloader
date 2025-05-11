@@ -7,6 +7,7 @@ import hashlib
 
 from modules.logger import Logger
 from modules.filesystem import Files, Directories
+from modules.networking import requests, Response
 
 from PIL import Image  # type: ignore
 

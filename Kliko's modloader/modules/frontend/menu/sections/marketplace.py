@@ -270,7 +270,8 @@ class MarketplaceSection(ScrollableFrame):
             Label(content, mod.name, style="body_strong", autowrap=False, wraplength=self._ENTRY_INNER_WIDTH).grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_INNER_GAP, 0))
             Button(content, width=self._ENTRY_INNER_WIDTH, height=32, image=button_image, secondary=True, command=lambda mod=mod: self.show_mod_window(mod)).grid(column=0, row=3, sticky="nsew", pady=(self._ENTRY_INNER_GAP, 0))
 
-            self.after(100, self._load_mod_thumbnail, mod, image_label)
+            Thread(target=self._load_mod_thumbnail, args=(mod, image_label), daemon=True).start()
+            # self.after(100, self._load_mod_thumbnail, mod, image_label)
         return
 
 
@@ -279,7 +280,8 @@ class MarketplaceSection(ScrollableFrame):
         thumbnail_size: tuple[int, int] = self._ENTRY_THUMBNAIL_SIZE
         if isinstance(thumbnail, tuple): image: CTkImage = get_ctk_image(crop_to_fit(thumbnail[0], mod.THUMBNAIL_ASPECT_RATIO), crop_to_fit(thumbnail[1], mod.THUMBNAIL_ASPECT_RATIO), size=thumbnail_size)
         else: image = get_ctk_image(crop_to_fit(thumbnail, mod.THUMBNAIL_ASPECT_RATIO), size=thumbnail_size)
-        image_label.configure(image=image, width=thumbnail_size[0], height=thumbnail_size[1])
+        image_label.after(0, lambda: image_label.configure(image=image, width=thumbnail_size[0], height=thumbnail_size[1]))
+        # image_label.configure(image=image, width=thumbnail_size[0], height=thumbnail_size[1])
 # endregion
 
 

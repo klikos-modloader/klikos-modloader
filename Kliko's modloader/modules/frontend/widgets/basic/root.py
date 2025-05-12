@@ -10,9 +10,10 @@ from tkinterdnd2 import TkinterDnD  # type: ignore
 class Root(CTk, TkinterDnD.DnDWrapper):
     BannerSystem: Optional["BannerSystem"] = None
 
-    def __init__(self, title: str, icon: str | Path | None = None, appearance_mode: Literal["light", "dark", "system"] = "system", width: Optional[int] = None, height: Optional[int] = None, centered: bool = True, banner_system: bool = False):
+    def __init__(self, title: str, icon: str | Path | None = None, appearance_mode: Literal["light", "dark", "system"] = "system", width: Optional[int] = None, height: Optional[int] = None, centered: bool = True, banner_system: bool = False, default_fg_color: bool = False):
         set_appearance_mode(appearance_mode)
-        CTk.__init__(self, fg_color=("#F3F3F3", "#202020"))
+        if default_fg_color: CTk.__init__(self)
+        else: CTk.__init__(self, fg_color=("#F3F3F3", "#202020"))
         TkinterDnD.DnDWrapper.__init__(self)
         self.TkdndVersion = TkinterDnD._require(self)
         if banner_system: self.BannerSystem = BannerSystem(self)

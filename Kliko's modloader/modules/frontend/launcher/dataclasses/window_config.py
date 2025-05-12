@@ -12,7 +12,7 @@ class WindowConfig:
     icon: Path = Resources.FAVICON
     width: Optional[int] = None
     height: Optional[int] = None
-    fg_color: str | tuple[str, str] = ("#F3F3F3", "#202020")
+    fg_color: str | tuple[str, str] | None = None
     appearance_mode: Literal["light", "dark", "system"] = "system"
     resizable: tuple[bool, bool] = (True, True)
     fullscreen: bool = False
@@ -103,9 +103,9 @@ class WindowConfig:
 # region filepath
     def _parse_filepath(self, string: str) -> Path:
         if string.startswith("{RESOURCES}"):
-            string = string.replace("{RESOURCES}", str(Directories.RESOURCES.resolve()), 1)
+            string = string.replace("{RESOURCES}", str(self._theme_base_directory.resolve()), 1)
         elif string.startswith("{INTERNAL}"):
-            string = string.replace("{INTERNAL}", str(self._theme_base_directory.resolve()), 1)
+            string = string.replace("{INTERNAL}", str(Directories.RESOURCES.resolve()), 1)
         return Path(string).resolve()
 # endregion
 

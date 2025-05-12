@@ -7,8 +7,7 @@ from modules.logger import Logger
 from modules.project_data import ProjectData
 from modules.filesystem import Resources, Directories
 from modules.frontend.widgets import Root
-from modules.frontend.widgets.basic.localized import LocalizedCTkLabel
-from modules.frontend.functions import get_ctk_image
+from modules.frontend.widgets.basic.localized import LocalizedCTkLabel, LocalizedCTkButton
 from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
 
@@ -16,7 +15,7 @@ from .dataclasses import WindowConfig, WidgetConfig
 from .exceptions import InvalidLauncherVersion
 
 from packaging.version import Version, InvalidVersion as pacakaging_invalid_version_error  # type: ignore
-from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkFont, CTkImage, set_default_color_theme, set_appearance_mode  # type: ignore
+from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkProgressBar, CTkFont, CTkImage, set_default_color_theme, set_appearance_mode  # type: ignore
 
 
 LAUNCHER_VERSION: Version = Version("1.0.0")
@@ -30,9 +29,10 @@ class CustomLauncher:
     window: Root
 
     _status_labels: list[LocalizedCTkLabel]
-    _version_labels: list[LocalizedCTkLabel]
+    _file_version_labels: list[LocalizedCTkLabel]
     _channel_labels: list[LocalizedCTkLabel]
     _guid_labels: list[LocalizedCTkLabel]
+    _progress_bars: list[CTkProgressBar]
 
     _LOG_PREFIX: str = "CustomLauncher"
 
@@ -71,9 +71,10 @@ class CustomLauncher:
 
         self.base_directory = target
         self._status_labels = []
-        self._version_labels = []
+        self._file_version_labels = []
         self._channel_labels = []
         self._guid_labels = []
+        self._progress_bars = []
         self.build_launcher_window()
 
 
@@ -96,8 +97,9 @@ class CustomLauncher:
         if window_config.theme is not None:
             set_default_color_theme(str(window_config.theme))
 
-        self.window = Root(window_config.title, icon=window_config.icon, appearance_mode=window_config.appearance_mode, width=window_config.width, height=window_config.height, centered=True, banner_system=False)
-        self.window.configure(fg_color=window_config.fg_color)
+        self.window = Root(window_config.title, icon=window_config.icon, appearance_mode=window_config.appearance_mode, width=window_config.width, height=window_config.height, centered=True, banner_system=False, default_fg_color=True)
+        if window_config.fg_color is not None:
+            self.window.configure(fg_color=window_config.fg_color)
         self.window.resizable(*window_config.resizable)
 
         if window_config.column_configure:
@@ -120,7 +122,7 @@ class CustomLauncher:
 
 # region place widget
     def _place_widget(self, parent, config: WidgetConfig) -> None:
-        widget: CTkFrame | CTkLabel | LocalizedCTkLabel | CTkButton
+        widget: CTkFrame | CTkLabel | LocalizedCTkLabel | CTkButton | LocalizedCTkButton | CTkProgressBar
 
         match config.type:
             case "frame":
@@ -133,14 +135,47 @@ class CustomLauncher:
                     for index, kwargs in config.row_configure.items():
                         widget.grid_rowconfigure(index, **kwargs)  # type: ignore
 
-            case "label":
+            case "label" | "status_label" | "channel_label" | "version_label" | "file_version_label":
                 kwargs = config.kwargs
-                widget = CTkLabel(parent, **kwargs)
+                font_data: dict | None = kwargs.pop("font", None)
+                if font_data: kwargs["font"] = CTkFont(**font_data)
+                image_data: dict | None = kwargs.pop("image", None)
+                if image_data: kwargs["image"] = CTkImage(**image_data)
+
+                match config.type:
+                    case "label":
+                        widget = CTkLabel(parent, **kwargs)
+                    case "status_label":
+                        kwargs.pop("text", None)
+                        widget = LocalizedCTkLabel(parent, "status_label", **kwargs)
+                        self._status_labels.append(widget)
+                    case "channel_label":
+                        kwargs.pop("text", None)
+                        widget = LocalizedCTkLabel(parent, "channel_label", **kwargs)
+                        self._channel_labels.append(widget)
+                    case "version_label":
+                        kwargs.pop("text", None)
+                        widget = LocalizedCTkLabel(parent, "version_label", **kwargs)
+                        self._guid_labels.append(widget)
+                    case "file_version_label":
+                        kwargs.pop("text", None)
+                        widget = LocalizedCTkLabel(parent, "file_version_label", **kwargs)
+                        self._file_version_labels.append(widget)
 
             case "button":
                 kwargs = config.kwargs
                 kwargs.pop("command", None)
-                widget = CTkButton(parent, **kwargs)
+
+                match config.button_action:
+                    case "cancel":
+                        widget = LocalizedCTkButton(parent, key="launcher.button.cancel", command=self._on_cancel, **kwargs)
+                    case _:
+                        widget = CTkButton(parent, **kwargs)
+
+            case "progress_bar":
+                kwargs = config.kwargs
+                widget = CTkProgressBar(parent, **kwargs)
+                self._progress_bars.append(widget)
 
         match config.placement_mode:
             case "grid": widget.grid(**config.placement_mode_kwargs)
@@ -159,4 +194,10 @@ class CustomLauncher:
     def run(self) -> None:
         self.window.deiconify()
         self.window.mainloop()
+# endregion
+
+
+# region on cancel
+    def _on_cancel(self, *_, **__) -> None:
+        print("Cancel!")
 # endregion

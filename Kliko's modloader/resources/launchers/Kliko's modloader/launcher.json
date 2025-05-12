@@ -2,28 +2,51 @@
     "version": "1.0.0",
 
     "window": {
-        "title": "DEFAULT",
-        "icon": "DEFAULT",
-        "size": [600, 400],
-        "theme": "DEFAULT",
-        "background_color": "DEFAULT",
-        "grid_columnconfigure": {},
-        "grid_rowconfigure": {}
+        "resizable": false,
+        "size": [500, 300],
+        "grid_columnconfigure": {
+            "0": {"weight": 1}
+        }
     },
 
     "widgets": [
         {
             "type": "frame",
-            "kwargs": {},
-            "placement": {
-                "type": "grid",
-                "kwargs": {}
+            "kwargs": {
+                "fg_color": "transparent",
+                "corner_radius": 0,
+                "border_width": 0
             },
-            "widgets": [],
+            "placement_mode": "grid",
+            "placement_kwargs": {
+                "column": 0,
+                "row": 0,
+                "ipadx": 4,
+                "ipady": [4, 0]
+            },
             "grid_columnconfigure": {
                 "0": {"weight": 1}
             },
-            "grid_rowconfigure": {}
+            "widgets": []
+        },
+        {
+            "type": "frame",
+            "kwargs": {
+                "fg_color": "transparent",
+                "corner_radius": 0,
+                "border_width": 0
+            },
+            "placement_mode": "grid",
+            "placement_kwargs": {
+                "column": 0,
+                "row": 1,
+                "padx": 16,
+                "pady": 16
+            },
+            "grid_columnconfigure": {
+                "0": {"weight": 1}
+            },
+            "widgets": []
         }
     ]
 }

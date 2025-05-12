@@ -1,0 +1,37 @@
+{
+    "CTk": {
+        "fg_color": ["#F3F3F3", "#202020"]
+    },
+    "CTkFrame": {
+        "corner_radius": 0,
+        "border_width": 0,
+        "fg_color": "transparent",
+        "border_color": ["#000", "#000"]
+    },
+    "CTkButton": {
+        "corner_radius": 4,
+        "border_width": 0,
+        "fg_color": ["#F20041", "#CC0037"],
+        "hover_color": ["#CC0037", "#F20031"],
+        "border_color": ["#000", "#000"],
+        "text_color": ["#1A1A1A", "#FFFFFF"],
+        "text_color_disabled": ["#1A1A1A", "#FFFFFF"]
+    },
+    "CTkLabel": {
+        "corner_radius": 0,
+        "fg_color": "transparent",
+        "text_color": ["#1A1A1A", "#FFFFFF"]
+    },
+    "CTkProgressBar": {
+        "corner_radius": 1000,
+        "border_width": 0,
+        "fg_color": ["#E6E6E6", "#353535"],
+        "progress_color": ["#F20041", "#CC0037"],
+        "border_color": ["#000", "#000"]
+    },
+    "CTkFont": {
+        "family": "Segoe UI",
+        "size": 14,
+        "weight": "normal"
+    }
+}

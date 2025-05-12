@@ -3,50 +3,128 @@
 
     "window": {
         "resizable": false,
-        "size": [500, 300],
         "grid_columnconfigure": {
             "0": {"weight": 1}
-        }
+        },
+        "grid_rowconfigure": {
+            "1": {"weight": 1}
+        },
+        "theme": "{RESOURCES}/theme.json"
     },
 
     "widgets": [
         {
             "type": "frame",
             "kwargs": {
-                "fg_color": "transparent",
-                "corner_radius": 0,
-                "border_width": 0
+                "height": 32
             },
             "placement_mode": "grid",
             "placement_kwargs": {
                 "column": 0,
                 "row": 0,
-                "ipadx": 4,
-                "ipady": [4, 0]
+                "sticky": "nsew",
+                "padx": 4,
+                "pady": 4
             },
             "grid_columnconfigure": {
-                "0": {"weight": 1}
+                "1": {"weight": 1}
             },
-            "widgets": []
+            "widgets": [
+                {
+                    "type": "channel_label",
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 0,
+                        "sticky": "w"
+                    }
+                },
+                {
+                    "type": "version_label",
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 1,
+                        "row": 0,
+                        "padx": [16, 0]
+                    }
+                },
+                {
+                    "type": "file_version_label",
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 2,
+                        "row": 0,
+                        "padx": [16, 0],
+                        "sticky": "e"
+                    }
+                }
+            ]
         },
         {
             "type": "frame",
             "kwargs": {
-                "fg_color": "transparent",
-                "corner_radius": 0,
-                "border_width": 0
+                "width": 456
             },
             "placement_mode": "grid",
             "placement_kwargs": {
                 "column": 0,
                 "row": 1,
-                "padx": 16,
-                "pady": 16
+                "sticky": "nsew",
+                "padx": 32,
+                "pady": 32
             },
             "grid_columnconfigure": {
-                "0": {"weight": 1}
+                "0": {"weight": 1, "minsize": 456}
             },
-            "widgets": []
+            "widgets": [
+                {
+                    "type": "label",
+                    "kwargs": {
+                        "image": {
+                            "light": "{RESOURCES}/logo.png",
+                            "size": 128
+                        }
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 0
+                    }
+                },
+                {
+                    "type": "status_label",
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 1,
+                        "pady": [16, 0]
+                    }
+                },
+                {
+                    "type": "progress_bar",
+                    "kwargs": {
+                        "width": 256,
+                        "height": 8
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 2,
+                        "pady": [8, 0]
+                    },
+                    "action": "cancel"
+                },
+                {
+                    "type": "button",
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 3,
+                        "pady": [8, 0]
+                    },
+                    "action": "cancel"
+                }
+            ]
         }
     ]
 }

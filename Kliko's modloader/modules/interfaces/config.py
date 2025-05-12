@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from modules.logger import Logger
 from modules.backend import ConfigEditor
-from modules.filesystem import Files
+from modules.filesystem import Files, Directories
 from modules.localization import Localizer
 
 
@@ -16,6 +16,7 @@ class ConfigInterface:
     DEFAULT_CONFIG: dict = {
         "appearance": "system",
         "language": "en_US",
+        "launcher": "Kliko's modloader",
 
         "check_for_updates": True,
         "confirm_launch": True,
@@ -83,9 +84,7 @@ class ConfigInterface:
 
     @classmethod
     def set_appearance_mode(cls, mode: Literal["light", "dark", "system"]) -> None:
-        data: dict = cls._read()
-        data["appearance"] = mode
-        cls.EDITOR.write(data)
+        cls.set("appearance", mode)
 
 
     @classmethod
@@ -97,14 +96,28 @@ class ConfigInterface:
 
 
     @classmethod
-    def set_language(cls, language: str) -> str:
+    def set_language(cls, language: str) -> None:
         if language not in Localizer.Metadata.LANGUAGES and language not in Localizer.get_available_languages():
             Logger.error(f"Unsupported language: '{language}'", prefix=cls.LOG_PREFIX)
             raise ValueError(f"Unsupported language: '{language}'. Must be {', '.join(Localizer.Metadata.LANGUAGES)}")
 
-        data: dict = cls._read()
-        language: str = data.get("language")  # type: ignore
-        return language
+        cls.set("language", language)
+
+
+    @classmethod
+    def get_launcher(cls) -> str:
+        if not Directories.LAUNCHERS.exists(): return cls.get_default_launcher()
+        return cls.get("launcher")
+    
+
+    @classmethod
+    def get_default_launcher(cls) -> str: return cls.DEFAULT_CONFIG["launcher"]
+
+
+    @classmethod
+    def set_launcher(cls, launcher: str | None) -> None:
+        if launcher is None: launcher = cls.DEFAULT_CONFIG["launcher"]
+        cls.set("launcher", launcher)
 
 
     @classmethod
@@ -155,7 +168,7 @@ class ConfigInterface:
     def get(cls, key: str, default: Optional[Any] = ...) -> Any:
         data: dict = cls._read()
         if default == ...: default = cls.DEFAULT_CONFIG.get(key, ...)
-        if key not in data and default == ...:
+        if default == ... and key not in data:
             Logger.error(f"Setting not found in config file: '{key}'", prefix=cls.LOG_PREFIX)
             raise KeyError(f"Setting not found in config file: '{key}'")
         return data.get(key, default)

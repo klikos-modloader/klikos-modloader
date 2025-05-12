@@ -1,9 +1,4 @@
 {
-    "button.yes": "Yes",
-    "button.no": "No",
-    "button.ok": "OK",
-    "button.cancel": "Cancel",
-
     "roblox.player": "Roblox Player",
     "roblox.player_alt": "Player",
     "roblox.studio": "Roblox Studio",
@@ -26,6 +21,7 @@
     "launcher.deployment_info.version": "Version: {value}",
     "launcher.deployment_info.guid": "GUID: {value}",
 
+    "launcher.button.cancel": "Cancel",
     "launcher.progress.get_client_info": "Getting deployment details...",
     "launcher.progress.check_client_update": "Checking for updates...",
     "launcher.progress.client_update": "Updating {roblox.dynamic}...",
@@ -37,9 +33,12 @@
 
     "launcher.popup.permission_to_kill": "{roblox.dynamic} is already running, launching a new instance will close the current one. Do you want to continue?",
 
-    "launcher.error.title": "Unable to launch {roblox.dynamic}",
-    "launcher.error.insufficient_storage": "{app.name} is unable to download and install {roblox.dynamic} because there is not enough disk space available.",
-    "launcher.error.connection_failed": "Failed to connect to {endpoint}. Please check your internet connection and try again.",
+    "launcher.warning.custom_launcher_version.too_new": "You're using a custom launcher that was made for a newer version of {app.name}, the default launcher will be used instead.",
+    "launcher.warning.custom_launcher_version.too_old": "You're using a custom launcher that was made for an older version of {app.name}, the default launcher will be used instead.",
+
+    "launcher.exception.title": "Unable to launch {roblox.dynamic}",
+    "launcher.exception.insufficient_storage": "{app.name} is unable to download and install {roblox.dynamic} because there is not enough disk space available.",
+    "launcher.exception.connection_failed": "Failed to connect to {endpoint}. Please check your internet connection and try again.",
 
 
 
@@ -163,6 +162,8 @@
     "menu.settings.content.appearance.dark": "{appearance.dark}",
     "menu.settings.content.appearance.system": "{appearance.system}",
     "menu.settings.content.language.title": "Language",
+    "menu.settings.content.custom_launcher.title": "Custom Launcher",
+    "menu.settings.content.custom_launcher.description": "Use a custom launcher when launching {roblox.common}",
     "menu.settings.content.check_for_updates.title": "Check for Updates",
     "menu.settings.content.check_for_updates.description": "Check for updates when launching {app.name}",
     "menu.settings.content.confirm_launch.title": "Launch Confirmation",

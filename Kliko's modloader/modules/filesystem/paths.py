@@ -61,6 +61,7 @@ class Directories:
     CONFIG: Path = ROOT / "config"
     MODS: Path = ROOT / "Mods"
     VERSIONS: Path = ROOT / "Versions"
+    LAUNCHERS: Path = ROOT / "Launchers"
     CACHE: Path = ROOT / "cache"
     MARKETPLACE_CACHE: Path = CACHE / "marketplace"
     MEIPASS: Optional[Path] = Path(sys._MEIPASS) if FROZEN else None  # type: ignore

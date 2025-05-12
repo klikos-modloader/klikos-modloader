@@ -23,6 +23,24 @@ class LocalizedCTkLabel(CTkLabel):
         else: self._localizer_callback_id = None
 
 
+    def configure(self, **kwargs):
+        key = kwargs.pop("key", None)
+        modification = kwargs.pop("modification", ...)
+
+        update_text = False
+        if key is not None:
+            self._localizer_string_key = key
+            update_text = True
+        if modification is not ...:
+            self._localizer_string_modification = modification
+            update_text = True
+        if update_text:
+            self._update_localized_string()
+
+        kwargs.pop("text", None)
+        return super().configure(**kwargs)
+
+
     def destroy(self):
         if self._localizer_callback_id is not None: Localizer.remove_callback(self._localizer_callback_id)
         return super().destroy()

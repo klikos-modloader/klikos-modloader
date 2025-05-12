@@ -1,6 +1,7 @@
 from tkinter import TclError, StringVar, BooleanVar
 from typing import Optional, Literal, Callable, TYPE_CHECKING
 
+from modules.filesystem import Directories
 from modules.project_data import ProjectData
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, DropDownMenu, ToggleSwitch
 from modules.localization import Localizer
@@ -9,6 +10,7 @@ from modules.interfaces.config import ConfigInterface
 if TYPE_CHECKING: from modules.frontend.widgets import Root
 
 from customtkinter import set_appearance_mode  # type: ignore
+from natsort import natsorted  # type: ignore
 
 
 class SettingsSection(ScrollableFrame):
@@ -125,7 +127,24 @@ class SettingsSection(ScrollableFrame):
         language: str = ConfigInterface.get_language()
         language = Localizer.Metadata.LANGUAGES.get(language, language)
         language_variable: StringVar = StringVar(value=language)
-        DropDownMenu(frame, language_options, variable=language_variable, command=self._update_language).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=self._ENTRY_PADDING[0])
+        DropDownMenu(frame, language_options, dont_localize=True, variable=language_variable, command=self._update_language).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=self._ENTRY_PADDING[0])
+
+
+        # Custom Launcher
+        row_counter += 1
+        frame = Frame(wrapper, layer=2)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
+        Label(frame, "menu.settings.content.custom_launcher.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.settings.content.custom_launcher.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        
+        known_launchers: set = {path.name for path in (Directories.RESOURCES / "launchers").iterdir() if path.is_dir()}
+        if Directories.LAUNCHERS.is_dir():
+            known_launchers |= {path.name for path in Directories.LAUNCHERS.iterdir() if path.is_dir()}
+        launcher_options: list[str] = natsorted(known_launchers)
+        launcher: str = ConfigInterface.get_launcher()
+        launcher_variable: StringVar = StringVar(value=launcher)
+        DropDownMenu(frame, launcher_options, dont_localize=True, variable=launcher_variable, command=self._update_launcher).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
 
 
         # Update checker
@@ -260,18 +279,30 @@ class SettingsSection(ScrollableFrame):
             )
 
 
-    def _update_boolean_setting(self, key: str, value: bool, localizer_name_key: Optional[str] = None, localizer_name_modification: Optional[Callable[[str], str]] = None) -> None:
+    def _update_launcher(self, value: str) -> None:
+        try: ConfigInterface.set_launcher(value)
+
+        except Exception as e:
+            self.root.send_banner(
+                title_key="menu.settings.exception.title",
+                title_modification=lambda string: Localizer.format(string, {"{setting.name}": Localizer.Key("menu.settings.content.custom_launcher.title")}),
+                message_key="menu.settings.exception.message.unknown",
+                message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
+                mode="error", auto_close_after_ms=6000
+            )
+
+
+    def _update_boolean_setting(self, key: str, value: bool, localizer_name_key: Optional[str] = None) -> None:
         if not localizer_name_key: name: str = key
         else:
             name = Localizer.Strings[localizer_name_key]
-            if callable(localizer_name_modification): name = localizer_name_modification(name)
 
         try: ConfigInterface.set(key, value)
 
         except Exception as e:
             self.root.send_banner(
                 title_key="menu.settings.exception.title",
-                title_modification=lambda string: Localizer.format(string, {"{setting.name}": name}),
+                title_modification=lambda string: Localizer.format(string, {"{setting.name}": Localizer.Key(name)}),
                 message_key="menu.settings.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
                 mode="error", auto_close_after_ms=6000

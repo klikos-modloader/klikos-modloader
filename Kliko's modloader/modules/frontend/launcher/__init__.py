@@ -1,7 +1,8 @@
 from typing import Literal
 
-from .window import Window
+from .custom_launcher import CustomLauncher
+from .exceptions import *
 
 
 def run(mode: Literal["Player", "Studio"]) -> None:
-    Window(mode).mainloop()
+    CustomLauncher(mode).run()

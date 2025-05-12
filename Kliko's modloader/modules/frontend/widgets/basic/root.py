@@ -10,7 +10,7 @@ from tkinterdnd2 import TkinterDnD  # type: ignore
 class Root(CTk, TkinterDnD.DnDWrapper):
     BannerSystem: Optional["BannerSystem"] = None
 
-    def __init__(self, title: str, icon: str | Path | None = None, appearance_mode: Literal["light", "dark", "system"] = "system", width: int = 256, height: int = 256, centered: bool = True, banner_system: bool = False):
+    def __init__(self, title: str, icon: str | Path | None = None, appearance_mode: Literal["light", "dark", "system"] = "system", width: Optional[int] = None, height: Optional[int] = None, centered: bool = True, banner_system: bool = False):
         set_appearance_mode(appearance_mode)
         CTk.__init__(self, fg_color=("#F3F3F3", "#202020"))
         TkinterDnD.DnDWrapper.__init__(self)
@@ -23,8 +23,9 @@ class Root(CTk, TkinterDnD.DnDWrapper):
             if icon.exists() and icon.suffix == ".ico":
                 self.iconbitmap(str(icon.resolve()))
 
-        if centered: self.geometry(f"{width}x{height}+{(self.winfo_screenwidth() - width)//2}+{(self.winfo_screenheight() - height)//2}")
-        else: self.geometry(f"{width}x{height}")
+        if width is not None and height is not None:
+            if centered: self.geometry(f"{width}x{height}+{(self.winfo_screenwidth() - width)//2}+{(self.winfo_screenheight() - height)//2}")
+            else: self.geometry(f"{width}x{height}")
 
         self.bind("<ButtonPress-1>", lambda event: event.widget.focus_set())
         # ScalingTracker.add_window(self._on_scaling_change, self)

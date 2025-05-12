@@ -7,7 +7,7 @@ from pathlib import Path
 from modules.logger import Logger
 from modules.localization import Localizer
 from modules.project_data import ProjectData
-from modules.filesystem import Directories
+from modules.filesystem import Directories, Files
 
 
 def run(exception: Exception) -> None:
@@ -21,6 +21,8 @@ def run(exception: Exception) -> None:
     crash_dir: Path = Directories.CRASHES / Logger.filepath.stem
     crash_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy(Logger.filepath, crash_dir)
+    try: shutil.copy(Files.CONFIG, crash_dir)
+    except FileNotFoundError: pass
 
     if getattr(sys, "frozen", False):
         try:

@@ -20,7 +20,7 @@ parser.add_argument("--presence-mode", choices=["Player", "Studio"], dest="prese
 parser.add_argument("--deeplink", help="Optional deeplink arguments when launching Roblox", dest="deeplink")
 args = parser.parse_args()
 
-if not any([args.player, args.studio, args.presence]): args.menu = True
+if not any([args.player, args.studio, args.presence]): args.menu = True  # Default launch mode
 if args.presence_mode and not args.presence: args.presence_mode = None
 if args.deeplink and not (args.player or args.studio): args.deeplink = None
 
@@ -83,10 +83,12 @@ def main() -> None:
             menu.run()
 
         elif args.player:
-            pass
+            from modules.frontend import launcher
+            launcher.run("Player")
 
         elif args.studio:
-            pass
+            from modules.frontend import launcher
+            launcher.run("Studio")
 
         elif args.presence:
             pass

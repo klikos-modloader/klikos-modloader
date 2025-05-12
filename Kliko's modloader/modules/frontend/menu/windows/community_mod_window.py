@@ -5,6 +5,7 @@ import shutil
 
 from modules.project_data import ProjectData
 from modules.localization import Localizer
+from modules.logger import Logger
 from modules.filesystem import Resources, DownloadStream, Directories
 from modules.frontend.widgets import Toplevel, Frame, Label, Button, ProgressBar
 from modules.frontend.widgets.basic.utils import FontStorage, WinAccentTracker
@@ -34,6 +35,7 @@ class CommunityModWindow(Toplevel):
     _downloading: bool = False
     _current_progress: float = 0
     _progress_update_threshold: float = 0.05
+    _LOG_PREFIX: str = "CommunityMod"
 
 
     def __init__(self, master: "Root", mod: CommunityMod):
@@ -170,6 +172,7 @@ class CommunityModWindow(Toplevel):
             Directories.MODS.mkdir(parents=True, exist_ok=True)
 
 
+        Logger.info(f'Downloading mod: "{self.mod.name}"', prefix=self._LOG_PREFIX)
         self._current_progress = 0
         self.progress_bar.set(self._current_progress)
         self.show_progress_bar()

@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 
 from modules.project_data import ProjectData
-from modules.filesystem import Resources
+from modules.filesystem import Resources, Directories
 from modules.interfaces.config import ConfigInterface
 
 
@@ -16,10 +16,15 @@ class WindowConfig:
     appearance_mode: Literal["light", "dark", "system"] = "system"
     resizable: tuple[bool, bool] = (True, True)
     fullscreen: bool = False
+    theme: Optional[Path] = None
     column_configure: Optional[dict[int, dict[str, str | int]]] = None
     row_configure: Optional[dict[int, dict[str, str | int]]] = None
 
-    def __init__(self, data: dict = {}):
+    _theme_base_directory: Path
+
+    def __init__(self, data: dict, theme_base_directory: Path):
+        self._theme_base_directory = theme_base_directory
+
         # Window title
         title: Any = data.get("title")
         if isinstance(title, str):
@@ -42,7 +47,7 @@ class WindowConfig:
                 self.height = height
 
         # Background color
-        background_color: Any = data.get("background_color")
+        background_color: Any = data.get("fg_color")
         if isinstance(background_color, str):
             if self._is_valid_color(background_color):
                 self.fg_color = background_color
@@ -82,7 +87,30 @@ class WindowConfig:
         if isinstance(row_configure, dict) and row_configure:
             self.row_configure = self._parse_gridconfigure_config(row_configure)
 
+        # Theme file
+        theme: Any = data.get("theme")
+        if isinstance(theme, str):
+            theme = self._parse_filepath(theme)
+            if theme.suffix == ".json" and theme.is_file():
+                self.theme = theme
 
+
+    def _is_valid_color(self, color: str) -> bool:
+        if re.fullmatch(r"#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})", color): return True
+        return False
+
+
+# region filepath
+    def _parse_filepath(self, string: str) -> Path:
+        if string.startswith("{RESOURCES}"):
+            string = string.replace("{RESOURCES}", str(Directories.RESOURCES.resolve()), 1)
+        elif string.startswith("{INTERNAL}"):
+            string = string.replace("{INTERNAL}", str(self._theme_base_directory.resolve()), 1)
+        return Path(string).resolve()
+# endregion
+
+
+# region grid configure
     def _parse_gridconfigure_config(self, data: dict) -> dict | None:
         parsed: dict = {}
         for index, config in data.items():
@@ -113,8 +141,4 @@ class WindowConfig:
                 parsed[index] = kwargs
 
         return parsed or None
-
-
-    def _is_valid_color(self, color: str) -> bool:
-        if isinstance(color, str) and re.fullmatch(r"#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})", color): return True
-        return False
+# endregion

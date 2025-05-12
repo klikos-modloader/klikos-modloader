@@ -3,15 +3,14 @@ from pathlib import Path
 import re
 
 from modules.filesystem import Directories
-from modules.localization import Localizer
 
-VALID_WIDGET_TYPES: set = {"frame", "label", "button"}
+VALID_WIDGET_TYPES: set = {"frame", "label", "button", "status_label", "client_channel_label", "client_version_label", "file_version_label"}
 VALID_PLACEMENT_MODES: set = {"grid", "pack", "place"}
 VALID_BUTTON_ACTIONS: set = {"cancel"}
 
 
 class WidgetConfig:
-    type: Literal["frame", "label", "button"]
+    type: Literal["frame", "label", "button", "status_label", "client_channel_label", "client_version_label", "file_version_label"]
     kwargs: dict
     placement_mode: Literal["grid", "pack", "place"]
     placement_mode_kwargs: dict
@@ -20,6 +19,8 @@ class WidgetConfig:
     row_configure: Optional[dict[int, dict[str, str | int]]] = None
     button_action: Literal["cancel"] | None = None
 
+    children: list["WidgetConfig"]
+
     _theme_base_directory: Path
     _ERROR_PREFIX: str = "WidgetConfig"
 
@@ -27,6 +28,7 @@ class WidgetConfig:
     def __init__(self, data: dict, theme_base_directory: Path):
         self.kwargs = {}
         self.placement_mode_kwargs = {}
+        self.children = []
         self._theme_base_directory = theme_base_directory
 
         # Type
@@ -69,10 +71,21 @@ class WidgetConfig:
         kwargs: Any = data.get("kwargs")
         if isinstance(kwargs, dict) and kwargs:
             self.kwargs = self._parse_widget_kwargs(kwargs)
+        if self.type in {"status_label", "client_channel_label", "client_version_label", "file_version_label"}:
+            self.kwargs.pop("text", None)
+
+        # Children
+        widgets: Any = data.get("widgets")
+        if isinstance(widgets, list) and widgets:
+            for item in widgets:
+                if not isinstance(item, dict): continue
+                widget: "WidgetConfig" = WidgetConfig(item, theme_base_directory)
+                self.children.append(widget)
 
 
+# region color
     def _is_valid_color(self, color: str) -> bool:
-        if isinstance(color, str) and re.fullmatch(r"#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})", color): return True
+        if re.fullmatch(r"#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})", color): return True
         return False
 
 
@@ -92,16 +105,20 @@ class WidgetConfig:
                 return (light, dark)
 
         return None
+# endregion
 
 
+# region filepath
     def _parse_filepath(self, string: str) -> Path:
         if string.startswith("{RESOURCES}"):
             string = string.replace("{RESOURCES}", str(Directories.RESOURCES.resolve()), 1)
         elif string.startswith("{INTERNAL}"):
             string = string.replace("{INTERNAL}", str(self._theme_base_directory.resolve()), 1)
-        return Path(string)
+        return Path(string).resolve()
+# endregion
 
 
+# region anchor
     def _parse_anchor(self, value: str) -> str | None:
         value_lower = value.lower()
         if value_lower == "center":
@@ -111,8 +128,10 @@ class WidgetConfig:
         if len(value_list) == len(set(value_list)) and all(char in {"n", "s", "e", "w"} for char in value_list):
             return ''.join(value_list)
         return None
+# endregion
 
 
+# region font
     def _parse_font(self, data: dict) -> dict | None:
         family: Any = data.get("family")
         size: Any = data.get("size")
@@ -137,8 +156,10 @@ class WidgetConfig:
             font["overstrike"] = overstrike
 
         return font or None
+# endregion
 
 
+# region image
     def _parse_image(self, data: dict) -> dict | None:
         light: Any = data.get("light")
         dark: Any = data.get("dark")
@@ -176,8 +197,10 @@ class WidgetConfig:
         if has_size and has_path:
             return image
         return None
+# endregion
 
 
+# region grid_configure
     def _parse_gridconfigure_config(self, data: dict) -> dict | None:
         parsed: dict = {}
         for index, config in data.items():
@@ -208,15 +231,18 @@ class WidgetConfig:
                 parsed[index] = kwargs
 
         return parsed or None
+# endregion
 
 
+# region placement kwargs
     def _parse_placement_kwargs(self, mode: Literal["grid", "place", "pack"], data: dict) -> dict:
         kwargs: dict = {}
 
         match mode:
+# region - grid
             case "grid":
-                int_kwargs = {"row", "column", "rowspan", "columnspan"}
-                tuple_or_int_kwargs = {"padx", "pady", "ipadx", "ipady"}
+                int_kwargs = {"row", "column", "rowspan", "columnspan", "ipadx", "ipady"}
+                tuple_or_int_kwargs = {"padx", "pady"}
                 string_kwargs = {"sticky"}
                 valid_kwargs = int_kwargs | tuple_or_int_kwargs | string_kwargs
 
@@ -244,15 +270,22 @@ class WidgetConfig:
                             sticky: str | None = self._parse_anchor(value)
                             if sticky:
                                 kwargs[key] = sticky
+# endregion
 
+# region - place
             case "place":
                 string_kwargs = {"anchor", "side", "fill"}
                 boolean_kwargs = {"expand"}
-                tuple_or_int_kwargs = {"padx", "pady", "ipadx", "ipady"}
-                valid_kwargs = string_kwargs | boolean_kwargs | tuple_or_int_kwargs
+                int_kwargs = {"ipadx", "ipady"}
+                tuple_or_int_kwargs = {"padx", "pady"}
+                valid_kwargs = string_kwargs | int_kwargs | boolean_kwargs | tuple_or_int_kwargs
 
                 for key in valid_kwargs:
                     value = data.get(key)
+
+                    if key in int_kwargs:
+                        if isinstance(value, int) and value >= 0:
+                            kwargs[key] = value
 
                     if key in boolean_kwargs:
                         if isinstance(value, bool):
@@ -285,7 +318,9 @@ class WidgetConfig:
                             value_lower = value.lower()
                             if value_lower in {"top", "left", "bottom", "right"}:
                                 kwargs[key] = value_lower
+# endregion
 
+# region - pack
             case "pack":
                 float_kwargs = {"relx", "rely"}
                 int_kwargs = {"width", "height"}
@@ -311,30 +346,35 @@ class WidgetConfig:
                             anchor = self._parse_anchor(value)
                             if anchor:
                                 kwargs[key] = anchor
+# endregion
         return kwargs
+# endregion
 
 
+# region widget kwargs
     def _parse_widget_kwargs(self, data: dict) -> dict:
         kwargs: dict = {}
 
         match self.type:
+# region - frame
             case "frame":
                 int_kwargs = {"width", "height", "border_width", "corner_radius"}
                 color_kwargs = {"fg_color", "border_color"}
                 valid_kwargs = int_kwargs | color_kwargs
 
                 for key in valid_kwargs:
-                    value: Any = data.get("key")
+                    value: Any = data.get(key)
 
                     if key in int_kwargs:
                         if isinstance(value, int) and value >= 0:
                             kwargs[key] = value
-                    
+
                     elif key in color_kwargs:
-                        value = data.get("key")
                         color = self._parse_color(value)
                         if color: kwargs[key] = color
+# endregion
 
+# region - label
             case "label":
                 int_kwargs = {"width", "height", "corner_radius", "padx", "pady", "wraplength"}
                 string_kwargs = {"text", "compound", "anchor"}
@@ -344,7 +384,7 @@ class WidgetConfig:
                 valid_kwargs = int_kwargs | string_kwargs | color_kwargs | font_kwargs | image_kwargs
 
                 for key in valid_kwargs:
-                    value = data.get("key")
+                    value = data.get(key)
 
                     if key in int_kwargs:
                         if isinstance(value, int) and value >= 0:
@@ -384,15 +424,61 @@ class WidgetConfig:
                             image: dict | None = self._parse_image(value)
                             if image:
                                 kwargs[key] = image
+# endregion
 
+# region - button
             case "button":
                 int_kwargs = {"width", "height", "corner_radius", "border_width", "border_spacing"}
                 boolean_kwargs = {"round_width_to_even_numbers", "round_height_to_even_numbers", "hover"}
-                string_kwargs = {"text", "compound", "anchor", "state"}
                 color_kwargs = {"fg_color", "hover_color", "border_color", "text_color"}
+                string_kwargs = {"text", "compound", "anchor"}
                 font_kwargs = {"font"}
                 image_kwargs = {"image"}
-                valid_kwargs = int_kwargs | boolean_kwargs | string_kwargs | color_kwargs | font_kwargs | image_kwargs
+                valid_kwargs = int_kwargs | boolean_kwargs | color_kwargs | string_kwargs | font_kwargs | image_kwargs
 
-                # TODO
+                for key in valid_kwargs:
+                    value = data.get(key)
+
+                    if key in int_kwargs:
+                        if isinstance(value, int) and value >= 0:
+                            kwargs[key] = value
+
+                    if key in boolean_kwargs:
+                        if isinstance(value, bool):
+                            kwargs[key] = value
+
+                    elif key in color_kwargs:
+                        color = self._parse_color(value)
+                        if key in {"text_color", "text_color"} and color == "transparent":
+                            continue
+                        if color:
+                            kwargs[key] = color
+                    
+                    elif key in string_kwargs:
+                        if key == "anchor":
+                            anchor = self._parse_anchor(value)
+                            if anchor:
+                                kwargs[key] = anchor
+                        
+                        elif key == "compound":
+                            value_lower = value.lower()
+                            if value_lower in {"left", "right", "center"}:
+                                kwargs[key] = value_lower
+                        
+                        elif key == "text":
+                            kwargs[key] = value
+                    
+                    elif key in font_kwargs:
+                        if isinstance(value, dict) and value:
+                            font = self._parse_font(value)
+                            if font:
+                                kwargs[key] = font
+
+                    elif key in image_kwargs:
+                        if isinstance(value, dict) and value:
+                            image = self._parse_image(value)
+                            if image:
+                                kwargs[key] = image
+# endregion
         return kwargs
+# endregion

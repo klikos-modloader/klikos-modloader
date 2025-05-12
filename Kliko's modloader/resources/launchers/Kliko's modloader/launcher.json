@@ -1,0 +1,29 @@
+{
+    "version": "1.0.0",
+
+    "window": {
+        "title": "DEFAULT",
+        "icon": "DEFAULT",
+        "size": [600, 400],
+        "theme": "DEFAULT",
+        "background_color": "DEFAULT",
+        "grid_columnconfigure": {},
+        "grid_rowconfigure": {}
+    },
+
+    "widgets": [
+        {
+            "type": "frame",
+            "kwargs": {},
+            "placement": {
+                "type": "grid",
+                "kwargs": {}
+            },
+            "widgets": [],
+            "grid_columnconfigure": {
+                "0": {"weight": 1}
+            },
+            "grid_rowconfigure": {}
+        }
+    ]
+}

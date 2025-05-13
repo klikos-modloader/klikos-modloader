@@ -23,7 +23,7 @@
                 "column": 0,
                 "row": 0,
                 "sticky": "nsew",
-                "padx": 4,
+                "padx": 8,
                 "pady": 4
             },
             "grid_columnconfigure": {
@@ -62,19 +62,16 @@
         },
         {
             "type": "frame",
-            "kwargs": {
-                "width": 456
-            },
             "placement_mode": "grid",
             "placement_kwargs": {
                 "column": 0,
                 "row": 1,
                 "sticky": "nsew",
                 "padx": 32,
-                "pady": 32
+                "pady": [16, 8]
             },
             "grid_columnconfigure": {
-                "0": {"weight": 1, "minsize": 456}
+                "0": {"weight": 1}
             },
             "widgets": [
                 {
@@ -97,20 +94,22 @@
                     "placement_kwargs": {
                         "column": 0,
                         "row": 1,
-                        "pady": [16, 0]
+                        "pady": [16, 8],
+                        "sticky": "ew"
                     }
                 },
                 {
                     "type": "progress_bar",
                     "kwargs": {
-                        "width": 256,
-                        "height": 8
+                        "width": 456,
+                        "height": 16
                     },
                     "placement_mode": "grid",
                     "placement_kwargs": {
                         "column": 0,
                         "row": 2,
-                        "pady": [8, 0]
+                        "pady": [8, 0],
+                        "sticky": "ew"
                     },
                     "action": "cancel"
                 },

@@ -1,11 +1,11 @@
 from typing import Literal, Any
 from pathlib import Path
-from tkinter import messagebox, DoubleVar
+from tkinter import messagebox, TclError
 import json
 
 from modules.logger import Logger
 from modules.project_data import ProjectData
-from modules.filesystem import Resources, Directories
+from modules.filesystem import Directories
 from modules.frontend.widgets import Root
 from modules.frontend.widgets.basic.localized import LocalizedCTkLabel, LocalizedCTkButton
 from modules.localization import Localizer
@@ -138,6 +138,7 @@ class CustomLauncher:
         widget: CTkFrame | CTkLabel | LocalizedCTkLabel | CTkButton | LocalizedCTkButton | CTkProgressBar
 
         match config.type:
+# region - frame
             case "frame":
                 kwargs = config.kwargs
                 widget = CTkFrame(parent, **kwargs)
@@ -147,7 +148,9 @@ class CustomLauncher:
                 if config.row_configure:
                     for index, kwargs in config.row_configure.items():
                         widget.grid_rowconfigure(index, **kwargs)  # type: ignore
+# endregion
 
+# region - label
             case "label" | "status_label" | "channel_label" | "version_label" | "file_version_label":
                 kwargs = config.kwargs
                 font_data: dict | None = kwargs.pop("font", None)
@@ -156,8 +159,6 @@ class CustomLauncher:
                 if image_data: kwargs["image"] = CTkImage(**image_data)
 
                 match config.type:
-                    case "label":
-                        widget = CTkLabel(parent, **kwargs)
                     case "status_label":
                         kwargs.pop("text", None)
                         widget = LocalizedCTkLabel(parent, key="launcher.progress.initializing", modification=None, **kwargs)
@@ -175,21 +176,34 @@ class CustomLauncher:
                         widget = LocalizedCTkLabel(parent, key=None, modification=None, **kwargs)
                         self._file_version_labels.append(widget)
 
+                    case "label":
+                        widget = CTkLabel(parent, **kwargs)
+
+                        if config.localized_string is not None:
+                            widget = LocalizedCTkLabel(parent, key=config.localized_string, modification=config.localized_string_modification, **kwargs)
+                        else:
+                            widget = CTkLabel(parent, **kwargs)
+# endregion
+
+# region - button
             case "button":
                 kwargs = config.kwargs
                 kwargs.pop("command", None)
+                if config.button_action == "cancel":
+                    kwargs["command"] = self._on_cancel
 
-                match config.button_action:
-                    case "cancel":
-                        kwargs["command"] = self._on_cancel
-                        widget = LocalizedCTkButton(parent, key="launcher.button.cancel", modification=None, **kwargs)
-                    case _:
-                        widget = CTkButton(parent, **kwargs)
+                if config.localized_string is not None:
+                    widget = LocalizedCTkButton(parent, key=config.localized_string, modification=config.localized_string_modification, **kwargs)
+                else:
+                    widget = CTkButton(parent, **kwargs)
+# endregion
 
+# region - progress bar
             case "progress_bar":
                 kwargs = config.kwargs
                 widget = CTkProgressBar(parent, **kwargs)
                 self._progress_bars.append(widget)
+# endregion
 
         match config.placement_mode:
             case "grid": widget.grid(**config.placement_mode_kwargs)
@@ -203,7 +217,6 @@ class CustomLauncher:
 # endregion
 
 
-
 # region run
     def run(self) -> None:
         self.window.deiconify()
@@ -214,9 +227,10 @@ class CustomLauncher:
 # region update progress bars
     def _update_progress_bars(self, value: float) -> None:
         for bar in self._progress_bars:
-            if bar.cget("mode") == "determinate":
-                bar.set(value)
-
+            try:
+                if bar.cget("mode") == "determinate":
+                    bar.set(value)
+            except (TclError, AttributeError): pass
 # endregion
 
 

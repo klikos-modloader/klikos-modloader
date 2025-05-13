@@ -48,7 +48,7 @@ class Localizer:
     def format(cls, string: str, data: dict[str, str | Key]) -> str:
         for key, value in data.items():
             if isinstance(value, cls.Key):
-                value = Localizer.Strings[value.value]
+                value = Localizer.Strings.get(value.value, value.value)
             string = string.replace(key, value)
         return string
 

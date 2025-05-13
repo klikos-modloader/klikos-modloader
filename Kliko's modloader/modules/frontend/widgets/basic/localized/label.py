@@ -6,9 +6,9 @@ from customtkinter import CTkLabel  # type: ignore
 
 
 class LocalizedCTkLabel(CTkLabel):
-    _localizer_string_key: str
+    _localizer_string_key: Optional[str] = None
     _localizer_string_modification: Optional[Callable[[str], str]] = None
-    _localizer_callback_id: Optional[str]
+    _localizer_callback_id: Optional[str] = None
 
 
     def __init__(self, master, key: Optional[str] = None, modification: Optional[Callable[[str], str]] = None, **kwargs):
@@ -20,7 +20,6 @@ class LocalizedCTkLabel(CTkLabel):
                 self._localizer_string_modification = modification
             self._localizer_callback_id = Localizer.add_callback(self._update_localized_string)
             self._update_localized_string()
-        else: self._localizer_callback_id = None
 
 
     def configure(self, **kwargs):
@@ -30,6 +29,8 @@ class LocalizedCTkLabel(CTkLabel):
         update_text = False
         if key is not None:
             self._localizer_string_key = key
+            if self._localizer_callback_id is None:
+                self._localizer_callback_id = Localizer.add_callback(self._update_localized_string)
             update_text = True
         if modification is not ...:
             self._localizer_string_modification = modification
@@ -49,10 +50,9 @@ class LocalizedCTkLabel(CTkLabel):
     def _update_localized_string(self) -> None:
         string: str | None = Localizer.Strings.get(self._localizer_string_key)
         if string is None:
-            self.configure(text=self._localizer_string_key)
+            super().configure(text=self._localizer_string_key)
             return
 
         if callable(self._localizer_string_modification):
             string = self._localizer_string_modification(string)
-
-        self.configure(text=string)
+        super().configure(text=string)

@@ -33,7 +33,7 @@ class WindowConfig:
         # Window icon
         icon: Any = data.get("icon")
         if isinstance(icon, str):
-            icon = Path(icon)
+            icon = self._parse_filepath(icon)
             if icon.suffix == ".ico" and icon.is_file():
                 self.icon = icon
 

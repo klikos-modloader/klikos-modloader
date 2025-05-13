@@ -76,9 +76,9 @@ def main() -> None:
     Logger.initialize()
     ConfigInterface.verify_file_integrity()
     log_debug_info()
+    initialize_localization()
 
     try:
-        initialize_localization()
         if args.menu:
             from modules.frontend import menu
             menu.run()

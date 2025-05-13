@@ -26,7 +26,8 @@ class LocalizedCTkOptionMenu(CTkOptionMenu):
 
 
     def destroy(self):
-        Localizer.remove_callback(self._localizer_callback_id)
+        if hasattr(self, "_localizer_callback_id"):
+            Localizer.remove_callback(self._localizer_callback_id)
         return super().destroy()
 
 

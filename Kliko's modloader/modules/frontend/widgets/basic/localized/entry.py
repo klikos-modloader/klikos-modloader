@@ -6,9 +6,9 @@ from customtkinter import CTkEntry  # type: ignore
 
 
 class LocalizedCTkEntry(CTkEntry):
-    _localizer_string_key: Optional[str]
+    _localizer_string_key: Optional[str] = None
     _localizer_string_modification: Optional[Callable[[str], str]] = None
-    _localizer_callback_id: Optional[str]
+    _localizer_callback_id: Optional[str] = None
 
 
     def __init__(self, master, placeholder_key: Optional[str] = None, placeholder_modification: Optional[Callable[[str], str]] = None, **kwargs):

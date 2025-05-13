@@ -1,6 +1,6 @@
 from typing import Literal, Any
 from pathlib import Path
-from tkinter import messagebox
+from tkinter import messagebox, DoubleVar
 import json
 
 from modules.logger import Logger
@@ -38,6 +38,7 @@ class CustomLauncher:
 
 
     def __init__(self, mode: Literal["Player", "Studio"]):
+        Logger.info(f"Initializing launcher (mode: {mode})...")
         self.mode = mode
         default_launcher: str = ConfigInterface.get_default_launcher()
         launcher: str = ConfigInterface.get_launcher()
@@ -47,7 +48,7 @@ class CustomLauncher:
 
         target: Path = Directories.RESOURCES / "launchers" / launcher
         if not target.is_dir(): target = Directories.LAUNCHERS / launcher
-        if not target.is_dir() or not not (target / "launcher.json").is_file():
+        if not target.is_dir() or not (target / "launcher.json").is_file():
             Logger.error(f'Custom launcher not found: {launcher}, reverting to default launcher', prefix=self._LOG_PREFIX)
             ConfigInterface.set_launcher(None)
             target = Directories.RESOURCES / "launchers" / default_launcher
@@ -75,6 +76,7 @@ class CustomLauncher:
         self._channel_labels = []
         self._guid_labels = []
         self._progress_bars = []
+
         self.build_launcher_window()
 
 
@@ -101,6 +103,9 @@ class CustomLauncher:
         if window_config.fg_color is not None:
             self.window.configure(fg_color=window_config.fg_color)
         self.window.resizable(*window_config.resizable)
+        if window_config.fullscreen:
+            self.window.wm_attributes("-fullscreen", True)
+            self.window.state("normal")
 
         if window_config.column_configure:
             for index, kwargs in window_config.column_configure.items():
@@ -117,6 +122,14 @@ class CustomLauncher:
             if not isinstance(item, dict): continue
             widget: WidgetConfig = WidgetConfig(item, self.base_directory)
             self._place_widget(self.window, widget)
+
+        for bar in self._progress_bars:
+            match bar.cget("mode"):
+                case "determinate":
+                    bar.set(0)
+                case "indeterminate":
+                    bar.start()
+
 # endregion
 
 
@@ -147,19 +160,19 @@ class CustomLauncher:
                         widget = CTkLabel(parent, **kwargs)
                     case "status_label":
                         kwargs.pop("text", None)
-                        widget = LocalizedCTkLabel(parent, "status_label", **kwargs)
+                        widget = LocalizedCTkLabel(parent, key="launcher.progress.initializing", modification=None, **kwargs)
                         self._status_labels.append(widget)
                     case "channel_label":
                         kwargs.pop("text", None)
-                        widget = LocalizedCTkLabel(parent, "channel_label", **kwargs)
+                        widget = LocalizedCTkLabel(parent, key=None, modification=None, **kwargs)
                         self._channel_labels.append(widget)
                     case "version_label":
                         kwargs.pop("text", None)
-                        widget = LocalizedCTkLabel(parent, "version_label", **kwargs)
+                        widget = LocalizedCTkLabel(parent, key=None, modification=None, **kwargs)
                         self._guid_labels.append(widget)
                     case "file_version_label":
                         kwargs.pop("text", None)
-                        widget = LocalizedCTkLabel(parent, "file_version_label", **kwargs)
+                        widget = LocalizedCTkLabel(parent, key=None, modification=None, **kwargs)
                         self._file_version_labels.append(widget)
 
             case "button":
@@ -168,7 +181,8 @@ class CustomLauncher:
 
                 match config.button_action:
                     case "cancel":
-                        widget = LocalizedCTkButton(parent, key="launcher.button.cancel", command=self._on_cancel, **kwargs)
+                        kwargs["command"] = self._on_cancel
+                        widget = LocalizedCTkButton(parent, key="launcher.button.cancel", modification=None, **kwargs)
                     case _:
                         widget = CTkButton(parent, **kwargs)
 
@@ -194,6 +208,15 @@ class CustomLauncher:
     def run(self) -> None:
         self.window.deiconify()
         self.window.mainloop()
+# endregion
+
+
+# region update progress bars
+    def _update_progress_bars(self, value: float) -> None:
+        for bar in self._progress_bars:
+            if bar.cget("mode") == "determinate":
+                bar.set(value)
+
 # endregion
 
 

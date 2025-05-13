@@ -9,7 +9,8 @@
         "grid_rowconfigure": {
             "1": {"weight": 1}
         },
-        "theme": "{RESOURCES}/theme.json"
+        "theme": "{RESOURCES}/theme.json",
+        "fg_color": "{accent_normal}"
     },
 
     "widgets": [
@@ -115,6 +116,7 @@
                 },
                 {
                     "type": "button",
+                    "localized_string": "launcher.button.cancel",
                     "placement_mode": "grid",
                     "placement_kwargs": {
                         "column": 0,

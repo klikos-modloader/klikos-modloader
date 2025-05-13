@@ -1,14 +1,11 @@
 from typing import Optional, Literal, Any
 from pathlib import Path
-import re
 
 from modules.project_data import ProjectData
-from modules.filesystem import Resources, Directories
+from modules.filesystem import Resources
 from modules.interfaces.config import ConfigInterface
 
 from .parser import Parser
-
-import winaccent  # type: ignore
 
 
 class WindowConfig:
@@ -23,6 +20,7 @@ class WindowConfig:
     theme: Optional[Path] = None
     column_configure: Optional[dict[int, dict[str, str | int]]] = None
     row_configure: Optional[dict[int, dict[str, str | int]]] = None
+    alpha: float = 1
 
     _theme_base_directory: Path
 
@@ -91,3 +89,8 @@ class WindowConfig:
             theme = Parser.parse_filepath(theme, self._theme_base_directory)
             if theme.suffix == ".json" and theme.is_file():
                 self.theme = theme
+
+        # Alpha
+        alpha: Any = data.get("alpha")
+        if (isinstance(alpha, int) or isinstance(alpha, float)) and alpha >= 0 and alpha <= 1:
+            self.alpha = alpha

@@ -106,6 +106,7 @@ class CustomLauncher:
         if window_config.fullscreen:
             self.window.wm_attributes("-fullscreen", True)
             self.window.state("normal")
+        self.window.wm_attributes("-alpha", window_config.alpha)
 
         if window_config.column_configure:
             for index, kwargs in window_config.column_configure.items():

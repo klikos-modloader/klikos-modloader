@@ -24,7 +24,7 @@
     "launcher.button.cancel": "Cancel",
     "launcher.progress.initializing": "Initializing...",
     "launcher.progress.get_client_info": "Getting deployment details...",
-    "launcher.progress.check_client_update": "Checking for updates...",
+    "launcher.progress.check_for_update": "Checking for updates...",
     "launcher.progress.client_update": "Updating {roblox.dynamic}...",
     "launcher.progress.check_mod_update": "Checking for mod updates...",
     "launcher.progress.mod_update": "Updating mods...",
@@ -32,13 +32,13 @@
     "launcher.progress.launch_integrations": "Launching custom integrations...",
     "launcher.progress.launch_client": "Launching {roblox.dynamic}...",
 
-    "launcher.popup.permission_to_kill": "{roblox.dynamic} is already running, launching a new instance will close the current one. Do you want to continue?",
+    "launcher.popup.permission_to_kill": "{roblox.common} is already running, launching a new instance will close the current one. Do you want to continue?",
+    "launcher.popup.permission_to_kill.on_update": "In order to update {roblox.common}, existing instances will be closed. Do you want to continue?",
 
     "launcher.warning.custom_launcher_version.too_new": "You're using a custom launcher that was made for a newer version of {app.name}, the default launcher will be used instead.",
     "launcher.warning.custom_launcher_version.too_old": "You're using a custom launcher that was made for an older version of {app.name}, the default launcher will be used instead.",
 
-    "launcher.exception.title": "Unable to launch {roblox.dynamic}",
-    "launcher.exception.insufficient_storage": "{app.name} is unable to download and install {roblox.dynamic} because there is not enough disk space available.",
+    "launcher.exception.insufficient_storage": "{app.name} is unable to download and install {roblox.common} because there is not enough disk space available.",
     "launcher.exception.connection_failed": "Failed to connect to {endpoint}. Please check your internet connection and try again.",
 
 
@@ -177,6 +177,8 @@
     "menu.settings.content.disable_mods.description": "Prevents any mods from being applied",
     "menu.settings.content.disable_fastflags.title": "Disable all FastFlags",
     "menu.settings.content.disable_fastflags.description": "Prevents any FastFlags from being applied",
+    "menu.settings.content.static_version_folder.title": "Static Version Folder",
+    "menu.settings.content.static_version_folder.description": "Use static names for the {roblox.common} version folder",
 
     "menu.settings.exception.title.failed_to_update": "Unable to update setting: \"{setting.name}\"",
     "menu.settings.exception.message.unknown": "{exception.type}: {exception.message}",

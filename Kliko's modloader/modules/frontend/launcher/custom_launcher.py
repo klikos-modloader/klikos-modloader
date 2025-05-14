@@ -1,8 +1,10 @@
 from typing import Literal, Any
 from pathlib import Path
 from tkinter import messagebox, TclError
+from threading import Event, Thread
 import json
 
+from modules import exception_handler
 from modules.logger import Logger
 from modules.project_data import ProjectData
 from modules.filesystem import Directories
@@ -10,12 +12,14 @@ from modules.frontend.widgets import Root
 from modules.frontend.widgets.basic.localized import LocalizedCTkLabel, LocalizedCTkButton
 from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
+from modules.deployments import LatestVersion
 
+from . import tasks
 from .dataclasses import WindowConfig, WidgetConfig
 from .exceptions import InvalidLauncherVersion
 
 from packaging.version import Version, InvalidVersion as pacakaging_invalid_version_error  # type: ignore
-from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkProgressBar, CTkFont, CTkImage, set_default_color_theme, set_appearance_mode  # type: ignore
+from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkProgressBar, CTkFont, CTkImage, ScalingTracker, set_default_color_theme, set_appearance_mode  # type: ignore
 
 
 LAUNCHER_VERSION: Version = Version("1.0.0")
@@ -27,6 +31,8 @@ class CustomLauncher:
     version: Version
     base_directory: Path
     window: Root
+    window_config: WindowConfig
+    stop_event: Event
 
     _status_labels: list[LocalizedCTkLabel]
     _file_version_labels: list[LocalizedCTkLabel]
@@ -76,6 +82,8 @@ class CustomLauncher:
         self._channel_labels = []
         self._guid_labels = []
         self._progress_bars = []
+        self.window_config: WindowConfig = WindowConfig(self.config.get("window", {}), self.base_directory)
+        self.stop_event = Event()
 
         self.build_launcher_window()
 
@@ -93,13 +101,14 @@ class CustomLauncher:
 
 # region build window
     def build_launcher_window(self) -> None:
-        window_config: WindowConfig = WindowConfig(self.config.get("window", {}), self.base_directory)
-
+        window_config = self.window_config
         set_appearance_mode(window_config.appearance_mode)
         if window_config.theme is not None:
             set_default_color_theme(str(window_config.theme))
 
         self.window = Root(window_config.title, icon=window_config.icon, appearance_mode=window_config.appearance_mode, width=window_config.width, height=window_config.height, centered=True, banner_system=False, default_fg_color=True)
+        self.window.withdraw()
+        self.window.protocol("WM_DELETE_WINDOW", self.on_cancel)
         if window_config.fg_color is not None:
             self.window.configure(fg_color=window_config.fg_color)
         self.window.resizable(*window_config.resizable)
@@ -162,7 +171,16 @@ class CustomLauncher:
                 match config.type:
                     case "status_label":
                         kwargs.pop("text", None)
-                        widget = LocalizedCTkLabel(parent, key="launcher.progress.initializing", modification=None, **kwargs)
+                        widget = LocalizedCTkLabel(
+                            parent, key="launcher.progress.initializing",
+                            modification=lambda string: Localizer.format(string, {
+                                "{roblox.player}": Localizer.Key("roblox.player"),
+                                "{roblox.player_alt}": Localizer.Key("roblox.player_alt"),
+                                "{roblox.studio}": Localizer.Key("roblox.studio"),
+                                "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt"),
+                                "{roblox.common}": Localizer.Key("roblox.common"),
+                                "{roblox.dynamic}": Localizer.Key("roblox.player") if self.mode == "Player" else Localizer.Key("roblox.studio")
+                            }), **kwargs)
                         self._status_labels.append(widget)
                     case "channel_label":
                         kwargs.pop("text", None)
@@ -191,7 +209,7 @@ class CustomLauncher:
                 kwargs = config.kwargs
                 kwargs.pop("command", None)
                 if config.button_action == "cancel":
-                    kwargs["command"] = self._on_cancel
+                    kwargs["command"] = self.on_cancel
 
                 if config.localized_string is not None:
                     widget = LocalizedCTkButton(parent, key=config.localized_string, modification=config.localized_string_modification, **kwargs)
@@ -220,22 +238,84 @@ class CustomLauncher:
 
 # region run
     def run(self) -> None:
+        self.window.update()
         self.window.deiconify()
+        self.center_window()
+        Thread(
+            target=tasks.run, kwargs={
+                "mode": self.mode, "stop_event": self.stop_event,
+                "on_success": self.on_success, "on_error": self.on_error,
+                "on_cancel": self.on_cancel,
+                "set_status_label": self.set_status_label,
+                "set_deployment_details": self.set_deployment_details,
+                "update_progress_bars": self.update_progress_bars
+            }, daemon=True).start()
         self.window.mainloop()
 # endregion
 
 
-# region update progress bars
-    def _update_progress_bars(self, value: float) -> None:
+    def center_window(self) -> None:
+        window_scaling: float = ScalingTracker.get_window_scaling(self.window)
+        width: int = int(self.window_config.width / window_scaling) if self.window_config.width else int(self.window.winfo_width() / window_scaling)
+        height: int = int(self.window_config.height / window_scaling) if self.window_config.height else int(self.window.winfo_height() / window_scaling)
+        x: int = int((self.window.winfo_screenwidth()-width)/2)
+        y: int = int((self.window.winfo_screenheight()-height)/2)
+        self.window.geometry(f"{width}x{height}+{x}+{y}")
+
+
+    def on_cancel(self, *_, **__) -> None:
+        Logger.info("Roblox launch cancelled!")
+        self._close_window()
+
+
+    def _close_window(self, *_, **__) -> None:
+        self.stop_event.set()
+        if self.window.winfo_exists():
+            self.window.destroy()
+
+
+    def set_status_label(self, key: str) -> None:
+        for label in self._status_labels:
+            label.after(0, lambda: label.configure(key=key))
+
+
+    def set_deployment_details(self, deployment_details: LatestVersion) -> None:
+        if not ConfigInterface.get("deployment_info"): return
+        for label in self._channel_labels:
+            label.after(0,
+                lambda label=label: label.configure(  # type: ignore
+                    key="launcher.deployment_info.channel",
+                    modification=lambda string: Localizer.format(string, {"{value}": deployment_details.channel})
+                )
+            )
+        for label in self._file_version_labels:
+            label.after(0,
+                lambda label=label: label.configure(  # type: ignore
+                    key="launcher.deployment_info.file_version",
+                    modification=lambda string: Localizer.format(string, {"{value}": str(deployment_details.file_version.minor)})
+                )
+            )
+        for label in self._guid_labels:
+            label.after(0,
+                lambda label=label: label.configure(  # type: ignore
+                    key="launcher.deployment_info.guid",
+                    modification=lambda string: Localizer.format(string, {"{value}": deployment_details.guid})
+                )
+            )
+
+
+    def update_progress_bars(self, value: float) -> None:
         for bar in self._progress_bars:
             try:
                 if bar.cget("mode") == "determinate":
-                    bar.set(value)
+                    bar.after(0, bar.set, value)
             except (TclError, AttributeError): pass
-# endregion
 
 
-# region on cancel
-    def _on_cancel(self, *_, **__) -> None:
-        print("Cancel!")
-# endregion
+    def on_success(self) -> None:
+        self._close_window()
+
+
+    def on_error(self, error: Exception) -> None:
+        exception_handler.run(error)
+        self._close_window()

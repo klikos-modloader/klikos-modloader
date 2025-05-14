@@ -63,6 +63,7 @@ class Directories:
     VERSIONS: Path = ROOT / "Versions"
     LAUNCHERS: Path = ROOT / "Launchers"
     CACHE: Path = ROOT / "cache"
+    VERSIONS_CACHE: Path = CACHE / "downloads"
     MARKETPLACE_CACHE: Path = CACHE / "marketplace"
     MEIPASS: Optional[Path] = Path(sys._MEIPASS) if FROZEN else None  # type: ignore
     RESOURCES: Path = (MEIPASS if FROZEN else ROOT) / "resources"  # type: ignore
@@ -75,7 +76,7 @@ class Directories:
 
 class Files:
     CONFIG: Path = Directories.CONFIG / "config.json"
-    STATE: Path = Directories.CONFIG / "state.json"
+    DATA: Path = Directories.CONFIG / "data.json"
     MOD_CONFIG: Path = Directories.CONFIG / "mods.json"
     MARKETPLACE_CACHE_INDEX: Path = Directories.MARKETPLACE_CACHE / "index.json"
 

@@ -28,7 +28,7 @@ class Api:
 
         LATEST_VERSION: str = r"https://raw.githubusercontent.com/klikos-modloader/config/refs/heads/main/version.json"
         LATEST_RELEASE_INFO: str = r"https://api.github.com/repos/klikos-modloader/klikos-modloader/releases/latest"
-        FILEMAP: str = r"https://github.com/klikos-modloader/config/blob/main/filemap.json"
+        FILEMAP: str = r"https://raw.githubusercontent.com/klikos-modloader/config/refs/heads/main/filemap.json"
         MOD_GENERATOR_CONFIG: str = r"https://github.com/klikos-modloader/config/blob/main/mod_generator.json"
         MARKETPLACE: str = r"https://raw.githubusercontent.com/klikos-modloader/marketplace/refs/heads/main/index.json"
     # endregion

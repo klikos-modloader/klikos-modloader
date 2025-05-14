@@ -23,6 +23,8 @@ def run(exception: Exception) -> None:
     shutil.copy(Logger.filepath, crash_dir)
     try: shutil.copy(Files.CONFIG, crash_dir)
     except FileNotFoundError: pass
+    try: shutil.copy(Files.DATA, crash_dir)
+    except FileNotFoundError: pass
 
     if getattr(sys, "frozen", False):
         try:
@@ -37,4 +39,3 @@ def run(exception: Exception) -> None:
     try: user_string: str = Localizer.format(Localizer.Strings["fatalerror.message"], {"{app.name}": ProjectData.NAME, "{exception.type}": exception_type, "{exception.message}": exception_message})
     except Exception: user_string = f"{ProjectData.NAME} crashed due to a fatal error!\n\n{exception_type}: {exception_message}\n\nMore information may be available in the latest log file"
     showerror(title=f"{ProjectData.NAME} ({ProjectData.VERSION})", message=user_string)
-    sys.exit(1)

@@ -43,6 +43,7 @@ try:
     from modules.localization import Localizer
     from modules.interfaces.config import ConfigInterface
     from modules.filesystem import Directories
+    from modules.backend.registry_editor import set_registry_keys
     from modules import exception_handler
 except (ImportError, ModuleNotFoundError) as e:
     print(f"[CRITICAL] Missing requires libraries!\n{type(e).__name__}: {e}")
@@ -79,26 +80,26 @@ def main() -> None:
     initialize_localization()
 
     try:
+        if FROZEN:
+            set_registry_keys()
+
         if args.menu:
             from modules.frontend import menu
             menu.run()
 
         elif args.player:
             from modules.frontend import launcher
-            launcher.run("Player")
+            launcher.run("Player", args.deeplink)
 
         elif args.studio:
             from modules.frontend import launcher
-            launcher.run("Studio")
+            launcher.run("Studio", args.deeplink)
 
         elif args.presence:
             pass
 
     except Exception as e: exception_handler.run(e)
-
-    else:
-        Logger.info("Exit Code 0")
-        sys.exit(0)
+    Logger.info("Shutting down...")
 
 
 if __name__ == "__main__":

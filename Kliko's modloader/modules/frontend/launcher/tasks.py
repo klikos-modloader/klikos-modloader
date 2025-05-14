@@ -2,6 +2,8 @@ from typing import Literal, Callable, NamedTuple, Any
 from pathlib import Path
 from threading import Event
 from tkinter import messagebox
+import time
+import subprocess
 import ctypes
 import shutil
 import hashlib
@@ -20,8 +22,16 @@ from modules import filesystem
 
 LOG_PREFIX: str = "LauncherTasks"
 DEPLOYMENT_DETAILS_END_PROGRESS: float = 0.06
-DOWNLOAD_END_PROGRESS: float = 0.6
-MOD_UPDATER_END_PROGRESS: float = 0.5
+DOWNLOAD_END_PROGRESS: float = 0.65
+MOD_UPDATER_END_PROGRESS: float = 0.85
+MOD_DEPLOY_END_PROGRESS: float = 0.90
+LAUNCH_END_PROGRESS: float = 1
+
+APPSETTINGS: str = """<?xml version="1.0" encoding="UTF-8"?>
+<Settings>
+	<ContentFolder>content</ContentFolder>
+	<BaseUrl>http://www.roblox.com</BaseUrl>
+</Settings>"""
 
 class Config(NamedTuple):
     confirm_launch: bool
@@ -44,10 +54,11 @@ class Functions(NamedTuple):
     update_progress_bars: Callable[[float], Any]
 
 
-def run(mode: Literal["Player", "Studio"], stop_event: Event, on_success: Callable, on_cancel: Callable, on_error: Callable[[Exception], Any], set_status_label: Callable[[str], Any], set_deployment_details: Callable[[LatestVersion], Any], update_progress_bars: Callable[[float], Any]) -> None:
+def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_success: Callable, on_cancel: Callable, on_error: Callable[[Exception], Any], set_status_label: Callable[[str], Any], set_deployment_details: Callable[[LatestVersion], Any], update_progress_bars: Callable[[float], Any]) -> None:
     try:
         Logger.info("Running launcher tasks...", prefix=LOG_PREFIX)
         functions = Functions(on_success, on_cancel, on_error, set_status_label, set_deployment_details, update_progress_bars)
+
 
         # Settings & Data
         Logger.info("Getting config...", prefix=LOG_PREFIX)
@@ -75,14 +86,23 @@ def run(mode: Literal["Player", "Studio"], stop_event: Event, on_success: Callab
         latest_version: LatestVersion = LatestVersion(binary_type)
         functions.set_deployment_details(latest_version)
         functions.update_progress_bars(DEPLOYMENT_DETAILS_END_PROGRESS)
-        if stop_event.is_set(): return
+        if stop_event.is_set():
+            return
 
+
+        # Updates
         Logger.info("Checking for updates...", prefix=LOG_PREFIX)
         functions.set_status_label("launcher.progress.check_client_update")
         if should_update(mode, latest_version, config):
+            Logger.info("Updating Roblox...", prefix=LOG_PREFIX)
+            functions.set_status_label("launcher.progress.client_update")
             update_roblox(mode, config, functions, stop_event, latest_version)
         functions.update_progress_bars(DOWNLOAD_END_PROGRESS)
-        
+        if stop_event.is_set():
+            return
+
+
+        # Mutliple Instances
         skip_modloader: bool = False  # Don't load mods during multi-instance launching
         if RobloxInterface.is_roblox_running(mode):
             if config.multi_instance_launching:
@@ -103,14 +123,52 @@ def run(mode: Literal["Player", "Studio"], stop_event: Event, on_success: Callab
                 RobloxInterface.kill_existing_instances(mode)
         
         elif config.multi_instance_launching:
-                create_singleton_mutexes()
-        
+            create_singleton_mutexes()
+
+
+        # Mods
         if not skip_modloader or not config.disable_mods:
-            pass
             # mod loader, mod updates ...
+            pass
+        functions.update_progress_bars(MOD_DEPLOY_END_PROGRESS)
+
+
+        # FastFlags
+        if config.disable_fastflags:
+            pass
+        else:
+            pass
+
+
+        # Custom integrations
+
+
+        # Launch Roblox
+        Logger.info("Launching Roblox...")
+        functions.set_status_label("launcher.progress.launch_client")
+        functions.update_progress_bars(LAUNCH_END_PROGRESS)
+        version_folder: Path = get_version_dir(mode, latest_version, config)
+        target: Path = version_folder / f"Roblox{mode}Beta.exe"
+        timestamp: int = int(time.time() * 1000)
+        args: str = ""
+        if deeplink:
+            args = "+".join([
+                item if not item.startswith("launchtime:") else f"launchtime:{timestamp}"
+                for item in deeplink.split("+")
+            ])
+            args = f"\"{str(target)}\" {args}"
+        else:
+            args =  f"\"{str(target)}\""
+        subprocess.Popen(args)
+
+        time.sleep(1)
+
 
     except Exception as e:
         return functions.on_error(e)
+
+    else:
+        return functions.on_success()
 
 
 # region update
@@ -126,9 +184,6 @@ def should_update(mode: Literal["Player", "Studio"], latest_version: LatestVersi
 
 
 def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: Functions, stop_event: Event, latest_version: LatestVersion) -> None:
-    Logger.info("Updating Roblox...", prefix=LOG_PREFIX)
-    functions.set_status_label("launcher.progress.client_update")
-
     package_manifest = PackageManifest(latest_version.guid)
     install_target: Path = Directories.VERSIONS / (mode if config.static_version_folder else latest_version.guid)
 
@@ -166,6 +221,8 @@ def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: 
                         shutil.rmtree(path)
                 elif not (path / ("RobloxStudioBeta.exe" if mode == "Player" else "RobloxPlayerBeta.exe")).exists():
                     shutil.rmtree(path)
+    if stop_event.is_set():
+        return
 
     # Clear downloads cache (don't remove files for the current version)
     Logger.info("Cleaning downloads cache...", prefix=LOG_PREFIX)
@@ -182,8 +239,11 @@ def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: 
                 else:
                     cached_packages.append(path.name)
             elif path.is_dir(): shutil.rmtree(path, ignore_errors=True)
+    if stop_event.is_set():
+        return
 
     # Download missing files
+    Logger.info("Downloading Roblox...")
     download_start_progress: float = DEPLOYMENT_DETAILS_END_PROGRESS
     download_end_progress: float = DOWNLOAD_END_PROGRESS
     functions.update_progress_bars(download_start_progress)
@@ -194,14 +254,34 @@ def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: 
         filesystem.download(package.source, destination)
         current_progress: float = download_start_progress + i * ((download_end_progress - download_start_progress) / total)
         functions.update_progress_bars(current_progress)
+        if stop_event.is_set():
+            return
+
+    # Extract files to version folder
+    Logger.info("Installing Roblox...")
+    version_folder: Path = get_version_dir(mode, latest_version, config)
+    version_folder.mkdir(parents=True, exist_ok=True)
+    for package in package_manifest.packages:
+        source: Path = Directories.VERSIONS_CACHE / mode / package.md5
+        destination = pacakage_map[package.file]
+        if package.file.endswith(".zip"):
+            filesystem.extract(source, destination, ignore_filetype=True)
+        else:
+            shutil.copy(source, destination)
+
+    Logger.info("Writing AppSettings.xml")
+    with open(version_folder / "AppSettings.xml", "w") as file:
+        file.write(APPSETTINGS)
+
+    DataInterface.set_installed_version(mode, latest_version.guid)
 # endregion
 
 
 # region other
 def get_version_dir(mode: Literal["Player", "Studio"], latest_version: LatestVersion, config: Config) -> Path:
     if config.static_version_folder:
-        return Directories.VERSIONS / mode
-    return Directories.VERSIONS / latest_version.guid
+        return (Directories.VERSIONS / mode).resolve()
+    return (Directories.VERSIONS / latest_version.guid).resolve()
 
 
 def get_md5(path: Path) -> str:

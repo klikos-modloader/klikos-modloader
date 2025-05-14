@@ -237,13 +237,14 @@ class CustomLauncher:
 
 
 # region run
-    def run(self) -> None:
+    def run(self, deeplink: str) -> None:
         self.window.update()
         self.window.deiconify()
         self.center_window()
         Thread(
             target=tasks.run, kwargs={
                 "mode": self.mode, "stop_event": self.stop_event,
+                "deeplink": deeplink,
                 "on_success": self.on_success, "on_error": self.on_error,
                 "on_cancel": self.on_cancel,
                 "set_status_label": self.set_status_label,

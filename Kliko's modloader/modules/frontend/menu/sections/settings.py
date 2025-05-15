@@ -1,15 +1,17 @@
 from tkinter import TclError, StringVar, BooleanVar
-from typing import Optional, Literal, Callable, TYPE_CHECKING
+from typing import Optional, Literal, TYPE_CHECKING
 
-from modules.filesystem import Directories
+from modules.filesystem import Directories, Resources
 from modules.project_data import ProjectData
-from modules.frontend.widgets import ScrollableFrame, Frame, Label, DropDownMenu, ToggleSwitch
+from modules.frontend.widgets import ScrollableFrame, Frame, Label, DropDownMenu, ToggleSwitch, Button
 from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
+from modules.frontend.launcher import PreviewLauncher
+from modules.frontend.functions import get_ctk_image
 
 if TYPE_CHECKING: from modules.frontend.widgets import Root
 
-from customtkinter import set_appearance_mode  # type: ignore
+from customtkinter import CTkImage, set_appearance_mode  # type: ignore
 from natsort import natsorted  # type: ignore
 
 
@@ -144,7 +146,9 @@ class SettingsSection(ScrollableFrame):
         launcher_options: list[str] = natsorted(known_launchers)
         launcher: str = ConfigInterface.get_launcher()
         launcher_variable: StringVar = StringVar(value=launcher)
-        DropDownMenu(frame, launcher_options, dont_localize=True, variable=launcher_variable, command=self._update_launcher).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
+        DropDownMenu(frame, launcher_options, dont_localize=True, variable=launcher_variable, command=self._update_launcher).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, 0))
+        eye_image: CTkImage = get_ctk_image(Resources.Common.Light.EYE, Resources.Common.Dark.EYE, 24)
+        Button(frame, "menu.settings.content.custom_launcher.preview_button", secondary=True, image=eye_image, command=self._preview_launcher).grid(column=2, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
 
 
         # Update checker
@@ -319,4 +323,20 @@ class SettingsSection(ScrollableFrame):
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
                 mode="error", auto_close_after_ms=6000
             )
+
+
+    def _preview_launcher(self) -> None:
+        try:
+            window = PreviewLauncher(self.root)
+        
+        except Exception as e:
+            self.root.send_banner(
+                title_key="menu.settings.exception.title.launcher_preview_failed",
+                message_key="menu.settings.exception.message.unknown",
+                message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
+                mode="error", auto_close_after_ms=6000
+            )
+
+        else:
+            window.show()
 # endregion

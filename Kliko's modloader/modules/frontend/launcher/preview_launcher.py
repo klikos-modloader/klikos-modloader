@@ -8,7 +8,7 @@ from modules import exception_handler
 from modules.logger import Logger
 from modules.project_data import ProjectData
 from modules.filesystem import Directories
-from modules.frontend.widgets import Root
+from modules.frontend.widgets import Root, Toplevel
 from modules.frontend.widgets.basic.localized import LocalizedCTkLabel, LocalizedCTkButton
 from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
@@ -25,14 +25,12 @@ from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkProgressBar, CTkFont
 LAUNCHER_VERSION: Version = Version("1.0.0")
 
 
-class CustomLauncher:
-    mode: Literal["Player", "Studio"]
+class PreviewLauncher:
     config: dict
     version: Version
     base_directory: Path
-    window: Root
+    window: Toplevel
     window_config: WindowConfig
-    stop_event: Event
 
     _status_labels: list[LocalizedCTkLabel]
     _file_version_labels: list[LocalizedCTkLabel]
@@ -40,12 +38,12 @@ class CustomLauncher:
     _guid_labels: list[LocalizedCTkLabel]
     _progress_bars: list[CTkProgressBar]
 
-    _LOG_PREFIX: str = "CustomLauncher"
+    _LOG_PREFIX: str = "PreviewLauncher"
 
 
-    def __init__(self, mode: Literal["Player", "Studio"]):
-        Logger.info(f"Initializing launcher (mode: {mode})...")
-        self.mode = mode
+    def __init__(self, root: Root):
+        Logger.info(f"Loading launcher preview...")
+        self.root = root
         default_launcher: str = ConfigInterface.get_default_launcher()
         launcher: str = ConfigInterface.get_launcher()
 
@@ -66,7 +64,7 @@ class CustomLauncher:
         if not launcher_version:
             raise ValueError("Unknown launcher version!")
         try: self.version: Version = Version(launcher_version)
-        except (pacakaging_invalid_version_error, TypeError, ValueError):
+        except (pacakaging_invalid_version_error, TypeError):
             raise InvalidLauncherVersion(f'Invalid launcher version: "{launcher_version}"')
         if len(self.version.base_version.split(".")) != 3:
             raise InvalidLauncherVersion(f'Invalid launcher version: "{launcher_version}"')
@@ -108,8 +106,7 @@ class CustomLauncher:
         if window_config.theme is not None:
             set_default_color_theme(str(window_config.theme))
 
-        self.window = Root(window_config.title, icon=window_config.icon, appearance_mode=window_config.appearance_mode, width=window_config.width, height=window_config.height, centered=True, banner_system=False, default_fg_color=True)
-        self.window.withdraw()
+        self.window = Toplevel(window_config.title, icon=window_config.icon, width=window_config.width, height=window_config.height, centered=True, master=self.root)
         self.window.protocol("WM_DELETE_WINDOW", self.on_cancel)
         if window_config.fg_color is not None:
             self.window.configure(fg_color=window_config.fg_color)
@@ -181,7 +178,7 @@ class CustomLauncher:
                                 "{roblox.studio}": Localizer.Key("roblox.studio"),
                                 "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt"),
                                 "{roblox.common}": Localizer.Key("roblox.common"),
-                                "{roblox.dynamic}": Localizer.Key("roblox.player") if self.mode == "Player" else Localizer.Key("roblox.studio")
+                                "{roblox.dynamic}": Localizer.Key("roblox.common")
                             }), **kwargs)
                         self._status_labels.append(widget)
                     case "channel_label":
@@ -240,29 +237,21 @@ class CustomLauncher:
 
 # region preview
     def preview(self) -> None:
-        self.window.update()
         self.window.deiconify()
+        self.window.update()
         self.center_window()
-        self.window.mainloop()
 # endregion
 
 
-# region run
-    def run(self, deeplink: str) -> None:
+# region show
+    def show(self) -> None:
+        self.update_progress_bars(0.5)
+        self.set_deployment_details("version-3c1b78b767674c66", "LIVE", 670)
+        self.set_status_label("launcher.progress.preview")
         self.window.update()
         self.window.deiconify()
         self.center_window()
-        Thread(
-            target=tasks.run, kwargs={
-                "mode": self.mode, "stop_event": self.stop_event,
-                "deeplink": deeplink,
-                "on_success": self.on_success, "on_error": self.on_error,
-                "on_cancel": self.on_cancel,
-                "set_status_label": self.set_status_label,
-                "set_deployment_details": self.set_deployment_details,
-                "update_progress_bars": self.update_progress_bars
-            }, daemon=True).start()
-        self.window.mainloop()
+        self.window.grab_set()
 # endregion
 
 
@@ -276,7 +265,6 @@ class CustomLauncher:
 
 
     def on_cancel(self, *_, **__) -> None:
-        Logger.info("Roblox launch cancelled!")
         self._close_window()
 
 
@@ -291,27 +279,27 @@ class CustomLauncher:
             label.after(0, lambda: label.configure(key=key))
 
 
-    def set_deployment_details(self, deployment_details: LatestVersion) -> None:
+    def set_deployment_details(self, guid: str, channel: str, file_version: int) -> None:
         if not ConfigInterface.get("deployment_info"): return
         for label in self._channel_labels:
             label.after(0,
                 lambda label=label: label.configure(  # type: ignore
                     key="launcher.deployment_info.channel",
-                    modification=lambda string: Localizer.format(string, {"{value}": deployment_details.channel})
+                    modification=lambda string: Localizer.format(string, {"{value}": channel})
                 )
             )
         for label in self._file_version_labels:
             label.after(0,
                 lambda label=label: label.configure(  # type: ignore
                     key="launcher.deployment_info.file_version",
-                    modification=lambda string: Localizer.format(string, {"{value}": str(deployment_details.file_version.minor)})
+                    modification=lambda string: Localizer.format(string, {"{value}": str(file_version)})
                 )
             )
         for label in self._guid_labels:
             label.after(0,
                 lambda label=label: label.configure(  # type: ignore
                     key="launcher.deployment_info.guid",
-                    modification=lambda string: Localizer.format(string, {"{value}": deployment_details.guid})
+                    modification=lambda string: Localizer.format(string, {"{value}": guid})
                 )
             )
 
@@ -322,12 +310,3 @@ class CustomLauncher:
                 if bar.cget("mode") == "determinate":
                     bar.after(0, bar.set, value)
             except (TclError, AttributeError): pass
-
-
-    def on_success(self) -> None:
-        self._close_window()
-
-
-    def on_error(self, error: Exception) -> None:
-        exception_handler.run(error)
-        self._close_window()

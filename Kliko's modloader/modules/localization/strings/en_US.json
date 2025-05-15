@@ -22,6 +22,7 @@
     "launcher.deployment_info.guid": "GUID: {value}",
 
     "launcher.button.cancel": "Cancel",
+    "launcher.progress.preview": "Launcher preview...",
     "launcher.progress.initializing": "Initializing...",
     "launcher.progress.get_client_info": "Getting deployment details...",
     "launcher.progress.check_for_update": "Checking for updates...",
@@ -165,6 +166,7 @@
     "menu.settings.content.language.title": "Language",
     "menu.settings.content.custom_launcher.title": "Custom Launcher",
     "menu.settings.content.custom_launcher.description": "Use a custom launcher when launching {roblox.common}",
+    "menu.settings.content.custom_launcher.preview_button": "Preview",
     "menu.settings.content.check_for_updates.title": "Check for Updates",
     "menu.settings.content.check_for_updates.description": "Check for updates when launching {app.name}",
     "menu.settings.content.confirm_launch.title": "Launch Confirmation",
@@ -180,7 +182,8 @@
     "menu.settings.content.static_version_folder.title": "Static Version Folder",
     "menu.settings.content.static_version_folder.description": "Use static names for the {roblox.common} version folder",
 
-    "menu.settings.exception.title.failed_to_update": "Unable to update setting: \"{setting.name}\"",
+    "menu.settings.exception.title.failed_to_update": "Failed to update setting: \"{setting.name}\"",
+    "menu.settings.exception.title.launcher_preview_failed": "Failed to load launcher preview!",
     "menu.settings.exception.message.unknown": "{exception.type}: {exception.message}",
 
 

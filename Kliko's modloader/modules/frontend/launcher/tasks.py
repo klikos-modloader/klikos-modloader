@@ -13,6 +13,7 @@ from modules.project_data import ProjectData
 from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
 from modules.interfaces.data import DataInterface
+from modules.interfaces.mod_manager import Mod, ModManager
 from modules.interfaces.roblox import RobloxInterface
 from modules.deployments import LatestVersion, Package, PackageManifest
 from modules.networking import requests, Response, Api
@@ -25,6 +26,7 @@ DEPLOYMENT_DETAILS_END_PROGRESS: float = 0.06
 DOWNLOAD_END_PROGRESS: float = 0.65
 MOD_UPDATER_END_PROGRESS: float = 0.85
 MOD_DEPLOY_END_PROGRESS: float = 0.90
+CUSTOM_INTEGRATIONS_END_PROGRESS: float = 0.95
 LAUNCH_END_PROGRESS: float = 1
 
 APPSETTINGS: str = """<?xml version="1.0" encoding="UTF-8"?>
@@ -41,6 +43,7 @@ class Config(NamedTuple):
     static_version_folder: bool
     mod_updates: bool
     multi_instance_launching: bool
+    discord_rpc: bool
     installed_version: str
     loaded_mods: list[str]
 
@@ -70,10 +73,11 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
         mod_updates: bool = ConfigInterface.get("mod_updates")
         multi_instance_launching: bool = ConfigInterface.get("multi_instance_launching")
+        discord_rpc: bool = ConfigInterface.get("discord_rpc")
 
         installed_version: str = DataInterface.get_installed_version(mode)
         loaded_mods: list[str] = DataInterface.get_loaded_mods(mode)
-        config: Config = Config(confirm_launch, force_reinstall, disable_mods, disable_fastflags, static_version_folder, mod_updates, multi_instance_launching, installed_version, loaded_mods)
+        config: Config = Config(confirm_launch, force_reinstall, disable_mods, disable_fastflags, static_version_folder, mod_updates, multi_instance_launching, discord_rpc, installed_version, loaded_mods)
 
 
         # Deployment details
@@ -127,27 +131,41 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
 
         # Mods
+        version_folder: Path = get_version_dir(mode, latest_version, config)
         if not skip_modloader or not config.disable_mods:
+            mods: list[Mod] = ModManager.get_active(mode.lower())  # type: ignore
+
+            if config.mod_updates:
+                functions.set_status_label("launcher.progress.check_mod_update")
+                Logger.info("Checking for mod updates...", prefix=LOG_PREFIX)
+            functions.update_progress_bars(MOD_UPDATER_END_PROGRESS)
+
+            Logger.info("Deploying mods...", prefix=LOG_PREFIX)
+            functions.set_status_label("launcher.progress.deploying_mods")
+            ModManager.deploy_mods(version_folder, mods)  # type: ignore
             # mod loader, mod updates ...
             pass
         functions.update_progress_bars(MOD_DEPLOY_END_PROGRESS)
 
 
         # FastFlags
-        if config.disable_fastflags:
-            pass
-        else:
-            pass
+        fastflags: dict = {}
+        if not config.disable_fastflags:
+            fastflags = {}
+        if config.discord_rpc:
+            fastflags.update({"FLogNetwork": "7"})
+        # TODO: FastFlagManager
 
 
         # Custom integrations
+        functions.update_progress_bars(CUSTOM_INTEGRATIONS_END_PROGRESS)
+        # TODO: CustomIntegrationsManager
 
 
         # Launch Roblox
         Logger.info("Launching Roblox...")
         functions.set_status_label("launcher.progress.launch_client")
         functions.update_progress_bars(LAUNCH_END_PROGRESS)
-        version_folder: Path = get_version_dir(mode, latest_version, config)
         target: Path = version_folder / f"Roblox{mode}Beta.exe"
         timestamp: int = int(time.time() * 1000)
         args: str = ""

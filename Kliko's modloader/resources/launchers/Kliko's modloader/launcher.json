@@ -9,8 +9,7 @@
         "grid_rowconfigure": {
             "1": {"weight": 1}
         },
-        "theme": "{RESOURCES}/theme.json",
-        "fg_color": "{accent_normal}"
+        "theme": "{RESOURCES}/theme.json"
     },
 
     "widgets": [

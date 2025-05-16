@@ -266,10 +266,10 @@ class PreviewLauncher:
 
 
     def on_cancel(self, *_, **__) -> None:
-        self._close_window()
+        self.close_window()
 
 
-    def _close_window(self, *_, **__) -> None:
+    def close_window(self, *_, **__) -> None:
         self.stop_event.set()
         if self.window.winfo_exists():
             self.window.destroy()

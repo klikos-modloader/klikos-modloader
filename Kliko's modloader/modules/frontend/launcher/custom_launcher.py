@@ -277,10 +277,10 @@ class CustomLauncher:
 
     def on_cancel(self, *_, **__) -> None:
         Logger.info("Roblox launch cancelled!")
-        self._close_window()
+        self.close_window()
 
 
-    def _close_window(self, *_, **__) -> None:
+    def close_window(self, *_, **__) -> None:
         self.stop_event.set()
         if self.window.winfo_exists():
             self.window.destroy()
@@ -325,9 +325,9 @@ class CustomLauncher:
 
 
     def on_success(self) -> None:
-        self._close_window()
+        self.close_window()
 
 
     def on_error(self, error: Exception) -> None:
         exception_handler.run(error)
-        self._close_window()
+        self.close_window()

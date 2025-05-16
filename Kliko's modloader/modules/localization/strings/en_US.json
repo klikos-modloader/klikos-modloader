@@ -18,7 +18,7 @@
 
 
     "launcher.deployment_info.channel": "Channel: {value}",
-    "launcher.deployment_info.file_version": "Version: {value}",
+    "launcher.deployment_info.file_version": "File Version: {value}",
     "launcher.deployment_info.guid": "GUID: {value}",
 
     "launcher.button.cancel": "Cancel",

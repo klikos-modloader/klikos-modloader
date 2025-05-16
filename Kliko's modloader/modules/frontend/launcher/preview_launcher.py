@@ -250,6 +250,7 @@ class PreviewLauncher:
         self.set_status_label("launcher.progress.preview")
         self.window.update()
         self.window.deiconify()
+        self.window.attributes("-topmost", True)  # Sometimes the launcher is hidden behind the menu window
         self.center_window()
         self.window.grab_set()
 # endregion

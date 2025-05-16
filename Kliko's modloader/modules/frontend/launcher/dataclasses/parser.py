@@ -452,7 +452,7 @@ class Parser:
     # region - label
             case "label" | "status_label" | "channel_label" | "version_label" | "file_version_label":
                 int_kwargs = {"width", "height", "corner_radius", "padx", "pady", "wraplength"}
-                string_kwargs = {"text", "compound", "anchor"}
+                string_kwargs = {"text", "compound", "anchor", "justify"}
                 color_kwargs = {"fg_color", "text_color"}
                 font_kwargs = {"font"}
                 image_kwargs = {"image"}
@@ -476,6 +476,10 @@ class Parser:
 
                         elif key == "compound":
                             value_lower = value.lower()
+                            if value_lower in {"left", "right", "center"}:
+                                kwargs[key] = value_lower
+                        
+                        elif key == "justify":
                             if value_lower in {"left", "right", "center"}:
                                 kwargs[key] = value_lower
 

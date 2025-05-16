@@ -23,7 +23,7 @@
         "text_color": ["#1A1A1A", "#FFFFFF"]
     },
     "CTkProgressBar": {
-        "corner_radius": 0,
+        "corner_radius": 1000,
         "border_width": 0,
         "fg_color": ["#E6E6E6", "#353535"],
         "progress_color": ["#F20041", "#CC0037"],

@@ -31,7 +31,11 @@
             },
             "widgets": [
                 {
-                    "type": "channel_label",
+                    "type": "file_version_label",
+                    "kwargs": {
+                        "text_color": ["#5C5C5C", "#CCCCCC"],
+                        "font": {"size": 12}
+                    },
                     "placement_mode": "grid",
                     "placement_kwargs": {
                         "column": 0,
@@ -41,20 +45,26 @@
                 },
                 {
                     "type": "version_label",
+                    "kwargs": {
+                        "text_color": ["#5C5C5C", "#CCCCCC"],
+                        "font": {"size": 12}
+                    },
                     "placement_mode": "grid",
                     "placement_kwargs": {
                         "column": 1,
-                        "row": 0,
-                        "padx": [16, 0]
+                        "row": 0
                     }
                 },
                 {
-                    "type": "file_version_label",
+                    "type": "channel_label",
+                    "kwargs": {
+                        "text_color": ["#5C5C5C", "#CCCCCC"],
+                        "font": {"size": 12}
+                    },
                     "placement_mode": "grid",
                     "placement_kwargs": {
                         "column": 2,
                         "row": 0,
-                        "padx": [16, 0],
                         "sticky": "e"
                     }
                 }
@@ -68,7 +78,7 @@
                 "row": 1,
                 "sticky": "nsew",
                 "padx": 32,
-                "pady": [16, 8]
+                "pady": 16
             },
             "grid_columnconfigure": {
                 "0": {"weight": 1}
@@ -90,11 +100,14 @@
                 },
                 {
                     "type": "status_label",
+                    "kwargs": {
+                        "font": {"size": 16}
+                    },
                     "placement_mode": "grid",
                     "placement_kwargs": {
                         "column": 0,
                         "row": 1,
-                        "pady": [16, 8],
+                        "pady": [12, 0],
                         "sticky": "ew"
                     }
                 },
@@ -102,13 +115,14 @@
                     "type": "progress_bar",
                     "kwargs": {
                         "width": 456,
-                        "height": 16
+                        "height": 8,
+                        "mode": "indeterminate"
                     },
                     "placement_mode": "grid",
                     "placement_kwargs": {
                         "column": 0,
                         "row": 2,
-                        "pady": [8, 0],
+                        "pady": [12, 0],
                         "sticky": "ew"
                     },
                     "action": "cancel"
@@ -120,7 +134,7 @@
                     "placement_kwargs": {
                         "column": 0,
                         "row": 3,
-                        "pady": [8, 0]
+                        "pady": [12, 0]
                     },
                     "action": "cancel"
                 }

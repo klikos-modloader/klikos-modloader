@@ -209,6 +209,10 @@ class PreviewLauncher:
                 kwargs.pop("command", None)
                 if config.button_action == "cancel":
                     kwargs["command"] = self.on_cancel
+                font_data = kwargs.pop("font", None)
+                if font_data: kwargs["font"] = CTkFont(**font_data)
+                image_data = kwargs.pop("image", None)
+                if image_data: kwargs["image"] = CTkImage(**image_data)
 
                 if config.localized_string is not None:
                     widget = LocalizedCTkButton(parent, key=config.localized_string, modification=config.localized_string_modification, **kwargs)

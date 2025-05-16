@@ -480,6 +480,7 @@ class Parser:
                                 kwargs[key] = value_lower
                         
                         elif key == "justify":
+                            value_lower = value.lower()
                             if value_lower in {"left", "right", "center"}:
                                 kwargs[key] = value_lower
 

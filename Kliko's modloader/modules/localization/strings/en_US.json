@@ -143,7 +143,6 @@
     "menu.fastflags.exception.title.change_status": "Unable to update status of \"{profile.name}\"",
 
     "menu.fastflags.exception.message.profile_exists": "Another profile with the same name already exists!",
-    "menu.fastflags.exception.message.unsupported_filetype": "Unsupported filetype: \"{filetype}\"",
     "menu.fastflags.exception.message.unknown": "{exception.type}: {exception.message}",
 
 
@@ -175,6 +174,25 @@
 
     "menu.custom_integrations.header.title": "Custom Integrations",
     "menu.custom_integrations.header.description": "Add your own integrations",
+    "menu.custom_integrations.header.button.add_new": "New",
+    "menu.custom_integrations.content.launch_args.placeholder": "Launch arguments",
+    "menu.custom_integrations.content.status.dropdown.player": "{roblox.player_alt} only",
+    "menu.custom_integrations.content.status.dropdown.studio": "{roblox.studio_alt} only",
+    "menu.custom_integrations.content.status.dropdown.both": "Enabled",
+    "menu.custom_integrations.content.status.dropdown.none": "Disabled",
+
+    "menu.custom_integrations.popup.add.title": "{app.name} | Custom Integrations",
+    "menu.custom_integrations.popup.delete.message": "Are you sure you want to remove this integration: \"{integration.name}\"\nThis action cannot be undone!",
+
+    "menu.custom_integrations.exception.title.add": "Unable to add integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.update": "Unable to update integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.create": "Unable to create integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.remove": "Unable to remove integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.change_status": "Unable to update status of \"{integration.name}\"",
+
+    "menu.custom_integrations.exception.message.already_exists": "Another integration for the same file already exists!",
+    "menu.custom_integrations.exception.message.file_not_found": "File not found: \"{path}\"",
+    "menu.custom_integrations.exception.message.unknown": "{exception.type}: {exception.message}",
 
 
 

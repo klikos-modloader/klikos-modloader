@@ -11,9 +11,11 @@ class LocalizedCTkLabel(CTkLabel):
     _localizer_callback_id: Optional[str] = None
 
 
-    def __init__(self, master, key: Optional[str] = None, modification: Optional[Callable[[str], str]] = None, **kwargs):
+    def __init__(self, master, key: Optional[str] = None, modification: Optional[Callable[[str], str]] = None, dont_localize: bool = False, **kwargs):
         kwargs.pop("text", None)
         super().__init__(master, text=key or "", **kwargs)
+        if dont_localize: return
+
         if key is not None:
             self._localizer_string_key = key
             if callable(modification):

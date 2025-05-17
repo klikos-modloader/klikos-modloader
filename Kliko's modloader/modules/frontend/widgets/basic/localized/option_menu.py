@@ -13,8 +13,8 @@ class LocalizedCTkOptionMenu(CTkOptionMenu):
     def __init__(self, master, value_keys: list[str], value_modifications: Optional[list[Optional[Callable[[str], str]]]] = None, dont_localize: bool = False, **kwargs):
         kwargs.pop("values", None)
         super().__init__(master, values=value_keys, **kwargs)
-
         if dont_localize: return
+
         if value_modifications is None: value_modifications = [None] * len(value_keys)
         key_count: int = len(value_keys)
         modification_count: int = len(value_modifications)

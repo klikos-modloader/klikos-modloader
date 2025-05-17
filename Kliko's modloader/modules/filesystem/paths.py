@@ -79,6 +79,7 @@ class Files:
     DATA: Path = Directories.CONFIG / "data.json"
     MOD_CONFIG: Path = Directories.CONFIG / "mods.json"
     FASTFLAG_CONFIG: Path = Directories.CONFIG / "fastflags.json"
+    CUSTOM_INTEGRATIONS_CONFIG: Path = Directories.CONFIG / "launch_integrations.json"
     MARKETPLACE_CACHE_INDEX: Path = Directories.MARKETPLACE_CACHE / "index.json"
 
 

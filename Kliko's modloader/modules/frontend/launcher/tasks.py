@@ -14,6 +14,8 @@ from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
 from modules.interfaces.data import DataInterface
 from modules.interfaces.mod_manager import Mod, ModManager
+from modules.interfaces.fastflag_manager import FastFlagProfile, FastFlagManager
+from modules.interfaces.custom_integrations_manager import CustomIntegrationManager
 from modules.interfaces.roblox import RobloxInterface
 from modules.deployments import LatestVersion, Package, PackageManifest
 from modules.networking import requests, Response, Api
@@ -26,6 +28,7 @@ DEPLOYMENT_DETAILS_END_PROGRESS: float = 0.06
 DOWNLOAD_END_PROGRESS: float = 0.65
 MOD_UPDATER_END_PROGRESS: float = 0.85
 MOD_DEPLOY_END_PROGRESS: float = 0.90
+FASTFLAG_DEPLOY_END_PROGRESS: float = 0.92
 CUSTOM_INTEGRATIONS_END_PROGRESS: float = 0.95
 LAUNCH_END_PROGRESS: float = 1
 
@@ -125,9 +128,11 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
                         "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")
                 })): return functions.on_cancel()
                 RobloxInterface.kill_existing_instances(mode)
-        
+
         elif config.multi_instance_launching:
             create_singleton_mutexes()
+        if stop_event.is_set():
+            return
 
 
         # Mods
@@ -138,28 +143,34 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
             if config.mod_updates:
                 functions.set_status_label("launcher.progress.check_mod_update")
                 Logger.info("Checking for mod updates...", prefix=LOG_PREFIX)
+                # TODO
             functions.update_progress_bars(MOD_UPDATER_END_PROGRESS)
 
             Logger.info("Deploying mods...", prefix=LOG_PREFIX)
             functions.set_status_label("launcher.progress.deploying_mods")
             ModManager.deploy_mods(version_folder, mods)  # type: ignore
-            # mod loader, mod updates ...
-            pass
         functions.update_progress_bars(MOD_DEPLOY_END_PROGRESS)
+        if stop_event.is_set():
+            return
 
 
         # FastFlags
-        fastflags: dict = {}
-        if not config.disable_fastflags:
-            fastflags = {}
-        if config.discord_rpc:
-            fastflags.update({"FLogNetwork": "7"})
-        # TODO: FastFlagManager
+        Logger.info("Deploying FastFlags...")
+        if config.disable_fastflags: fastflag_profiles: list[FastFlagProfile] = []
+        else: fastflag_profiles = FastFlagManager.get_active(mode=mode.lower(), sorted=True)  # type: ignore
+        if not config.discord_rpc: manual_override: dict = {}
+        else: manual_override = {"FLogNetwork": "7"}
+
+        clientsettings_file: Path = version_folder / "ClientSettings" / "ClientAppSettings.json"
+        FastFlagManager.deploy_profiles(clientsettings_file, fastflag_profiles, manual_override)
+        functions.update_progress_bars(FASTFLAG_DEPLOY_END_PROGRESS)
+        if stop_event.is_set():
+            return
 
 
         # Custom integrations
+        CustomIntegrationManager.launch_active_integrations(mode=mode.lower(), ignore_errors=True)  # type: ignore
         functions.update_progress_bars(CUSTOM_INTEGRATIONS_END_PROGRESS)
-        # TODO: CustomIntegrationsManager
 
 
         # Launch Roblox

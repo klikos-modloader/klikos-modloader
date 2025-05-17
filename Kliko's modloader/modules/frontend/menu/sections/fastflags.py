@@ -180,7 +180,7 @@ class FastFlagsSection(ScrollableFrame):
             FastFlagManager.update_config(FastFlagProfile(response))
         except Exception as e:
             self.root.send_banner(
-                title_key="menu.fastflags.exception.title.remove",
+                title_key="menu.fastflags.exception.title.create",
                 title_modification=lambda string: Localizer.format(string, {"{profile.name}": response}),
                 message_key="menu.fastflags.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
@@ -263,9 +263,9 @@ class FastFlagsSection(ScrollableFrame):
 
         except Exception as e:
             self.root.send_banner(
-                title_key="menu.profile.exception.title.change_status",
+                title_key="menu.fastflags.exception.title.change_status",
                 title_modification=lambda string: Localizer.format(string, {"{profile.name}": profile.name}),
-                message_key="menu.profile.exception.message.unknown",
+                message_key="menu.fastflags.exception.message.unknown",
                 message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
                 mode="error", auto_close_after_ms=6000
             )

@@ -37,7 +37,7 @@ class App(Root):
     def __init__(self) -> None:
         appearance: Literal["light", "dark", "system"] = ConfigInterface.get_appearance_mode()
         width, height = ConfigInterface.get_menu_size()
-        super().__init__(title="Kliko's modloader", icon=Resources.FAVICON, appearance_mode=appearance, width=width, height=height, centered=True, banner_system=True)
+        super().__init__(title=ProjectData.NAME, icon=Resources.FAVICON, appearance_mode=appearance, width=width, height=height, centered=True, banner_system=True)
         self.grid_columnconfigure(0, minsize=self._SIDEBAR_MIN_WIDTH)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)

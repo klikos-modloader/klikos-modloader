@@ -14,6 +14,9 @@
     "appearance.dark": "Dark",
     "appearance.system": "System",
 
+    "button.ok": "OK",
+    "button.cancel": "Cancel",
+
 
 
 
@@ -123,6 +126,25 @@
 
     "menu.fastflags.header.title": "FastFlags",
     "menu.fastflags.header.description": "Customize your {roblox.common} experience by adjusting client settings",
+    "menu.fastflags.header.button.new_profile": "Create new profile",
+    "menu.fastflags.content.configure": "Configure",
+    "menu.fastflags.content.status.dropdown.player": "{roblox.player_alt} only",
+    "menu.fastflags.content.status.dropdown.studio": "{roblox.studio_alt} only",
+    "menu.fastflags.content.status.dropdown.both": "Enabled",
+    "menu.fastflags.content.status.dropdown.none": "Disabled",
+    
+    "menu.fastflags.input.new_profile.message": "Choose a name for your FastFlag profile",
+
+    "menu.fastflags.popup.delete.message": "Are you sure you want to remove this profile: \"{profile.name}\"\nThis action cannot be undone!",
+
+    "menu.fastflags.exception.title.rename": "Unable to rename profile: \"{profile.name}\"",
+    "menu.fastflags.exception.title.create": "Unable to create profile: \"{profile.name}\"",
+    "menu.fastflags.exception.title.remove": "Unable to remove profile: \"{profile.name}\"",
+    "menu.fastflags.exception.title.change_status": "Unable to update status of \"{profile.name}\"",
+
+    "menu.fastflags.exception.message.profile_exists": "Another profile with the same name already exists!",
+    "menu.fastflags.exception.message.unsupported_filetype": "Unsupported filetype: \"{filetype}\"",
+    "menu.fastflags.exception.message.unknown": "{exception.type}: {exception.message}",
 
 
 

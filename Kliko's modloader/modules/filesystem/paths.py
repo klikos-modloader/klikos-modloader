@@ -78,6 +78,7 @@ class Files:
     CONFIG: Path = Directories.CONFIG / "config.json"
     DATA: Path = Directories.CONFIG / "data.json"
     MOD_CONFIG: Path = Directories.CONFIG / "mods.json"
+    FASTFLAG_CONFIG: Path = Directories.CONFIG / "fastflags.json"
     MARKETPLACE_CACHE_INDEX: Path = Directories.MARKETPLACE_CACHE / "index.json"
 
 
@@ -106,6 +107,8 @@ class Resources:
             DOWNLOAD: Path = Directories.RESOURCES / "common" / "light" / "download.png"
             OPEN_EXTERNAL: Path = Directories.RESOURCES / "common" / "light" / "open_external.png"
             EYE: Path = Directories.RESOURCES / "common" / "light" / "eye.png"
+            CONFIGURE: Path = Directories.RESOURCES / "common" / "light" / "configure.png"
+            ADD: Path = Directories.RESOURCES / "common" / "light" / "add.png"
         class Dark:
             BIN: Path = Directories.RESOURCES / "common" / "dark" / "bin.png"
             SUCCESS: Path = Directories.RESOURCES / "common" / "dark" / "success.png"
@@ -119,6 +122,8 @@ class Resources:
             DOWNLOAD: Path = Directories.RESOURCES / "common" / "dark" / "download.png"
             OPEN_EXTERNAL: Path = Directories.RESOURCES / "common" / "dark" / "open_external.png"
             EYE: Path = Directories.RESOURCES / "common" / "dark" / "eye.png"
+            CONFIGURE: Path = Directories.RESOURCES / "common" / "dark" / "configure.png"
+            ADD: Path = Directories.RESOURCES / "common" / "dark" / "add.png"
 
     class Navigation:
         class Light:

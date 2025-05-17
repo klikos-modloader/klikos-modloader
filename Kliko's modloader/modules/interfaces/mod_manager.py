@@ -51,8 +51,10 @@ class Mod:
         if self.archive: target = target.with_suffix(self.path.suffix)
 
         self.path.rename(target)
+        ModManager.remove_from_config(self.name)
         self.path = target
         self.name = value
+        ModManager.update_config(self)
 
 
     def remove(self) -> None:

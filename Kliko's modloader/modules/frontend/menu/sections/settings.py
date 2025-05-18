@@ -211,6 +211,18 @@ class SettingsSection(ScrollableFrame):
         ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("static_version_folder", var.get(), "menu.settings.content.static_version_folder.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
 
 
+        # Registry keys
+        row_counter += 1
+        frame = Frame(wrapper, layer=2)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid(column=0, row=row_counter, sticky="nsew", pady=0 if row_counter == 0 else (self._ENTRY_GAP, 0))
+        Label(frame, "menu.settings.content.registry_keys.title", style="body_strong", autowrap=True).grid(column=0, row=0, sticky="sew", pady=(self._ENTRY_PADDING[1], 0), padx=(self._ENTRY_PADDING[0], 0))
+        Label(frame, "menu.settings.content.registry_keys.description", lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME, "{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="new", pady=(0, self._ENTRY_PADDING[1]), padx=(self._ENTRY_PADDING[0], 0))
+        value = ConfigInterface.get("registry_keys")
+        switch_var = BooleanVar(value=value)
+        ToggleSwitch(frame, variable=switch_var, command=lambda var=switch_var: self._update_boolean_setting("registry_keys", var.get(), "menu.settings.content.registry_keys.title")).grid(column=1, row=0, rowspan=2, sticky="e", pady=self._ENTRY_PADDING[1], padx=(self._ENTRY_INNER_GAP, self._ENTRY_PADDING[0]))
+
+
         # Disable mods
         row_counter += 1
         frame = Frame(wrapper, layer=2)

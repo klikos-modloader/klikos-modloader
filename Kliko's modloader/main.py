@@ -79,7 +79,7 @@ def main() -> None:
     initialize_localization()
 
     try:
-        if FROZEN:
+        if FROZEN and ConfigInterface.get("registry_keys"):
             set_registry_keys()
 
         if args.menu:

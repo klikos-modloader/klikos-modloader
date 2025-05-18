@@ -25,6 +25,7 @@ class ConfigInterface:
         "disable_mods": False,
         "disable_fastflags": False,
         "static_version_folder": False,
+        "registry_keys": False,
         "menu_size": {
             "w": 1100,
             "h": 600

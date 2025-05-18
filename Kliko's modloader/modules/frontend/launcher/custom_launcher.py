@@ -33,6 +33,7 @@ class CustomLauncher:
     window: Root
     window_config: WindowConfig
     stop_event: Event
+    should_run_rpc: bool = False
 
     _status_labels: list[LocalizedCTkLabel]
     _file_version_labels: list[LocalizedCTkLabel]
@@ -328,7 +329,8 @@ class CustomLauncher:
             except (TclError, AttributeError): pass
 
 
-    def on_success(self) -> None:
+    def on_success(self, should_run_rpc: bool) -> None:
+        self.should_run_rpc = should_run_rpc
         self.close_window()
 
 

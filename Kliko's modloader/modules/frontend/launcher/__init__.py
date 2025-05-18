@@ -6,4 +6,9 @@ from .exceptions import *
 
 
 def run(mode: Literal["Player", "Studio"], deeplink: str) -> None:
-    CustomLauncher(mode).run(deeplink)
+    launcher: CustomLauncher = CustomLauncher(mode)
+    launcher.run(deeplink)
+
+    if launcher.should_run_rpc:
+        pass
+        # TODO

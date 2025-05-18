@@ -60,6 +60,7 @@ class Functions(NamedTuple):
     update_progress_bars: Callable[[float], Any]
 
 
+# region run
 def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_success: Callable, on_cancel: Callable, on_error: Callable[[Exception], Any], set_status_label: Callable[[str], Any], set_deployment_details: Callable[[LatestVersion], Any], update_progress_bars: Callable[[float], Any]) -> None:
     try:
         Logger.info("Running launcher tasks...", prefix=LOG_PREFIX)
@@ -197,7 +198,8 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
         return functions.on_error(e)
 
     else:
-        return functions.on_success()
+        return functions.on_success(config.discord_rpc)
+# endregion
 
 
 # region update

@@ -69,6 +69,7 @@ class Directories:
     RESOURCES: Path = (MEIPASS if FROZEN else ROOT) / "resources"  # type: ignore
 
     DOWNLOADS: Path = _get_downloads_directory().resolve()
+    ROBLOX: Path = Path.home() / "AppData" / "Local" / "Roblox"
 
     DEV: Path = ROOT / "dev"
     DEV_TRANSLATIONS: Path = DEV / "localization"
@@ -81,6 +82,7 @@ class Files:
     FASTFLAG_CONFIG: Path = Directories.CONFIG / "fastflags.json"
     CUSTOM_INTEGRATIONS_CONFIG: Path = Directories.CONFIG / "launch_integrations.json"
     MARKETPLACE_CACHE_INDEX: Path = Directories.MARKETPLACE_CACHE / "index.json"
+    GLOBAL_BASIC_SETTINGS: Path = Directories.ROBLOX / "GlobalBasicSettings_13.xml"
 
 
 class Resources:
@@ -151,8 +153,10 @@ class Resources:
     class Large:
         class Light:
             WIFI_OFF: Path = Directories.RESOURCES / "large" / "light" / "wifi_off.png"
+            FILE_NOT_FOUND: Path = Directories.RESOURCES / "large" / "light" / "file_not_found.png"
         class Dark:
             WIFI_OFF: Path = Directories.RESOURCES / "large" / "dark" / "wifi_off.png"
+            FILE_NOT_FOUND: Path = Directories.RESOURCES / "large" / "dark" / "file_not_found.png"
 
     class Marketplace:
         MASK: Path = Directories.RESOURCES / "marketplace" / "mask.png"

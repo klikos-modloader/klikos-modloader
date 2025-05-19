@@ -1,4 +1,5 @@
 from typing import Callable, Optional, Literal, NamedTuple
+from tkinter import StringVar
 
 from .localized import LocalizedCTkEntry
 from .utils import WinAccentTracker, FontStorage
@@ -38,6 +39,9 @@ class Entry(LocalizedCTkEntry):
         if "corner_radius" not in kwargs: kwargs["corner_radius"] = 4
         if "border_width" not in kwargs: kwargs["border_width"] = 1
         if "height" not in kwargs: kwargs["height"] = 32
+        textvariable = kwargs.get("textvariable", None)
+        if isinstance(textvariable, StringVar):
+            self.last_value = textvariable.get()
         super().__init__(master, placeholder_key=placeholder_key, placeholder_modification=placeholder_modification, **kwargs)
         self.focused = False
         self.hovered = False

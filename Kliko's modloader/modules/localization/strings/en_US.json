@@ -20,6 +20,8 @@
 
 
 
+
+
     "launcher.deployment_info.channel": "Channel: {value}",
     "launcher.deployment_info.file_version": "File Version: {value}",
     "launcher.deployment_info.guid": "GUID: {value}",
@@ -48,6 +50,8 @@
 
 
 
+
+
     "menu.sidebar.version": "Version {app.version}",
     "menu.sidebar.navigation.mods": "Mods",
     "menu.sidebar.navigation.marketplace": "Community Mods",
@@ -58,6 +62,8 @@
     "menu.sidebar.navigation.custom_integrations": "Custom Integrations",
     "menu.sidebar.navigation.settings": "Settings",
     "menu.sidebar.navigation.about": "About",
+
+
 
 
 
@@ -98,6 +104,8 @@
 
 
 
+
+
     "menu.marketplace.header.title": "Community Mods",
     "menu.marketplace.header.description": "Browse mods made by the community",
     "menu.marketplace.content.failed_to_load.title": "Data failed to load!",
@@ -118,8 +126,12 @@
 
 
 
+
+
     "menu.mod_generator.header.title": "Mod Generator",
     "menu.mod_generator.header.description": "Creating mods has never been easier",
+
+
 
 
 
@@ -148,8 +160,15 @@
 
 
 
+
+
     "menu.global_basic_settings.header.title": "Global Basic Settings",
     "menu.global_basic_settings.header.description": "Configure global {roblox.common} settings",
+
+    "menu.global_basic_settings.content.file_not_found": "File not found: {file.name}",
+    "menu.global_basic_settings.content.value": "Value:",
+
+
 
 
 
@@ -168,6 +187,8 @@
     "menu.integrations.content.show_user_in_rpc.description": "Show your {roblox.common} profile in your Discord RPC",
     "menu.integrations.content.bloxstrap_rpc_sdk.title": "BloxstrapRPC SDK",
     "menu.integrations.content.bloxstrap_rpc_sdk.description": "Allow games to customize your RPC status",
+
+
 
 
 
@@ -193,6 +214,8 @@
     "menu.custom_integrations.exception.message.already_exists": "Another integration for the same file already exists!",
     "menu.custom_integrations.exception.message.file_not_found": "File not found: \"{path}\"",
     "menu.custom_integrations.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
 
 
 
@@ -227,6 +250,8 @@
     "menu.settings.exception.title.failed_to_update": "Failed to update setting: \"{setting.name}\"",
     "menu.settings.exception.title.launcher_preview_failed": "Failed to load launcher preview!",
     "menu.settings.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
 
 
 

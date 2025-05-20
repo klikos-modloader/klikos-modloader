@@ -6,6 +6,7 @@ from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button
 from modules.frontend.functions import get_ctk_image
 from modules.localization import Localizer
 from modules.filesystem import Resources
+from modules.mod_generator import ModGenerator
 
 if TYPE_CHECKING: from modules.frontend.widgets import Root
 
@@ -41,6 +42,7 @@ class ModGeneratorSection(ScrollableFrame):
 
     def show(self) -> None:
         self.load()
+
 
 
 # region load

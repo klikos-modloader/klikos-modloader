@@ -167,6 +167,8 @@
 
     "menu.global_basic_settings.content.file_not_found": "File not found: {file.name}",
     "menu.global_basic_settings.content.value": "Value:",
+    "menu.global_basic_settings.content.x_value": "X:",
+    "menu.global_basic_settings.content.y_value": "Y:",
 
 
 

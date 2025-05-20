@@ -1,6 +1,6 @@
 from tkinter import TclError, BooleanVar, StringVar
 from xml.etree import ElementTree as xml
-from typing import Any, TYPE_CHECKING
+from typing import Literal, Any, TYPE_CHECKING
 
 from modules.logger import Logger
 from modules.project_data import ProjectData
@@ -188,35 +188,33 @@ class GlobalBasicSettingsSection(ScrollableFrame):
 
 
             case "Vector2":
-                pass
-                # TODO
+                value_box.grid_columnconfigure((1, 3), weight=1)
+
+                x_element: xml.Element | None = element.find("X")
+                y_element: xml.Element | None = element.find("Y")
+                string_value_x: str = "" if x_element is None else (x_element.text or "")
+                string_value_y: str ="" if y_element is None else (y_element.text or "")
+
+                string_var_x = StringVar(frame, value=string_value_x)
+                Label(value_box, "menu.global_basic_settings.content.x_value", style="body", autowrap=False).grid(column=0, row=0, sticky="w")
+                Entry(
+                    value_box, on_focus_lost="command", run_command_if_empty=False, reset_if_empty=True, command=lambda _, element=x_element, var=string_var_x: self.update_string_value(tree, element, var.get()),
+                    height=32, textvariable=string_var_x, validate="key", validatecommand=(self.root.register(lambda value: value.replace(".", "", 1).isdigit() or value == ""), '%P')
+                ).grid(column=1, row=0, sticky="ew", padx=(8, 0))
+
+                string_var_y = StringVar(frame, value=string_value_y)
+                Label(value_box, "menu.global_basic_settings.content.y_value", style="body", autowrap=False).grid(column=2, row=0, sticky="w", padx=(self._ENTRY_INNER_GAP, 0))
+                Entry(
+                    value_box, on_focus_lost="command", run_command_if_empty=False, reset_if_empty=True, command=lambda _, element=y_element, var=string_var_y: self.update_string_value(tree, element, var.get()),
+                    height=32, textvariable=string_var_y, validate="key", validatecommand=(self.root.register(lambda value: value.replace(".", "", 1).isdigit() or value == ""), '%P')
+                ).grid(column=3, row=0, sticky="ew", padx=(8, 0))
 # endregion
 
 
 # region functions
-    # def update_boolean_value(self, tree: xml.ElementTree, element: xml.Element, value: bool) -> None:
-    #     self.update_string_value(tree, element, str(value).lower())
-
-
-    # def update_float_value(self, tree: xml.ElementTree, element: xml.Element, event: Any) -> None:
-    #     self.update_int_value(tree, element, event)
-
-
-    # def update_int_value(self, tree: xml.ElementTree, element: xml.Element, event: Any) -> None:
-    #     value: str = event.widget.get()
-    #     self.update_string_value(tree, element, value)
-
-
-    # def update_token_value(self, tree: xml.ElementTree, element: xml.Element, value: str) -> None:
-    #     self.update_string_value(tree, element, value)
-
-
     def update_string_value(self, tree: xml.ElementTree, element: xml.Element, value_or_event: str | Any) -> None:
         if isinstance(value_or_event, str): value: str = value_or_event
         else: value = value_or_event.widget.get()
         element.text = value
         tree.write(Files.GLOBAL_BASIC_SETTINGS)
-
-
-    # TODO: Vector2
 # endregion

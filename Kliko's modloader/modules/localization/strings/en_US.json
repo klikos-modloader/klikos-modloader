@@ -131,6 +131,8 @@
     "menu.mod_generator.header.title": "Mod Generator",
     "menu.mod_generator.header.description": "Creating mods has never been easier",
 
+    "menu.mod_generator.preview_window.window_title": "{app.name} | Mod Preview",
+
 
 
 

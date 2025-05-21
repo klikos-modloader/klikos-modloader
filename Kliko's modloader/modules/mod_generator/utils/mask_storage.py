@@ -68,6 +68,9 @@ class MaskStorage:
         if cached_mask is not None:
             return cached_mask
 
+        if image.mode != "RGBA":
+            image = image.convert("RGBA")
+
         image_width, image_height = image.size
         target_width, target_height = size
 
@@ -80,6 +83,7 @@ class MaskStorage:
             cropped = image
 
         resized: Image.Image = cropped.resize(size, resample=Image.Resampling.LANCZOS)
+
         if not dont_cache:
             cls.cache[cache_key] = resized
         return resized
@@ -104,8 +108,3 @@ class MaskStorage:
         paste_y: int = int((new_h - h)/2)
         resized.paste(image, (paste_x, paste_y))
         return resized
-
-
-    @classmethod
-    def clear_cache(cls) -> None:
-        cls.cache.clear()

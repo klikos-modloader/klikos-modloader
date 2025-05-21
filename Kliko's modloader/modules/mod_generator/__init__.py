@@ -1,4 +1,6 @@
 from typing import Literal, Optional
+from pathlib import Path
+import json
 
 from modules.logger import Logger
 
@@ -7,31 +9,62 @@ from .utils import MaskStorage
 from PIL import Image  # type: ignore
 
 
+PREVIEW_DATA_DIR: Path = Path(__file__).parent / "preview_data"
+
+
 class ModGenerator:
     _LOG_PREFIX: str = "ModGenerator"
 
 
     @classmethod
-    def get_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, size: tuple[int, int], angle: Optional[float] = None)  -> Image.Image:
+    def get_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, size: tuple[int, int], angle: Optional[float] = None, dont_cache: bool = False)  -> Image.Image:
         """Assumes data has already been validated"""
 
         match mode:
-            case "color": return MaskStorage.get_solid_color(data, size, dont_cache=True)  # type: ignore
-            case "gradient": return MaskStorage.get_gradient(data, angle or 0, size, dont_cache=True)  # type: ignore
-            case "custom": return MaskStorage.get_custom(data, size, dont_cache=True)  # type: ignore
+            case "color": return MaskStorage.get_solid_color(data, size, dont_cache=dont_cache)  # type: ignore
+            case "gradient": return MaskStorage.get_gradient(data, angle or 0, size, dont_cache=dont_cache)  # type: ignore
+            case "custom": return MaskStorage.get_custom(data, size, dont_cache=dont_cache)  # type: ignore
 
 
     @classmethod
     def generate_preview_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, size: tuple[int, int], angle: Optional[float] = None)  -> Image.Image:
         cls._validate_data(mode, data)
-        return cls.get_mask(mode, data, size, angle)
+        return cls.get_mask(mode, data, size, angle, dont_cache=True)
 
 
-    # @classmethod
-    # def generate_preview_image(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, size: tuple[int, int], angle: Optional[float] = None)  -> Image.Image:
-    #     cls._validate_data(mode, data)
-    #     mask: Image.Image = cls.get_mask(mode, data, size, angle)
-    #     return
+    @classmethod
+    def generate_preview_image(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, angle: Optional[float] = None)  -> Image.Image:
+        cls._validate_data(mode, data)
+
+        index: Path = PREVIEW_DATA_DIR / "index.json"
+        with open(index) as file:
+            icon_data: list[str] = json.load(file)
+
+        image: Image.Image = Image.open(PREVIEW_DATA_DIR / "image.png", formats=["PNG"])
+        if image.mode != "RGBA":
+            image = image.convert("RGBA")
+
+        for icon in icon_data:
+            icon_name, icon_position, icon_size = icon.split()
+            icon_position = icon_position.split("x")  # type: ignore
+            icon_size = icon_size.split("x")  # type: ignore
+            icon_x: int = int(icon_position[0])
+            icon_y: int = int(icon_position[1])
+            icon_w: int = int(icon_size[0])
+            icon_h: int = int(icon_size[1])
+
+            icon_cropped: Image.Image = image.crop((icon_x, icon_y, icon_x + icon_w, icon_y + icon_h))
+            mask: Image.Image = cls.get_mask(mode, data, (icon_w, icon_h), angle)
+            if mode == "custom":
+                mask = Image.alpha_composite(icon_cropped, mask)
+                mask.putalpha(icon_cropped.getchannel("A"))
+                image.paste(mask, (icon_x, icon_y))
+            else:
+                mask.putalpha(icon_cropped.getchannel("A"))
+                image.paste(mask, (icon_x, icon_y))
+        MaskStorage.cache.clear()
+
+        return image
 
 
     @classmethod

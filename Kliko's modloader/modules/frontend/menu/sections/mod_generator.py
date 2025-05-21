@@ -2,6 +2,7 @@ from tkinter import TclError
 from typing import TYPE_CHECKING
 
 from modules.project_data import ProjectData
+from ..windows import ModGeneratorPreviewWindow
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button
 from modules.frontend.functions import get_ctk_image
 from modules.localization import Localizer
@@ -11,6 +12,7 @@ from modules.mod_generator import ModGenerator
 if TYPE_CHECKING: from modules.frontend.widgets import Root
 
 from customtkinter import CTkImage  # type: ignore
+from PIL import Image  # type: ignore
 
 
 class ModGeneratorSection(ScrollableFrame):
@@ -42,6 +44,21 @@ class ModGeneratorSection(ScrollableFrame):
 
     def show(self) -> None:
         self.load()
+
+        # image: Image.Image = ModGenerator.generate_preview_image("color", (204, 0, 55))
+        # ModGeneratorPreviewWindow(self.root, image)
+
+        # image: Image.Image = ModGenerator.generate_preview_image("gradient", [(0, (153, 0, 0)), (1, (255, 0, 110))], angle=-45)
+        # ModGeneratorPreviewWindow(self.root, image)
+
+        # from tkinter import filedialog
+        # path = filedialog.askopenfilename()
+        # if path:
+        #     image = ModGenerator.generate_preview_image("custom", Image.open(path))
+        #     ModGeneratorPreviewWindow(self.root, image)
+
+        # image = ModGenerator.generate_preview_image("custom", Image.open(Resources.Logo.CHRISTMAS))
+        # ModGeneratorPreviewWindow(self.root, image)
 
 
 

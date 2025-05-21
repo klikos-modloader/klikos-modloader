@@ -1,5 +1,6 @@
 from typing import Literal, Optional
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import json
 
 from modules.logger import Logger
@@ -65,6 +66,19 @@ class ModGenerator:
         MaskStorage.cache.clear()
 
         return image
+
+
+    @classmethod
+    def generate_mod(cls, mod: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, output_dir: str | Path, angle: Optional[float] = None) -> None:
+        output_dir = Path(output_dir).resolve()
+        if output_dir.exists():
+            raise FileExistsError(str(output_dir))
+
+        with TemporaryDirectory() as tmp:
+            temporary_directory: Path = Path(tmp)
+
+            if output_dir.exists():
+                raise FileExistsError(str(output_dir))
 
 
     @classmethod

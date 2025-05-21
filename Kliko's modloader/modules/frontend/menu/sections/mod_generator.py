@@ -1,5 +1,5 @@
 from tkinter import TclError
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
 from modules.project_data import ProjectData
 from ..windows import ModGeneratorPreviewWindow
@@ -18,6 +18,14 @@ from PIL import Image  # type: ignore
 class ModGeneratorSection(ScrollableFrame):
     loaded: bool = False
     root: "Root"
+
+    mode: Literal["color", "gradient", "custom"] = "color"
+    color_data: tuple[int, int, int] = (255, 255, 255)
+    gradient_data: list[tuple[float, tuple[int, int, int]]] = [(0, (255, 255, 255)), (1, (0, 0, 0))]
+    gradient_angle: float = 0
+    image_data: Image.Image = Image.new(mode="RGBA", size=(64, 64), color="#FFF")
+
+    generating: bool = False
 
     _SECTION_PADX: int | tuple[int, int] = (8, 4)
     _SECTION_PADY: int | tuple[int, int] = 8

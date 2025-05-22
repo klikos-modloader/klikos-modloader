@@ -44,6 +44,7 @@ class Config(NamedTuple):
     disable_mods: bool
     disable_fastflags: bool
     static_version_folder: bool
+    use_roblox_version_folder: bool
     mod_updates: bool
     multi_instance_launching: bool
     discord_rpc: bool
@@ -74,6 +75,7 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
         disable_mods: bool = ConfigInterface.get("disable_mods")
         disable_fastflags: bool = ConfigInterface.get("disable_fastflags")
         static_version_folder: bool = ConfigInterface.get("static_version_folder")
+        use_roblox_version_folder: bool = ConfigInterface.get("use_roblox_version_folder")
 
         mod_updates: bool = ConfigInterface.get("mod_updates")
         multi_instance_launching: bool = ConfigInterface.get("multi_instance_launching")
@@ -81,7 +83,7 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
         installed_version: str = DataInterface.get_installed_version(mode)
         loaded_mods: list[str] = DataInterface.get_loaded_mods(mode)
-        config: Config = Config(confirm_launch, force_reinstall, disable_mods, disable_fastflags, static_version_folder, mod_updates, multi_instance_launching, discord_rpc, installed_version, loaded_mods)
+        config: Config = Config(confirm_launch, force_reinstall, disable_mods, disable_fastflags, static_version_folder, use_roblox_version_folder, mod_updates, multi_instance_launching, discord_rpc, installed_version, loaded_mods)
 
 
         # Deployment details
@@ -137,6 +139,7 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
 
         # Mods
+        # TODO: Check loaded mods
         version_folder: Path = get_version_dir(mode, latest_version, config)
         if not skip_modloader or not config.disable_mods:
             mods: list[Mod] = ModManager.get_active(mode.lower())  # type: ignore
@@ -310,9 +313,14 @@ def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: 
 
 # region other
 def get_version_dir(mode: Literal["Player", "Studio"], latest_version: LatestVersion, config: Config) -> Path:
-    if config.static_version_folder:
-        return (Directories.VERSIONS / mode).resolve()
-    return (Directories.VERSIONS / latest_version.guid).resolve()
+    if config.use_roblox_version_folder:
+        if config.static_version_folder:
+            return (Directories.ROBLOX / "Versions" / mode).resolve()
+        return (Directories.ROBLOX / "Versions" / latest_version.guid).resolve()
+    else:
+        if config.static_version_folder:
+            return (Directories.VERSIONS / mode).resolve()
+        return (Directories.VERSIONS / latest_version.guid).resolve()
 
 
 def get_md5(path: Path) -> str:

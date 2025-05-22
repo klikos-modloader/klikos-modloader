@@ -26,6 +26,7 @@ class ConfigInterface:
         "disable_fastflags": False,
         "static_version_folder": False,
         "registry_keys": False,
+        "use_roblox_version_folder": False,
         "menu_size": {
             "w": 1100,
             "h": 600

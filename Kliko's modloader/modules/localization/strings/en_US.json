@@ -262,6 +262,8 @@
     "menu.settings.content.static_version_folder.description": "Use static names for the {roblox.common} version folder",
     "menu.settings.content.registry_keys.title": "Registry Keys",
     "menu.settings.content.registry_keys.description": "Set registry keys when launching {app.name}. Enabling this settings allows you to launch {roblox.common} from the website",
+    "menu.settings.content.use_roblox_version_folder.title": "Use {roblox.common} Directory",
+    "menu.settings.content.use_roblox_version_folder.description": "Install {roblox.common} updates to Roblox's default directroy",
 
     "menu.settings.exception.title.failed_to_update": "Failed to update setting: \"{setting.name}\"",
     "menu.settings.exception.title.launcher_preview_failed": "Failed to load launcher preview!",

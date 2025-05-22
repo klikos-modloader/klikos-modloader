@@ -2,15 +2,13 @@ from typing import Literal
 
 from modules.networking import requests, Response, Api
 
+from .roblox_version import RobloxVersion
+
 from packaging.version import Version  # type: ignore
 
 
-class LatestVersion:
-    binary_type: Literal["WindowsPlayer", "WindowsStudio64"]
+class LatestVersion(RobloxVersion):
     channel: str
-    guid: str
-    file_version: Version
-
 
     def __init__(self, binary_type: Literal["WindowsPlayer", "WindowsStudio64"]) -> None:
         self.binary_type = binary_type

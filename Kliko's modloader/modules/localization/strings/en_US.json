@@ -131,7 +131,19 @@
     "menu.mod_generator.header.title": "Mod Generator",
     "menu.mod_generator.header.description": "Creating mods has never been easier",
 
+    "menu.mod_generator.content.settings.title": "Settings",
+    "menu.mod_generator.content.settings.mode": "Mode:",
+    "menu.mod_generator.content.settings.mode.color": "Single Color",
+    "menu.mod_generator.content.settings.mode.gradient": "Gradient",
+    "menu.mod_generator.content.settings.mode.custom": "Custom",
+    "menu.mod_generator.content.settings.1x_only": "1x sizes only",
+    "menu.mod_generator.content.settings.use_remote_config": "Use remote configuration",
+    "menu.mod_generator.content.settings.version_specific": "Version:",
+
     "menu.mod_generator.preview_window.window_title": "{app.name} | Mod Preview",
+
+    "menu.mod_generator.exception.title.unknown": "Something went wrong!",
+    "menu.mod_generator.exception.message.unknown": "{exception.type}: {exception.message}",
 
 
 

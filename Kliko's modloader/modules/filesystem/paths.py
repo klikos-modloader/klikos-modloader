@@ -72,7 +72,7 @@ class Directories:
     ROBLOX: Path = Path.home() / "AppData" / "Local" / "Roblox"
 
     DEV: Path = ROOT / "dev"
-    DEV_TRANSLATIONS: Path = DEV / "localization"
+    DEV_TRANSLATIONS: Path = DEV / "translations"
 
 
 class Files:

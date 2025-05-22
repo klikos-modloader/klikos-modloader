@@ -4,8 +4,12 @@ from tempfile import TemporaryDirectory
 import json
 
 from modules.logger import Logger
+from modules.deployments import RobloxVersion, LatestVersion, DeployHistory
+from modules.networking import requests, Response, Api
 
 from .utils import MaskStorage
+from .dataclasses import IconBlacklist, RemoteConfig
+from .exceptions import *
 
 from PIL import Image  # type: ignore
 
@@ -19,7 +23,7 @@ class ModGenerator:
 
     @classmethod
     def get_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, size: tuple[int, int], angle: Optional[float] = None, dont_cache: bool = False)  -> Image.Image:
-        """Assumes data has already been validated"""
+        """Assumes data has been validated"""
 
         match mode:
             case "color": return MaskStorage.get_solid_color(data, size, dont_cache=dont_cache)  # type: ignore
@@ -45,8 +49,8 @@ class ModGenerator:
         if image.mode != "RGBA":
             image = image.convert("RGBA")
 
-        for icon in icon_data:
-            icon_name, icon_position, icon_size = icon.split()
+        for item in icon_data:
+            icon_name, icon_position, icon_size = item.split()
             icon_position = icon_position.split("x")  # type: ignore
             icon_size = icon_size.split("x")  # type: ignore
             icon_x: int = int(icon_position[0])
@@ -54,31 +58,12 @@ class ModGenerator:
             icon_w: int = int(icon_size[0])
             icon_h: int = int(icon_size[1])
 
-            icon_cropped: Image.Image = image.crop((icon_x, icon_y, icon_x + icon_w, icon_y + icon_h))
-            mask: Image.Image = cls.get_mask(mode, data, (icon_w, icon_h), angle)
-            if mode == "custom":
-                mask = Image.alpha_composite(icon_cropped, mask)
-                mask.putalpha(icon_cropped.getchannel("A"))
-                image.paste(mask, (icon_x, icon_y))
-            else:
-                mask.putalpha(icon_cropped.getchannel("A"))
-                image.paste(mask, (icon_x, icon_y))
+            icon: Image.Image = image.crop((icon_x, icon_y, icon_x + icon_w, icon_y + icon_h))
+            cls.apply_mask(icon, mode, data, angle)
+            image.paste(icon, (icon_x, icon_y))
         MaskStorage.cache.clear()
 
         return image
-
-
-    @classmethod
-    def generate_mod(cls, mod: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, output_dir: str | Path, angle: Optional[float] = None) -> None:
-        output_dir = Path(output_dir).resolve()
-        if output_dir.exists():
-            raise FileExistsError(str(output_dir))
-
-        with TemporaryDirectory() as tmp:
-            temporary_directory: Path = Path(tmp)
-
-            if output_dir.exists():
-                raise FileExistsError(str(output_dir))
 
 
     @classmethod
@@ -123,3 +108,54 @@ class ModGenerator:
 
             case invalid:
                 raise ValueError(f"Invalid mode: '{invalid}', must be one of 'color', 'gradient', 'custom'")
+
+
+    @classmethod
+    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False) -> None:
+        Logger.info(f"Generating mod (mode={mode})...", prefix=cls._LOG_PREFIX)
+        cls._validate_data(mode, data)
+        angle = angle or 0
+
+        if file_version is None:
+            target_version: RobloxVersion = LatestVersion("WindowsStudio64")
+        else:
+            deploy_history: DeployHistory = DeployHistory()
+            for deployment in reversed(deploy_history.studio_deployments):
+                if deployment.file_version.minor == file_version:
+                    target_version = deployment
+                    break
+            else: raise InvalidVersionError(file_version)
+
+        if use_remote_config:
+            response: Response = requests.get(Api.GitHub.MOD_GENERATOR_CONFIG)
+            remote_config: RemoteConfig = RemoteConfig(response.json())
+        else:
+            remote_config = RemoteConfig({})
+
+        output_dir = Path(output_dir).resolve()
+        if output_dir.exists():
+            raise FileExistsError(str(output_dir))
+
+        with TemporaryDirectory() as tmp:
+            temporary_directory: Path = Path(tmp)
+
+
+
+            if output_dir.exists():
+                raise FileExistsError(str(output_dir))
+
+
+    @classmethod
+    def apply_mask(cls, image: Image.Image, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, angle: Optional[float] = None):
+        """Modifies the image in place. Assumes data has been validated"""
+
+        size = image.size
+        w, h = size
+        mask: Image.Image = cls.get_mask(mode, data, (w, h), angle)
+        if mode == "custom":
+            mask = Image.alpha_composite(image, mask)
+            mask.putalpha(image.getchannel("A"))
+            image.paste(mask)
+        else:
+            mask.putalpha(image.getchannel("A"))
+            image.paste(mask)

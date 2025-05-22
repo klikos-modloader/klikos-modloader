@@ -1,12 +1,13 @@
-from tkinter import TclError, StringVar
+from tkinter import TclError, StringVar, BooleanVar
 from typing import Literal, Optional, TYPE_CHECKING
+import re
 
 from modules.project_data import ProjectData
 from ..windows import ModGeneratorPreviewWindow
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button, DropDownMenu, Entry, CheckBox
 from modules.frontend.functions import get_ctk_image
 from modules.localization import Localizer
-from modules.filesystem import Resources
+from modules.filesystem import Resources, Directories
 from modules.mod_generator import ModGenerator
 
 if TYPE_CHECKING: from modules.frontend.widgets import Root
@@ -24,14 +25,14 @@ class ModGeneratorSection(ScrollableFrame):
     color_frame: Frame
     gradient_frame: Frame
     custom_frame: Frame
-    settings_frame: Frame
 
     mode: Literal["color", "gradient", "custom"] = "color"
     color_data: tuple[int, int, int] = (255, 255, 255)
     gradient_data: list[tuple[float, tuple[int, int, int]]] = [(0, (255, 255, 255)), (1, (0, 0, 0))]
     gradient_angle: float = 0
-    image_data: Image.Image = Image.new(mode="RGBA", size=(64, 64), color="#FFF")
+    image_data: Image.Image = Image.new(mode="RGBA", size=(1, 1))
 
+    mod_name: str = "My Custom Mod"
     use_remote_config: bool = True
     create_1x_only: bool = False
     file_version: Optional[int] = None
@@ -41,7 +42,7 @@ class ModGeneratorSection(ScrollableFrame):
     _SECTION_PADX: int | tuple[int, int] = (8, 4)
     _SECTION_PADY: int | tuple[int, int] = 8
     _SECTION_GAP: int = 8
-    _SETTING_BOX_PADDING: tuple[int, int] = (8, 12)
+    _SETTING_BOX_PADDING: tuple[int, int] = (12, 12)
     _SETTING_GAP: int = 8
     _SETTING_INNER_GAP: int = 8
 
@@ -129,10 +130,10 @@ class ModGeneratorSection(ScrollableFrame):
         wrapper.grid_rowconfigure(1, weight=1)
         wrapper.grid(column=0, row=1, sticky="nsew")
 
-        # Settings
+        # region -  Settings
         settings_frame: Frame = Frame(wrapper, transparent=False, layer=2)
         settings_frame.grid_columnconfigure(0, weight=1)
-        settings_frame.grid(column=1, row=0, rowspan=2, sticky="ns", padx=(self._SECTION_GAP, 0))
+        settings_frame.grid(column=1, row=0, rowspan=2, sticky="n", padx=(self._SECTION_GAP, 0))
 
         settings_wrapper: Frame = Frame(settings_frame, transparent=True)
         settings_wrapper.grid_columnconfigure(0, weight=1)
@@ -141,9 +142,9 @@ class ModGeneratorSection(ScrollableFrame):
         setting_counter: int = 0
 
         setting_counter += 1
-        setting: Frame = Frame(settings_wrapper, transparent=True)
+        setting = Frame(settings_wrapper, transparent=True)
         setting.grid_columnconfigure(1, weight=1)
-        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0))
+        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
         Label(setting, "menu.mod_generator.content.settings.mode", autowrap=False).grid(column=0, row=0, sticky="w")
         mode_options: list[str] = ["menu.mod_generator.content.settings.mode.color", "menu.mod_generator.content.settings.mode.gradient", "menu.mod_generator.content.settings.mode.custom"]
         mode: str = Localizer.Strings[f"menu.mod_generator.content.settings.mode.{self.mode}"]
@@ -153,20 +154,83 @@ class ModGeneratorSection(ScrollableFrame):
         setting_counter += 1
         setting = Frame(settings_wrapper, transparent=True)
         setting.grid_columnconfigure(1, weight=1)
-        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0))
+        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
         Label(setting, "menu.mod_generator.content.settings.1x_only", autowrap=False).grid(column=0, row=0, sticky="w")
+        value = self.create_1x_only
+        variable = BooleanVar(setting, value=value)
+        CheckBox(setting, width=0, command=lambda variable=variable: self.set_1x_only(variable.get()), variable=variable).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="e")
 
         setting_counter += 1
         setting = Frame(settings_wrapper, transparent=True)
         setting.grid_columnconfigure(1, weight=1)
-        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0))
+        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
         Label(setting, "menu.mod_generator.content.settings.use_remote_config", autowrap=False).grid(column=0, row=0, sticky="w")
+        value = self.use_remote_config
+        variable = BooleanVar(setting, value=value)
+        CheckBox(setting, width=0, command=lambda variable=variable: self.set_remote_config(variable.get()), variable=variable).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="e")
 
         setting_counter += 1
         setting = Frame(settings_wrapper, transparent=True)
         setting.grid_columnconfigure(1, weight=1)
-        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0))
+        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
         Label(setting, "menu.mod_generator.content.settings.version_specific", autowrap=False).grid(column=0, row=0, sticky="w")
+        file_version: str = "" if self.file_version is None else str(self.file_version)
+        file_version_variable: StringVar = StringVar(setting, value=file_version)
+        Entry(
+            setting, command=lambda event: self.set_file_version(event.value), on_focus_lost="command", run_command_if_empty=True, reset_if_empty=False, textvariable=file_version_variable,
+            validate="key", validatecommand=(self.register(lambda value: value == "" or value.isdigit()), "%P")
+        ).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="ew")
+
+        setting_counter += 1
+        setting = Frame(settings_wrapper, transparent=True)
+        setting.grid_columnconfigure(0, weight=1)
+        setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
+        eye_image: CTkImage = get_ctk_image(Resources.Common.Light.EYE, Resources.Common.Dark.EYE, 24)
+        Button(setting, "menu.mod_generator.content.settings.preview", secondary=True, image=eye_image, command=self.show_preview).grid(column=0, row=0, sticky="ew")
+        # endregion
+
+        # region -  Color mode
+        self.color_frame = Frame(wrapper, transparent=True)
+        if self.mode == "color":
+            self.color_frame.grid(column=0, row=0, sticky="nsew")
+        # endregion
+
+        # region -  Gradient mode
+        self.gradient_frame = Frame(wrapper, transparent=True)
+        if self.mode == "gradient":
+            self.gradient_frame.grid(column=0, row=0, sticky="nsew")
+        # endregion
+
+        # region -  Custom mode
+        self.custom_frame = Frame(wrapper, transparent=True)
+        if self.mode == "custom":
+            self.custom_frame.grid(column=0, row=0, sticky="nsew")
+        # endregion
+
+        # region -  General data
+        general_data_frame: Frame = Frame(wrapper, transparent=True)
+        general_data_frame.grid_columnconfigure(0, weight=1)
+        general_data_frame.grid(column=0, row=1, sticky="nsew")
+
+        # Additional files
+        self.additional_files_frame = Frame(general_data_frame, transparent=True)
+        self.additional_files_frame.grid(column=0, row=1, sticky="nsew")
+
+        # Mod name
+        # setting_counter += 1
+        # setting = Frame(settings_wrapper, transparent=True)
+        # setting.grid_columnconfigure(1, weight=1)
+        # setting.grid(column=0, row=setting_counter, pady=0 if setting_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
+        # Label(setting, "menu.mod_generator.content.settings.mod_name", autowrap=False).grid(column=0, row=0, sticky="w")
+        # mod_name: str = self.mod_name
+        # mod_name_variable: StringVar = StringVar(setting, value=mod_name)
+        # Entry(
+        #     setting, command=lambda event: self.set_mod_name(event.value), on_focus_lost="command", run_command_if_empty=False, reset_if_empty=True, textvariable=mod_name_variable,
+        #     validate="key", validatecommand=(self.register(lambda value: not re.search(r'[\\/:*?"<>|]', value)), "%P")
+        # ).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="ew")
+
+        # Start button
+        # endregion
 # endregion
 
 
@@ -197,16 +261,75 @@ class ModGeneratorSection(ScrollableFrame):
             return
         normalized_value: Literal["color", "gradient", "custom"] = "color" if value == color_value else "gradient" if value == gradient_value else "custom"
         self.mode = normalized_value
+
+        if normalized_value == "color":
+            self.gradient_frame.grid_forget()
+            self.custom_frame.grid_forget()
+            self.color_frame.grid(column=0, row=0, sticky="nsew")
+
+        elif normalized_value == "gradient":
+            self.color_frame.grid_forget()
+            self.custom_frame.grid_forget()
+            self.gradient_frame.grid(column=0, row=0, sticky="nsew")
+
+        else:
+            self.color_frame.grid_forget()
+            self.gradient_frame.grid_forget()
+            self.custom_frame.grid(column=0, row=0, sticky="nsew")
+
+
+    def set_file_version(self, value: str) -> None:
+        print(value or None)
+        if not value:
+            self.file_version = None
+            return
+
+        value_int: int = int(value)
+        self.file_version = value_int
+
+
+    def set_remote_config(self, value: bool) -> None:
+        self.use_remote_config = value
+
+
+    def set_1x_only(self, value: bool) -> None:
+        self.create_1x_only = value
+
+
+    def set_mod_name(self, value: str) -> None:
+        self.mod_name = value
+
+
+    def show_preview(self) -> None:
+        mode: Literal['color', 'gradient', 'custom'] = self.mode
+        angle: float = self.gradient_angle
+        data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
+        image: Image.Image = ModGenerator.generate_preview_image(mode=mode, data=data, angle=angle)
+        ModGeneratorPreviewWindow(self.root, image)
+    
+
+    def generate_mod(self) -> None:
+        if self.generating:
+            self.root.send_banner(
+                title_key="menu.mods.exception.title.generate",
+                message_key="menu.mod_generator.exception.message.generator_busy",
+                mode="warning", auto_close_after_ms=6000
+            )
+            return
+
+        self.generating = True
+        mode: Literal['color', 'gradient', 'custom'] = self.mode
+        angle: float = self.gradient_angle
+        data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
+        mod_name: str = self.mod_name
+        
+        existing_mods = {path.stem.lower() if path.is_file() else path.name.lower() for path in Directories.MODS.iterdir()}
+        if mod_name in existing_mods:
+            self.root.send_banner(
+                title_key="menu.mods.exception.title.generate",
+                message_key="menu.mods.exception.message.mod_exists",
+                mode="warning", auto_close_after_ms=6000
+            )
+            self.generating = False
+            return
 # endregion
-
-
-
-
-    # "menu.mod_generator.content.settings.title": "Settings",
-    # "menu.mod_generator.content.settings.mode": "Mode:",
-    # "menu.mod_generator.content.settings.mode.color": "Single Color",
-    # "menu.mod_generator.content.settings.mode.gradient": "Gradient",
-    # "menu.mod_generator.content.settings.mode.custom": "Custom",
-    # "menu.mod_generator.content.settings.1x_only": "1x sizes only",
-    # "menu.mod_generator.content.settings.use_remote_config": "Ignore icon blacklist",
-    # "menu.mod_generator.content.settings.version_specific": "Version:",

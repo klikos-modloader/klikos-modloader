@@ -113,6 +113,7 @@ class Resources:
             CONFIGURE: Path = Directories.RESOURCES / "common" / "light" / "configure.png"
             ADD: Path = Directories.RESOURCES / "common" / "light" / "add.png"
             START: Path = Directories.RESOURCES / "common" / "light" / "start.png"
+            RESET: Path = Directories.RESOURCES / "common" / "light" / "reset.png"
         class Dark:
             BIN: Path = Directories.RESOURCES / "common" / "dark" / "bin.png"
             SUCCESS: Path = Directories.RESOURCES / "common" / "dark" / "success.png"
@@ -129,6 +130,7 @@ class Resources:
             CONFIGURE: Path = Directories.RESOURCES / "common" / "dark" / "configure.png"
             ADD: Path = Directories.RESOURCES / "common" / "dark" / "add.png"
             START: Path = Directories.RESOURCES / "common" / "dark" / "start.png"
+            RESET: Path = Directories.RESOURCES / "common" / "dark" / "reset.png"
 
     class Navigation:
         class Light:

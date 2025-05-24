@@ -1,5 +1,6 @@
-from tkinter import TclError, StringVar, BooleanVar
+from tkinter import TclError, StringVar, BooleanVar, filedialog
 from typing import Literal, Optional, TYPE_CHECKING
+from pathlib import Path
 import re
 
 from modules.project_data import ProjectData
@@ -25,13 +26,15 @@ class ModGeneratorSection(ScrollableFrame):
     color_frame: Frame
     gradient_frame: Frame
     custom_frame: Frame
+    additional_files_list: Frame
 
     mode: Literal["color", "gradient", "custom"] = "color"
     color_data: tuple[int, int, int] = (255, 0, 0)
-    gradient_data: list[tuple[float, tuple[int, int, int]]] = [(0, (255, 255, 255)), (1, (0, 0, 0))]
+    gradient_data: list[tuple[float, tuple[int, int, int]]]
     gradient_angle: float = 0
     image_data: Image.Image = Image.new(mode="RGBA", size=(1, 1))
     custom_roblox_icon: Optional[Image.Image] = None
+    additional_files: dict[Image.Image, str]
 
     mod_name: str = "My Custom Mod"
     use_remote_config: bool = True
@@ -42,14 +45,16 @@ class ModGeneratorSection(ScrollableFrame):
 
     _SECTION_PADX: int | tuple[int, int] = (8, 4)
     _SECTION_PADY: int | tuple[int, int] = 8
-    _SECTION_GAP: int = 8
-    _SETTING_BOX_PADDING: tuple[int, int] = (12, 12)
+    _SECTION_GAP: int = 16
+    _SECTION_BOX_PADDING: tuple[int, int] = (12, 12)
     _SETTING_GAP: int = 8
     _SETTING_INNER_GAP: int = 8
     _ENTRY_GAP: int = 8
 
 
     def __init__(self, master):
+        self.gradient_data = [(0, (255, 255, 255)), (1, (0, 0, 0))]
+        self.additional_files = {}
         super().__init__(master, transparent=False, round=True, border=True, layer=1)
         self.root = master
         self.grid_columnconfigure(0, weight=1)
@@ -116,14 +121,21 @@ class ModGeneratorSection(ScrollableFrame):
         wrapper.grid_columnconfigure(0, weight=1)
         wrapper.grid(column=0, row=1, sticky="nsew")
 
+        left_panel: Frame = Frame(wrapper, transparent=True)
+        left_panel.grid_columnconfigure(0, weight=1)
+        left_panel.grid(column=0, row=0, sticky="nsew")
+
+        right_panel: Frame = Frame(wrapper, transparent=True)
+        right_panel.grid(column=1, row=0, sticky="nsew", padx=(self._SECTION_GAP, 0))
+
         # region -  Settings
-        settings_frame: Frame = Frame(wrapper, transparent=False, layer=2)
+        settings_frame: Frame = Frame(right_panel, transparent=False, layer=2)
         settings_frame.grid_columnconfigure(0, weight=1)
-        settings_frame.grid(column=1, row=0, rowspan=3, sticky="n", padx=(self._SECTION_GAP, 0))
+        settings_frame.grid(column=0, row=0, sticky="nsew")
 
         settings_wrapper: Frame = Frame(settings_frame, transparent=True)
         settings_wrapper.grid_columnconfigure(0, weight=1)
-        settings_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._SETTING_BOX_PADDING[0], pady=self._SETTING_BOX_PADDING[1])
+        settings_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._SECTION_BOX_PADDING[0], pady=self._SECTION_BOX_PADDING[1])
         Label(settings_wrapper, "menu.mod_generator.content.settings.title", style="subtitle", autowrap=False).grid(column=0, row=0, sticky="w")
         setting_row_counter: int = 0
 
@@ -182,12 +194,32 @@ class ModGeneratorSection(ScrollableFrame):
         Label(settings_wrapper, "menu.mod_generator.content.settings.documentation_hyperlink", style="caption", autowrap=False, url=ProjectData.MOD_GENERATOR_DOCUMENTATION).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="w")
         # endregion
 
+        # Custom Roblox icon
+        custom_roblox_icon_frame: Frame = Frame(right_panel, transparent=False, layer=2)
+        custom_roblox_icon_frame.grid(column=0, row=1, sticky="nsew", pady=(self._SECTION_GAP, 0))
+
+        custom_icon_wrapper = Frame(custom_roblox_icon_frame, transparent=True)
+        custom_icon_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._SECTION_BOX_PADDING[0], pady=self._SECTION_BOX_PADDING[1])
+
+        Label(custom_icon_wrapper, "menu.mod_generator.content.custom_roblox_icon",
+            lambda string: Localizer.format(string, {
+                "{roblox.common}": Localizer.Key("roblox.common"),
+                "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"),
+                "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")
+            }), style="subtitle", autowrap=False, wraplength=200
+        ).grid(column=0, row=0, sticky="ew")
+
+
         # # region -  General info
-        general_info_frame: Frame = Frame(wrapper, transparent=True)
+        general_info_frame: Frame = Frame(left_panel, transparent=False, layer=2)
         general_info_frame.grid_columnconfigure(0, weight=1)
         general_info_frame.grid(column=0, row=0, sticky="nsew")
+    
+        general_info_wrapper = Frame(general_info_frame, transparent=True)
+        general_info_wrapper.grid_columnconfigure(0, weight=1)
+        general_info_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._SECTION_BOX_PADDING[0], pady=self._SECTION_BOX_PADDING[1])
 
-        mod_name_frame = Frame(general_info_frame, transparent=True)
+        mod_name_frame = Frame(general_info_wrapper, transparent=True)
         mod_name_frame.grid_columnconfigure(1, weight=1)
         mod_name_frame.grid(column=0, row=0, sticky="ew")
         Label(mod_name_frame, "menu.mod_generator.content.mod_name", style="body_strong", autowrap=False).grid(column=0, row=0, sticky="w")
@@ -200,44 +232,60 @@ class ModGeneratorSection(ScrollableFrame):
         # # endregion
 
         # region -  Color mode
-        self.color_frame = Frame(wrapper, transparent=True)
+        self.color_frame = Frame(general_info_wrapper, transparent=True)
         self.color_frame.grid_columnconfigure(0, weight=1)
         if self.mode == "color":
-            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
+            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
         color_picker = ColorPicker(self.color_frame, advanced=True, on_update_callback=self.set_color_data)
         color_picker.set(value_rgb_normalized=self.color_data)
         color_picker.grid(column=0, row=0)
-        # 
         # endregion
 
         # region -  Gradient mode
-        self.gradient_frame = Frame(wrapper, transparent=True)
+        self.gradient_frame = Frame(general_info_frame, transparent=False, layer=2)
         if self.mode == "gradient":
-            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
+            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
         # endregion
 
         # region -  Custom mode
-        self.custom_frame = Frame(wrapper, transparent=True)
+        self.custom_frame = Frame(general_info_frame, transparent=False, layer=2)
         if self.mode == "custom":
-            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
+            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
         # endregion
 
         # region -  Additional data
-        additional_data_frame: Frame = Frame(wrapper, transparent=True)
-        additional_data_frame.grid_columnconfigure(0, weight=1)
-        additional_data_frame.grid(column=0, row=2, sticky="nsew")
-        additional_row_counter: int = -1
-
-        # Custom Roblox icon
-        additional_row_counter += 1
-        custom_roblox_icon_frame = Frame(additional_data_frame, transparent=True)
-        custom_roblox_icon_frame.grid(column=0, row=additional_row_counter, sticky="nsew")
+        additional_files_frame: Frame = Frame(left_panel, transparent=False, layer=2)
+        additional_files_frame.grid_columnconfigure(0, weight=1)
+        additional_files_frame.grid(column=0, row=2, sticky="nsew", pady=(self._SECTION_GAP, 0))
 
         # Additional files
-        additional_row_counter += 1
-        additional_files_frame = Frame(additional_data_frame, transparent=True)
-        additional_files_frame.grid(column=0, row=additional_row_counter, sticky="nsew")
+        additional_files_wrapper = Frame(additional_files_frame, transparent=True)
+        additional_files_wrapper.grid_columnconfigure(0, weight=1)
+        additional_files_wrapper.grid(column=0, row=0, sticky="nsew", padx=self._SECTION_BOX_PADDING[0], pady=self._SECTION_BOX_PADDING[1])
+
+        Label(additional_files_wrapper, "menu.mod_generator.content.additional_files",
+            lambda string: Localizer.format(string, {
+                "{roblox.common}": Localizer.Key("roblox.common"),
+                "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"),
+                "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")
+            }), style="subtitle", autowrap=True
+        ).grid(column=0, row=0, sticky="ew")
+
+        reset_image: CTkImage = get_ctk_image(Resources.Common.Light.RESET, Resources.Common.Dark.RESET, 24)
+        Button(additional_files_wrapper, "menu.mod_generator.content.button.reset", secondary=True, image=reset_image, command=self._reset_additional_files).grid(column=0, row=1, sticky="w", pady=(8, 0))
+
+        dnd_frame: Frame = Frame(additional_files_wrapper, height=128, layer=3, dnd_command=self._add_additional_files, cursor="hand2")
+        dnd_frame.grid_columnconfigure(0, weight=1)
+        dnd_frame.grid_rowconfigure(0, minsize=128)
+        dnd_frame.grid(column=0, row=2, sticky="nsew", pady=(8, 0))
+        dnd_label: Label = Label(dnd_frame, "menu.mod_generator.content.dnd_target_frame", style="body_strong", justify="center")
+        dnd_label.grid(column=0, row=0, sticky="ew")
+        dnd_frame.bind("<ButtonPress-1>", self._manual_add_additional_files)
+        dnd_label.bind("<ButtonPress-1>", self._manual_add_additional_files)
+
+        self.additional_files_list = Frame(additional_files_wrapper, transparent=True)
+        self._reset_additional_files()
         # endregion
 # endregion
 
@@ -273,17 +321,17 @@ class ModGeneratorSection(ScrollableFrame):
         if normalized_value == "color":
             self.gradient_frame.grid_forget()
             self.custom_frame.grid_forget()
-            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
+            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
         elif normalized_value == "gradient":
             self.color_frame.grid_forget()
             self.custom_frame.grid_forget()
-            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
+            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
         else:
             self.color_frame.grid_forget()
             self.gradient_frame.grid_forget()
-            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
+            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
 
     def set_file_version(self, value: str) -> None:
@@ -360,4 +408,26 @@ class ModGeneratorSection(ScrollableFrame):
             mode="success", auto_close_after_ms=4000
         )
         self.generating = False
+# endregion
+
+
+# region additional files
+    def _reset_additional_files(self) -> None:
+
+        return
+
+
+    def _manual_add_additional_files(self, *_) -> None:
+        files: tuple[str, ...] | Literal[''] = filedialog.askopenfilenames(
+            initialdir=str(Directories.DOWNLOADS),
+            filetypes=(
+                (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
+            ), title=ProjectData.NAME)
+        if not files: return
+        self._add_additional_files(tuple(Path(path) for path in files))
+
+
+    def _add_additional_files(self, files_or_directories: tuple[Path, ...]) -> None:
+        print(files_or_directories)
+        return
 # endregion

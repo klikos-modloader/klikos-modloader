@@ -132,22 +132,23 @@
     "menu.mod_generator.header.description": "Creating mods has never been easier",
 
     "menu.mod_generator.content.settings.title": "Settings",
+    "menu.mod_generator.content.settings.documentation_hyperlink": "Documentation",
     "menu.mod_generator.content.settings.mode": "Mode:",
     "menu.mod_generator.content.settings.mode.color": "Single Color",
     "menu.mod_generator.content.settings.mode.gradient": "Gradient",
     "menu.mod_generator.content.settings.mode.custom": "Custom Mask",
     "menu.mod_generator.content.settings.1x_only": "1x sizes only",
     "menu.mod_generator.content.settings.use_remote_config": "Use remote configuration",
-    "menu.mod_generator.content.settings.version_specific": "Version:",
+    "menu.mod_generator.content.settings.version_specific": "File version:",
     "menu.mod_generator.content.settings.preview": "Preview",
     "menu.mod_generator.content.settings.mod_name": "Mod name:",
 
     "menu.mod_generator.preview_window.window_title": "{app.name} | Mod Preview",
 
     "menu.mod_generator.exception.title.unknown": "Something went wrong!",
-    "menu.mods.exception.title.generate": "Unable to generate mod",
+    "menu.mod_generator.exception.title.generate": "Unable to generate mod!",
 
-    "menu.mod_generator.exception.message.generator_busy": "Another mod is already being generated. Please wait for the current mod to finish before generating a new one",
+    "menu.mod_generator.exception.message.generator_busy": "Another mod is already being generated. Please wait for the current mod to finish before generating a new one.",
     "menu.mod_generator.exception.message.mod_exists": "Another mod with the same name already exists!",
     "menu.mod_generator.exception.message.unknown": "{exception.type}: {exception.message}",
 

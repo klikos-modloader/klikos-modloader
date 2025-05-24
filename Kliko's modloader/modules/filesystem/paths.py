@@ -175,3 +175,9 @@ class Resources:
         class Normal:
             GITHUB: Path = Directories.RESOURCES / "brands" / "normal" / "github.png"
             DISCORD: Path = Directories.RESOURCES / "brands" / "normal" / "discord.png"
+
+    class ColorPicker:
+        SATURATION_VALUE: Path = Directories.RESOURCES / "color_picker" / "saturation_value.png"
+        HUE: Path = Directories.RESOURCES / "color_picker" / "hue.png"
+        INDICATOR: Path = Directories.RESOURCES / "color_picker" / "indicator.png"
+        INDICATOR_WIDE: Path = Directories.RESOURCES / "color_picker" / "indicator_wide.png"

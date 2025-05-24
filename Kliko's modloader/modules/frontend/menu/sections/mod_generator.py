@@ -22,11 +22,14 @@ class ModGeneratorSection(ScrollableFrame):
     root: "Root"
     mode_variable: StringVar
     _language_change_callback_id: str | None = None
+    _gradient_list_frames: dict[tuple[float, tuple[int, int, int]], Frame]
+    _custom_icon_preview_size: int = 218
 
     color_frame: Frame
     gradient_frame: Frame
     custom_frame: Frame
     additional_files_list: Frame
+    custom_icon_preview_label: Label
 
     mode: Literal["color", "gradient", "custom"] = "color"
     color_data: tuple[int, int, int] = (255, 0, 0)
@@ -53,6 +56,7 @@ class ModGeneratorSection(ScrollableFrame):
 
 
     def __init__(self, master):
+        self.mod_name = Localizer.Strings["menu.mod_generator.content.mod_name_default"]
         self.gradient_data = [(0, (255, 255, 255)), (1, (0, 0, 0))]
         self.additional_files = {}
         super().__init__(master, transparent=False, round=True, border=True, layer=1)
@@ -209,6 +213,27 @@ class ModGeneratorSection(ScrollableFrame):
             }), style="subtitle", autowrap=False, wraplength=200
         ).grid(column=0, row=0, sticky="ew")
 
+        Label(custom_icon_wrapper, "menu.mod_generator.content.custom_roblox_icon.description",
+            lambda string: Localizer.format(string, {
+                "{roblox.common}": Localizer.Key("roblox.common"),
+                "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"),
+                "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")
+            }), style="caption", autowrap=False, wraplength=200
+        ).grid(column=0, row=1, sticky="ew")
+
+        button_row = Frame(custom_icon_wrapper, transparent=True)
+        button_row.grid(column=0, row=2, sticky="ew", pady=(12, 0))
+
+        bin_image = get_ctk_image(Resources.Common.Light.BIN, Resources.Common.Dark.BIN, 24)
+        Button(button_row, "menu.mod_generator.content.button.remove", secondary=True, image=bin_image, command=self._remove_custom_roblox_icon).grid(column=0, row=0)
+
+        bin_image = get_ctk_image(Resources.Common.Light.ADD, Resources.Common.Dark.ADD, 24)
+        Button(button_row, "menu.mod_generator.content.button.add", secondary=True, image=bin_image, command=self._choose_custom_roblox_icon).grid(column=1, row=0, padx=(8, 0))
+
+        self.custom_icon_preview_label = Label(custom_icon_wrapper, width=self._custom_icon_preview_size, height=self._custom_icon_preview_size)
+
+
+
 
         # # region -  General info
         general_info_frame: Frame = Frame(left_panel, transparent=False, layer=2)
@@ -237,9 +262,9 @@ class ModGeneratorSection(ScrollableFrame):
         if self.mode == "color":
             self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
-        color_picker = ColorPicker(self.color_frame, advanced=False, on_update_callback=self.set_color_data)
+        color_picker = ColorPicker(self.color_frame, advanced=True, on_update_callback=self.set_color_data)
         color_picker.set(value_rgb_normalized=self.color_data)
-        color_picker.grid(column=0, row=0)
+        color_picker.grid(column=0, row=0, sticky="w")
         # endregion
 
         # region -  Gradient mode
@@ -278,7 +303,7 @@ class ModGeneratorSection(ScrollableFrame):
         reset_image: CTkImage = get_ctk_image(Resources.Common.Light.RESET, Resources.Common.Dark.RESET, 24)
         Button(button_row, "menu.mod_generator.content.button.reset", secondary=True, image=reset_image, command=self._reset_additional_files).grid(column=0, row=0, sticky="w")
 
-        bin_image: CTkImage = get_ctk_image(Resources.Common.Light.BIN, Resources.Common.Dark.BIN, 24)
+        bin_image = get_ctk_image(Resources.Common.Light.BIN, Resources.Common.Dark.BIN, 24)
         Button(button_row, "menu.mod_generator.content.button.remove_all", secondary=True, image=bin_image, command=self._remove_all_additional_files).grid(column=1, row=0, sticky="w", padx=(8, 0))
 
         dnd_frame: Frame = Frame(additional_files_wrapper, height=128, layer=3, dnd_command=self._add_additional_files, cursor="hand2")
@@ -426,6 +451,37 @@ class ModGeneratorSection(ScrollableFrame):
 # endregion
 
 
+# region custom roblox icon
+    def _remove_custom_roblox_icon(self) -> None:
+        self.custom_roblox_icon = None
+        self.custom_icon_preview_label.grid_forget()
+        self.custom_icon_preview_label.configure(image=None)
+
+    def _choose_custom_roblox_icon(self) -> None:
+        path: str | Literal[''] = filedialog.askopenfilename(
+            initialdir=str(Directories.DOWNLOADS),
+            filetypes=(
+                (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
+            ), title=ProjectData.NAME)
+        if path:
+            self._set_custom_roblox_icon(Path(path))
+
+    def _set_custom_roblox_icon(self, path: Path) -> None:
+        if not path.suffix == ".png":
+            self.root.send_banner(
+                title_key="menu.mod_generator.exception.title.unknown",
+                message_key="menu.mods.exception.message.custom_icon_not_a_png",
+                message_modification=lambda string: Localizer.format(string, {"{path.name}": path.name}),
+                mode="warning", auto_close_after_ms=6000
+            )
+            return
+
+        self.custom_roblox_icon = Image.open(path)
+        self.custom_icon_preview_label.configure(image=get_ctk_image(self.custom_roblox_icon, size=self._custom_icon_preview_size))
+        self.custom_icon_preview_label.grid(column=0, row=3, pady=(8, 0))
+# endregion
+
+
 # region additional files
     def _reset_additional_files(self) -> None:
         self.additional_files = {}
@@ -444,8 +500,8 @@ class ModGeneratorSection(ScrollableFrame):
             filetypes=(
                 (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
             ), title=ProjectData.NAME)
-        if not files: return
-        self._add_additional_files(tuple(Path(path) for path in files))
+        if files:
+            self._add_additional_files(tuple(Path(path) for path in files))
 
 
     def _add_additional_files(self, files_or_directories: tuple[Path, ...]) -> None:

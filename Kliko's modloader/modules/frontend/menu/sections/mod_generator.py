@@ -237,7 +237,7 @@ class ModGeneratorSection(ScrollableFrame):
         if self.mode == "color":
             self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
-        color_picker = ColorPicker(self.color_frame, advanced=True, on_update_callback=self.set_color_data)
+        color_picker = ColorPicker(self.color_frame, advanced=False, on_update_callback=self.set_color_data)
         color_picker.set(value_rgb_normalized=self.color_data)
         color_picker.grid(column=0, row=0)
         # endregion
@@ -272,8 +272,14 @@ class ModGeneratorSection(ScrollableFrame):
             }), style="subtitle", autowrap=True
         ).grid(column=0, row=0, sticky="ew")
 
+        button_row = Frame(additional_files_wrapper, transparent=True)
+        button_row.grid(column=0, row=1, sticky="ew", pady=(8, 0))
+
         reset_image: CTkImage = get_ctk_image(Resources.Common.Light.RESET, Resources.Common.Dark.RESET, 24)
-        Button(additional_files_wrapper, "menu.mod_generator.content.button.reset", secondary=True, image=reset_image, command=self._reset_additional_files).grid(column=0, row=1, sticky="w", pady=(8, 0))
+        Button(button_row, "menu.mod_generator.content.button.reset", secondary=True, image=reset_image, command=self._reset_additional_files).grid(column=0, row=0, sticky="w")
+
+        bin_image: CTkImage = get_ctk_image(Resources.Common.Light.BIN, Resources.Common.Dark.BIN, 24)
+        Button(button_row, "menu.mod_generator.content.button.remove_all", secondary=True, image=bin_image, command=self._remove_all_additional_files).grid(column=1, row=0, sticky="w", padx=(8, 0))
 
         dnd_frame: Frame = Frame(additional_files_wrapper, height=128, layer=3, dnd_command=self._add_additional_files, cursor="hand2")
         dnd_frame.grid_columnconfigure(0, weight=1)
@@ -386,8 +392,17 @@ class ModGeneratorSection(ScrollableFrame):
         use_remote_config: bool = self.use_remote_config
         create_1x_only: bool = self.create_1x_only
 
-        mod_name: str = self.mod_name
+        if mode == "gradient":
+            if len(data) < 2:  # type: ignore
+                self.root.send_banner(
+                    title_key="menu.mod_generator.exception.title.generate",
+                    message_key="menu.mods.exception.message.gradient_not_enough_colors",
+                    mode="warning", auto_close_after_ms=6000
+                )
+                self.generating = False
+                return
 
+        mod_name: str = self.mod_name
         if Directories.MODS.exists():
             existing_mods = {path.stem.lower() if path.is_file() else path.name.lower() for path in Directories.MODS.iterdir()}
             if mod_name in existing_mods:
@@ -413,8 +428,14 @@ class ModGeneratorSection(ScrollableFrame):
 
 # region additional files
     def _reset_additional_files(self) -> None:
+        self.additional_files = {}
 
-        return
+        self._update_additional_files_list()
+
+
+    def _remove_all_additional_files(self) -> None:
+        self.additional_files = {}
+        self._update_additional_files_list()
 
 
     def _manual_add_additional_files(self, *_) -> None:
@@ -429,5 +450,9 @@ class ModGeneratorSection(ScrollableFrame):
 
     def _add_additional_files(self, files_or_directories: tuple[Path, ...]) -> None:
         print(files_or_directories)
+        return
+
+    def _update_additional_files_list(self) -> None:
+
         return
 # endregion

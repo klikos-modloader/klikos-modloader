@@ -31,6 +31,7 @@ class ModGeneratorSection(ScrollableFrame):
     gradient_data: list[tuple[float, tuple[int, int, int]]] = [(0, (255, 255, 255)), (1, (0, 0, 0))]
     gradient_angle: float = 0
     image_data: Image.Image = Image.new(mode="RGBA", size=(1, 1))
+    custom_roblox_icon: Optional[Image.Image] = None
 
     mod_name: str = "My Custom Mod"
     use_remote_config: bool = True
@@ -45,6 +46,7 @@ class ModGeneratorSection(ScrollableFrame):
     _SETTING_BOX_PADDING: tuple[int, int] = (12, 12)
     _SETTING_GAP: int = 8
     _SETTING_INNER_GAP: int = 8
+    _ENTRY_GAP: int = 8
 
 
     def __init__(self, master):
@@ -78,21 +80,6 @@ class ModGeneratorSection(ScrollableFrame):
 
     def show(self) -> None:
         self.load()
-
-        # image: Image.Image = ModGenerator.generate_preview_image("color", (204, 0, 55))
-        # ModGeneratorPreviewWindow(self.root, image)
-
-        # image: Image.Image = ModGenerator.generate_preview_image("gradient", [(0, (153, 0, 0)), (1, (255, 0, 110))], angle=-45)
-        # ModGeneratorPreviewWindow(self.root, image)
-
-        # from tkinter import filedialog
-        # path = filedialog.askopenfilename()
-        # if path:
-        #     image = ModGenerator.generate_preview_image("custom", Image.open(path))
-        #     ModGeneratorPreviewWindow(self.root, image)
-
-        # image = ModGenerator.generate_preview_image("custom", Image.open(Resources.Logo.CHRISTMAS))
-        # ModGeneratorPreviewWindow(self.root, image)
 
 
 
@@ -188,25 +175,29 @@ class ModGeneratorSection(ScrollableFrame):
         Button(setting, "menu.mod_generator.content.settings.preview", secondary=True, image=eye_image, command=self.show_preview).grid(column=0, row=0, sticky="ew")
 
         setting_row_counter += 1
+        generate_icon: CTkImage = get_ctk_image(Resources.Common.Light.START, Resources.Common.Dark.START, 24)
+        Button(settings_wrapper, "menu.mod_generator.content.button.generate", secondary=True, image=generate_icon, command=self.generate_mod).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
+
+        setting_row_counter += 1
         Label(settings_wrapper, "menu.mod_generator.content.settings.documentation_hyperlink", style="caption", autowrap=False, url=ProjectData.MOD_GENERATOR_DOCUMENTATION).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="w")
         # endregion
 
-        # region -  General info
-        mod_info_frame: Frame = Frame(wrapper, transparent=True)
-        mod_info_frame.grid_columnconfigure(0, weight=1)
-        mod_info_frame.grid(column=0, row=0, sticky="nsew")
+        # # region -  General info
+        general_info_frame: Frame = Frame(wrapper, transparent=True)
+        general_info_frame.grid_columnconfigure(0, weight=1)
+        general_info_frame.grid(column=0, row=0, sticky="nsew")
 
-        mod_name_frame = Frame(mod_info_frame, transparent=True)
+        mod_name_frame = Frame(general_info_frame, transparent=True)
         mod_name_frame.grid_columnconfigure(1, weight=1)
-        mod_name_frame.grid(column=0, row=0, pady=0, sticky="ew")
-        Label(mod_name_frame, "menu.mod_generator.content.settings.mod_name", style="body_strong", autowrap=False).grid(column=0, row=0, sticky="w")
+        mod_name_frame.grid(column=0, row=0, sticky="ew")
+        Label(mod_name_frame, "menu.mod_generator.content.mod_name", style="body_strong", autowrap=False).grid(column=0, row=0, sticky="w")
         mod_name: str = self.mod_name
         mod_name_variable: StringVar = StringVar(mod_name_frame, value=mod_name)
         Entry(
             mod_name_frame, command=lambda event: self.set_mod_name(event.value), on_focus_lost="command", run_command_if_empty=False, reset_if_empty=True, textvariable=mod_name_variable,
             validate="key", validatecommand=(self.register(lambda value: not re.search(r'[\\/:*?"<>|]', value)), "%P")
         ).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="ew")
-        # endregion
+        # # endregion
 
         # region -  Color mode
         self.color_frame = Frame(wrapper, transparent=True)
@@ -214,7 +205,7 @@ class ModGeneratorSection(ScrollableFrame):
         if self.mode == "color":
             self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
 
-        color_picker = ColorPicker(self.color_frame, on_update_callback=self.set_color_data)
+        color_picker = ColorPicker(self.color_frame, advanced=True, on_update_callback=self.set_color_data)
         color_picker.set(value_rgb_normalized=self.color_data)
         color_picker.grid(column=0, row=0)
         # 
@@ -233,21 +224,20 @@ class ModGeneratorSection(ScrollableFrame):
         # endregion
 
         # region -  Additional data
-        general_data_frame: Frame = Frame(wrapper, transparent=True)
-        general_data_frame.grid_columnconfigure(1, weight=1)
-        general_data_frame.grid(column=0, row=2, sticky="nsew")
+        additional_data_frame: Frame = Frame(wrapper, transparent=True)
+        additional_data_frame.grid_columnconfigure(0, weight=1)
+        additional_data_frame.grid(column=0, row=2, sticky="nsew")
+        additional_row_counter: int = -1
 
         # Custom Roblox icon
-        custom_roblox_icon_frame = Frame(general_data_frame, transparent=True)
-        custom_roblox_icon_frame.grid(column=0, row=0, sticky="nsew")
+        additional_row_counter += 1
+        custom_roblox_icon_frame = Frame(additional_data_frame, transparent=True)
+        custom_roblox_icon_frame.grid(column=0, row=additional_row_counter, sticky="nsew")
 
         # Additional files
-        additional_files_frame = Frame(general_data_frame, transparent=True)
-        additional_files_frame.grid(column=0, row=1, sticky="nsew")
-
-        # Mod name
-
-        # Start button
+        additional_row_counter += 1
+        additional_files_frame = Frame(additional_data_frame, transparent=True)
+        additional_files_frame.grid(column=0, row=additional_row_counter, sticky="nsew")
         # endregion
 # endregion
 
@@ -334,7 +324,7 @@ class ModGeneratorSection(ScrollableFrame):
     def generate_mod(self) -> None:
         if self.generating:
             self.root.send_banner(
-                title_key="menu.mods.exception.title.generate",
+                title_key="menu.mod_generator.exception.title.generate",
                 message_key="menu.mod_generator.exception.message.generator_busy",
                 mode="warning", auto_close_after_ms=6000
             )
@@ -344,15 +334,30 @@ class ModGeneratorSection(ScrollableFrame):
         mode: Literal['color', 'gradient', 'custom'] = self.mode
         angle: float = self.gradient_angle
         data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
+        custom_roblox_icon: Optional[Image.Image] = self.custom_roblox_icon
+        use_remote_config: bool = self.use_remote_config
+        create_1x_only: bool = self.create_1x_only
+
         mod_name: str = self.mod_name
-        
-        existing_mods = {path.stem.lower() if path.is_file() else path.name.lower() for path in Directories.MODS.iterdir()}
-        if mod_name in existing_mods:
-            self.root.send_banner(
-                title_key="menu.mods.exception.title.generate",
-                message_key="menu.mods.exception.message.mod_exists",
-                mode="warning", auto_close_after_ms=6000
-            )
-            self.generating = False
-            return
+
+        if Directories.MODS.exists():
+            existing_mods = {path.stem.lower() if path.is_file() else path.name.lower() for path in Directories.MODS.iterdir()}
+            if mod_name in existing_mods:
+                self.root.send_banner(
+                    title_key="menu.mod_generator.exception.title.generate",
+                    message_key="menu.mods.exception.message.mod_exists",
+                    mode="warning", auto_close_after_ms=6000
+                )
+                self.generating = False
+                return
+        else:
+            Directories.MODS.mkdir(parents=True, exist_ok=True)
+
+        self.root.send_banner(
+            title_key="menu.mod_generator.success.title.generate",
+            message_key="menu.mod_generator.success.message.generate",
+            message_modification=lambda string: Localizer.format(string, {"{mod.name}": mod_name}),
+            mode="success", auto_close_after_ms=4000
+        )
+        self.generating = False
 # endregion

@@ -141,9 +141,14 @@
     "menu.mod_generator.content.settings.use_remote_config": "Use remote configuration",
     "menu.mod_generator.content.settings.version_specific": "File version:",
     "menu.mod_generator.content.settings.preview": "Preview",
-    "menu.mod_generator.content.settings.mod_name": "Mod name:",
+
+    "menu.mod_generator.content.mod_name": "Mod name:",
+    "menu.mod_generator.content.button.generate": "Generate",
 
     "menu.mod_generator.preview_window.window_title": "{app.name} | Mod Preview",
+
+    "menu.mod_generator.success.title.generate": "Mod generated successfully!",
+    "menu.mod_generator.success.message.generate": "\"{mod.name}\" has been added to your mods folder",
 
     "menu.mod_generator.exception.title.unknown": "Something went wrong!",
     "menu.mod_generator.exception.title.generate": "Unable to generate mod!",

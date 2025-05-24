@@ -206,7 +206,7 @@ class ColorPicker(Frame):
                 hsv_input_wrapper, command=lambda event, mode="h": self._on_hsv_input(mode, event), on_focus_lost="command", reset_if_empty=True, run_command_if_empty=False, width=48, height=32,
                 validate="key", validatecommand=(self.register(lambda value: len(value) <= 3 and (value == "" or value.isdigit())), "%P")
             )
-            self._hsv_h_input.set(str(r))
+            self._hsv_h_input.set(str(h))
             self._hsv_h_input.grid(column=1, row=0, sticky="e", padx=(8, 0))
 
             Label(hsv_input_wrapper, "S", style="body", dont_localize=True).grid(column=0, row=1, pady=(8, 0))
@@ -214,7 +214,7 @@ class ColorPicker(Frame):
                 hsv_input_wrapper, command=lambda event, mode="s": self._on_hsv_input(mode, event), on_focus_lost="command", reset_if_empty=True, run_command_if_empty=False, width=48, height=32,
                 validate="key", validatecommand=(self.register(lambda value: len(value) <= 3 and (value == "" or value.isdigit())), "%P")
             )
-            self._hsv_s_input.set(str(r))
+            self._hsv_s_input.set(str(s))
             self._hsv_s_input.grid(column=1, row=1, sticky="e", padx=(8, 0), pady=(8, 0))
 
             Label(hsv_input_wrapper, "V", style="body", dont_localize=True).grid(column=0, row=2, pady=(8, 0))
@@ -222,7 +222,7 @@ class ColorPicker(Frame):
                 hsv_input_wrapper, command=lambda event, mode="v": self._on_hsv_input(mode, event), on_focus_lost="command", reset_if_empty=True, run_command_if_empty=False, width=48, height=32,
                 validate="key", validatecommand=(self.register(lambda value: len(value) <= 3 and (value == "" or value.isdigit())), "%P")
             )
-            self._hsv_v_input.set(str(r))
+            self._hsv_v_input.set(str(v))
             self._hsv_v_input.grid(column=1, row=2, sticky="e", padx=(8, 0), pady=(8, 0))
 
             # HEX & Preview

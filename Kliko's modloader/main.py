@@ -31,6 +31,8 @@ if FROZEN:
         import pyi_splash  # type: ignore
         if pyi_splash.is_alive(): pyi_splash.close()
     except (ImportError, ModuleNotFoundError): pass
+else:
+    print("[WARNING] You are running the source code directly, please make sure you have all dependencies installed or run the build script.")
 
 ROOT: Path = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT / "libraries"))

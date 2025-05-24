@@ -144,8 +144,14 @@
 
     "menu.mod_generator.content.mod_name": "Mod name:",
     "menu.mod_generator.content.button.generate": "Generate",
+    "menu.mod_generator.content.custom_roblox_icon": "Custom {roblox.common} icon",
+    "menu.mod_generator.content.additional_files": "Additional files",
+    "menu.mod_generator.content.button.reset": "Reset",
+    "menu.mod_generator.content.dnd_target_frame": "Drag and drop to add files",
 
     "menu.mod_generator.preview_window.window_title": "{app.name} | Mod Preview",
+    
+    "menu.mod_generator.popup.import.filetype.supported": "Supported Files",
 
     "menu.mod_generator.success.title.generate": "Mod generated successfully!",
     "menu.mod_generator.success.message.generate": "\"{mod.name}\" has been added to your mods folder",

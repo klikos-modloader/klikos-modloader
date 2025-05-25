@@ -1,4 +1,13 @@
 from typing import NamedTuple
+from dataclasses import dataclass
+
+from PIL import Image  # type: ignore
+
+
+@dataclass
+class AdditionalFile:
+    image: Image.Image
+    target: str
 
 
 class IconBlacklist(NamedTuple):

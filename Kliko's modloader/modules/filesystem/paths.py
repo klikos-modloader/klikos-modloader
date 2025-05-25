@@ -67,6 +67,7 @@ class Directories:
     MARKETPLACE_CACHE: Path = CACHE / "marketplace"
     MEIPASS: Optional[Path] = Path(sys._MEIPASS) if FROZEN else None  # type: ignore
     RESOURCES: Path = (MEIPASS if FROZEN else ROOT) / "resources"  # type: ignore
+    MOD_GENERATOR_FILES: Path = RESOURCES / "mod_generator_files"
 
     DOWNLOADS: Path = _get_downloads_directory().resolve()
     ROBLOX: Path = Path.home() / "AppData" / "Local" / "Roblox"

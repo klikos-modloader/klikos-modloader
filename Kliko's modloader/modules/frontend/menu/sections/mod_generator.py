@@ -1,15 +1,17 @@
 from tkinter import TclError, StringVar, BooleanVar, filedialog
 from typing import Literal, Optional, TYPE_CHECKING
 from pathlib import Path
+import uuid
+import json
 import re
 
 from modules.project_data import ProjectData
 from ..windows import ModGeneratorPreviewWindow
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button, DropDownMenu, Entry, CheckBox, ColorPicker, ask_color
-from modules.frontend.functions import get_ctk_image
+from modules.frontend.functions import get_ctk_image, crop_to_fit
 from modules.localization import Localizer
 from modules.filesystem import Resources, Directories
-from modules.mod_generator import ModGenerator
+from modules.mod_generator import ModGenerator, AdditionalFile
 
 if TYPE_CHECKING: from modules.frontend.widgets import Root
 
@@ -23,13 +25,18 @@ class ModGeneratorSection(ScrollableFrame):
     mode_variable: StringVar
     _language_change_callback_id: str | None = None
     _gradient_list_frames: dict[tuple[float, tuple[int, int, int]], Frame]
+    _additional_file_frames: dict[str, Frame]
+    _additional_file_ids: list[str]
     _custom_icon_preview_size: int = 218
+    _custom_mask_preview_size: int = 256
+    _addition_icon_preview_size: int = 24
 
     color_frame: Frame
     gradient_frame: Frame
     custom_frame: Frame
     additional_files_list: Frame
     custom_icon_preview_label: Label
+    custom_mask_preview_label: Label
 
     mode: Literal["color", "gradient", "custom"] = "color"
     color_data: tuple[int, int, int] = (255, 0, 0)
@@ -37,7 +44,7 @@ class ModGeneratorSection(ScrollableFrame):
     gradient_angle: float = 0
     image_data: Image.Image = Image.new(mode="RGBA", size=(1, 1))
     custom_roblox_icon: Optional[Image.Image] = None
-    additional_files: dict[Image.Image, str]
+    additional_files: dict[str, AdditionalFile]
 
     mod_name: str = "My Custom Mod"
     use_remote_config: bool = True
@@ -53,12 +60,16 @@ class ModGeneratorSection(ScrollableFrame):
     _SETTING_GAP: int = 8
     _SETTING_INNER_GAP: int = 8
     _ENTRY_GAP: int = 8
+    _ENTRY_INNER_GAP: int = 8
+    _ENTRY_BOX_PADDING: tuple[int, int] = (6, 6)
 
 
     def __init__(self, master):
         self.mod_name = Localizer.Strings["menu.mod_generator.content.mod_name_default"]
         self.gradient_data = [(0, (255, 255, 255)), (1, (0, 0, 0))]
         self.additional_files = {}
+        self._additional_file_ids = []
+        self._additional_file_frames = {}
         super().__init__(master, transparent=False, round=True, border=True, layer=1)
         self.root = master
         self.grid_columnconfigure(0, weight=1)
@@ -262,21 +273,25 @@ class ModGeneratorSection(ScrollableFrame):
         if self.mode == "color":
             self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
-        color_picker = ColorPicker(self.color_frame, advanced=True, on_update_callback=self.set_color_data)
+        color_picker = ColorPicker(self.color_frame, advanced=False, on_update_callback=self.set_color_data)
         color_picker.set(value_rgb_normalized=self.color_data)
         color_picker.grid(column=0, row=0, sticky="w")
         # endregion
 
         # region -  Gradient mode
-        self.gradient_frame = Frame(general_info_frame, transparent=False, layer=2)
+        self.gradient_frame = Frame(general_info_wrapper, transparent=False, layer=2)
         if self.mode == "gradient":
             self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
         # endregion
 
         # region -  Custom mode
-        self.custom_frame = Frame(general_info_frame, transparent=False, layer=2)
+        self.custom_frame = Frame(general_info_wrapper, transparent=False, layer=2)
         if self.mode == "custom":
             self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+
+        add_image: CTkImage = get_ctk_image(Resources.Common.Light.ADD, Resources.Common.Dark.ADD, 24)
+        Button(self.custom_frame, "menu.mod_generator.content.button.add", secondary=True, image=add_image, command=self._choose_custom_mask).grid(column=0, row=0, sticky="w")
+        self.custom_mask_preview_label = Label(self.custom_frame, width=self._custom_mask_preview_size, height=self._custom_mask_preview_size)
         # endregion
 
         # region -  Additional data
@@ -316,6 +331,7 @@ class ModGeneratorSection(ScrollableFrame):
         dnd_label.bind("<ButtonPress-1>", self._manual_add_additional_files)
 
         self.additional_files_list = Frame(additional_files_wrapper, transparent=True)
+        self.additional_files_list.grid_columnconfigure(0, weight=1)
         self._reset_additional_files()
         # endregion
 # endregion
@@ -390,13 +406,199 @@ class ModGeneratorSection(ScrollableFrame):
         hex_without_prefix: str = value_hex.removeprefix("#")
         r, g, b = int(hex_without_prefix[0:2], 16), int(hex_without_prefix[2:4], 16), int(hex_without_prefix[4:6], 16)
         self.color_data = (r, g, b)
+# endregion
 
 
+# region custom mask
+    def _choose_custom_mask(self) -> None:
+        path: str | Literal[''] = filedialog.askopenfilename(
+            initialdir=Directories.DOWNLOADS,
+            filetypes=(
+                (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
+            ), title=ProjectData.NAME)
+        if not path:
+            return
+
+        image: Image.Image = Image.open(path, formats=("PNG",))
+        w, h = image.size
+        ratio: float = w / h
+        if ratio == 1:
+            preview_image: Image.Image = image.copy()
+        else:  # Fit image
+            size: int = max(w, h)
+            preview_image = Image.new("RGBA", (size, size))
+            paste_x = (size - w) // 2
+            paste_y = (size - h) // 2
+            preview_image.paste(image, (paste_x, paste_y))
+        ctk_image: CTkImage = get_ctk_image(preview_image, size=self._custom_mask_preview_size)
+        self.image_data.close()
+        self.image_data = image
+        self.custom_mask_preview_label.grid(column=0, row=1, pady=(8, 0), sticky="w")
+        self.custom_mask_preview_label.configure(image=ctk_image)
+# endregion
+
+
+# region custom roblox icon
+    def _remove_custom_roblox_icon(self) -> None:
+        self.custom_roblox_icon = None
+        self.custom_icon_preview_label.grid_forget()
+        self.custom_icon_preview_label.configure(image=None)
+
+    def _choose_custom_roblox_icon(self) -> None:
+        path: str | Literal[''] = filedialog.askopenfilename(
+            initialdir=Directories.DOWNLOADS,
+            filetypes=(
+                (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
+            ), title=ProjectData.NAME)
+        if path:
+            self._set_custom_roblox_icon(Path(path))
+
+    def _set_custom_roblox_icon(self, path: Path) -> None:
+        if not path.suffix == ".png":
+            self.root.send_banner(
+                title_key="menu.mod_generator.exception.title.unknown",
+                message_key="menu.mod_generator.exception.message.not_a_png",
+                message_modification=lambda string: Localizer.format(string, {"{path.name}": path.name}),
+                mode="warning", auto_close_after_ms=6000
+            )
+            return
+
+        self.custom_roblox_icon = Image.open(path)
+        self.custom_icon_preview_label.configure(image=get_ctk_image(self.custom_roblox_icon, size=self._custom_icon_preview_size))
+        self.custom_icon_preview_label.grid(column=0, row=3, pady=(8, 0))
+# endregion
+
+
+# region additional files
+    def _reset_additional_files(self) -> None:
+        additional_files: dict[str, AdditionalFile] = {}
+        with open(Directories.MOD_GENERATOR_FILES / "index.json") as file:
+            data: dict = json.load(file)
+        directory: Path = Directories.MOD_GENERATOR_FILES / "images"
+        for path in directory.iterdir():
+            if not path.exists():
+                continue
+            if not path.suffix == ".png":
+                continue
+            target_list: list[str] | None = data.get(path.name)
+            if target_list is None:
+                continue
+
+            image: Image.Image = Image.open(path, formats=("PNG",))
+            target: str = "/".join(target_list)
+            additional_files[uuid.uuid4().hex] = AdditionalFile(image, target)
+        self.additional_files = additional_files
+        self._update_additional_files_list()
+
+
+    def _remove_all_additional_files(self) -> None:
+        self.additional_files = {}
+        self._update_additional_files_list()
+
+
+    def _remove_additional_file(self, id: str) -> None:
+        self.additional_files.pop(id, None)
+        self._update_additional_files_list()
+
+
+    def _manual_add_additional_files(self, *_) -> None:
+        files: tuple[str, ...] | Literal[''] = filedialog.askopenfilenames(
+            initialdir=Directories.DOWNLOADS,
+            filetypes=(
+                (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
+            ), title=ProjectData.NAME)
+        if files:
+            self._add_additional_files(tuple(Path(path) for path in files))
+
+
+    def _add_additional_files(self, files_or_directories: tuple[Path, ...]) -> None:
+        additional_files: dict = {}
+        for file in files_or_directories:
+            if file.suffix != ".png":
+                self.root.send_banner(
+                    title_key="menu.mod_generator.exception.title.unknown",
+                    message_key="menu.mod_generator.exception.message.not_a_png",
+                    message_modification=lambda string: Localizer.format(string, {"{path.name}": file.name}),
+                    mode="warning", auto_close_after_ms=6000
+                )
+                continue
+            
+            image: Image.Image = Image.open(file, formats=("PNG",))
+            target: str = ""
+            additional_files[uuid.uuid4().hex] = AdditionalFile(image, target)
+        self.additional_files.update(additional_files)
+        self._update_additional_files_list()
+
+
+    def _update_additional_files_list(self) -> None:
+        additional_files: dict[str, AdditionalFile] = self.additional_files
+
+        additional_file_ids: list[str] = list(additional_files.keys())
+
+        for id, frame in list(self._additional_file_frames.items()):
+            if id not in additional_file_ids:
+                self._additional_file_frames.pop(id)
+                frame.destroy()
+
+        list_mapped: bool = self.additional_files_list.winfo_ismapped()
+        if not additional_file_ids and list_mapped:
+            self.additional_files_list.grid_forget()
+            return
+        elif not additional_file_ids:
+            return
+        elif not list_mapped:
+            self.additional_files_list.grid(column=0, row=3, sticky="nsew", pady=(8, 0))
+
+        for i, (id, addition_file) in enumerate(additional_files.items()):
+            pady = 0 if i == 0 else (self._ENTRY_GAP, 0)
+
+            frame = self._additional_file_frames.get(id)  # type: ignore
+            if frame is not None:
+                if getattr(frame, "_row", None) != i:
+                    frame.grid(column=0, row=i, sticky="nsew", pady=pady)
+                    frame._row = i  # type: ignore
+
+            else:
+                frame = Frame(self.additional_files_list, layer=3)
+                frame._row = i  # type: ignore
+                frame.grid(column=0, row=i, sticky="nsew", pady=pady)
+                self._additional_file_frames[id] = frame
+                self.after(10, self._load_additional_file_frame, frame, id, addition_file)
+
+
+    def _load_additional_file_frame(self, frame: Frame, id: str, additional_file: AdditionalFile) -> None:
+        def update_file_target(file: AdditionalFile, event) -> None:
+            file.target = event.value
+
+        frame.grid_columnconfigure(0, weight=1)
+
+        wrapper: Frame = Frame(frame, transparent=True)
+        wrapper.grid_columnconfigure(2, weight=1)
+        wrapper.grid(column=0, row=0, sticky="nsew", padx=self._ENTRY_BOX_PADDING[0], pady=self._ENTRY_BOX_PADDING[1])
+
+        bin_image: CTkImage = get_ctk_image(Resources.Common.Light.BIN, Resources.Common.Dark.BIN, 24)
+        Button(wrapper, secondary=True, image=bin_image, command=lambda id=id: self._remove_additional_file(id)).grid(column=0, row=0)
+
+        icon_image: CTkImage = get_ctk_image(additional_file.image, size=self._addition_icon_preview_size)
+        Label(wrapper, image=icon_image).grid(column=1, row=0, padx=self._ENTRY_INNER_GAP)
+
+        target_entry: Entry = Entry(
+            wrapper, command=lambda event, additional_file=additional_file: update_file_target(additional_file, event),
+            on_focus_lost="command", run_command_if_empty=True, reset_if_empty=False,
+            validate="key", validatecommand=(self.register(lambda value: not re.search(r'[:*?"<>|]', value)), "%P")
+        )
+        target_entry.set(additional_file.target)
+        target_entry.grid(column=2, row=0, sticky="ew", padx=(self._ENTRY_INNER_GAP, 0))
+# endregion
+
+
+# region generate
     def show_preview(self) -> None:
         mode: Literal['color', 'gradient', 'custom'] = self.mode
         angle: float = self.gradient_angle
         data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
-        image: Image.Image = ModGenerator.generate_preview_image(mode=mode, data=data, angle=angle)
+        custom_roblox_icon: Optional[Image.Image] = self.custom_roblox_icon
+        image: Image.Image = ModGenerator.generate_preview_image(mode=mode, data=data, angle=angle, custom_roblox_icon=custom_roblox_icon)
         ModGeneratorPreviewWindow(self.root, image)
 
 
@@ -421,7 +623,7 @@ class ModGeneratorSection(ScrollableFrame):
             if len(data) < 2:  # type: ignore
                 self.root.send_banner(
                     title_key="menu.mod_generator.exception.title.generate",
-                    message_key="menu.mods.exception.message.gradient_not_enough_colors",
+                    message_key="menu.mod_generator.exception.message.gradient_not_enough_colors",
                     mode="warning", auto_close_after_ms=6000
                 )
                 self.generating = False
@@ -433,7 +635,7 @@ class ModGeneratorSection(ScrollableFrame):
             if mod_name in existing_mods:
                 self.root.send_banner(
                     title_key="menu.mod_generator.exception.title.generate",
-                    message_key="menu.mods.exception.message.mod_exists",
+                    message_key="menu.mod_generator.exception.message.mod_exists",
                     mode="warning", auto_close_after_ms=6000
                 )
                 self.generating = False
@@ -448,67 +650,4 @@ class ModGeneratorSection(ScrollableFrame):
             mode="success", auto_close_after_ms=4000
         )
         self.generating = False
-# endregion
-
-
-# region custom roblox icon
-    def _remove_custom_roblox_icon(self) -> None:
-        self.custom_roblox_icon = None
-        self.custom_icon_preview_label.grid_forget()
-        self.custom_icon_preview_label.configure(image=None)
-
-    def _choose_custom_roblox_icon(self) -> None:
-        path: str | Literal[''] = filedialog.askopenfilename(
-            initialdir=str(Directories.DOWNLOADS),
-            filetypes=(
-                (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
-            ), title=ProjectData.NAME)
-        if path:
-            self._set_custom_roblox_icon(Path(path))
-
-    def _set_custom_roblox_icon(self, path: Path) -> None:
-        if not path.suffix == ".png":
-            self.root.send_banner(
-                title_key="menu.mod_generator.exception.title.unknown",
-                message_key="menu.mods.exception.message.custom_icon_not_a_png",
-                message_modification=lambda string: Localizer.format(string, {"{path.name}": path.name}),
-                mode="warning", auto_close_after_ms=6000
-            )
-            return
-
-        self.custom_roblox_icon = Image.open(path)
-        self.custom_icon_preview_label.configure(image=get_ctk_image(self.custom_roblox_icon, size=self._custom_icon_preview_size))
-        self.custom_icon_preview_label.grid(column=0, row=3, pady=(8, 0))
-# endregion
-
-
-# region additional files
-    def _reset_additional_files(self) -> None:
-        self.additional_files = {}
-
-        self._update_additional_files_list()
-
-
-    def _remove_all_additional_files(self) -> None:
-        self.additional_files = {}
-        self._update_additional_files_list()
-
-
-    def _manual_add_additional_files(self, *_) -> None:
-        files: tuple[str, ...] | Literal[''] = filedialog.askopenfilenames(
-            initialdir=str(Directories.DOWNLOADS),
-            filetypes=(
-                (Localizer.Strings["menu.mod_generator.popup.import.filetype.supported"], "*.png"),
-            ), title=ProjectData.NAME)
-        if files:
-            self._add_additional_files(tuple(Path(path) for path in files))
-
-
-    def _add_additional_files(self, files_or_directories: tuple[Path, ...]) -> None:
-        print(files_or_directories)
-        return
-
-    def _update_additional_files_list(self) -> None:
-
-        return
 # endregion

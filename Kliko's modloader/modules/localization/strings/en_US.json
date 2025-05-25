@@ -168,8 +168,8 @@
 
     "menu.mod_generator.exception.message.generator_busy": "Another mod is already being generated. Please wait for the current mod to finish before generating a new one.",
     "menu.mod_generator.exception.message.mod_exists": "Another mod with the same name already exists!",
-    "menu.mods.exception.message.gradient_not_enough_colors": "Gradients must consist of at least 2 colors",
-    "menu.mods.exception.message.custom_icon_not_a_png": "Unsupported filetype: \"{path.name}\". Only .png files are supported.",
+    "menu.mod_generator.exception.message.gradient_not_enough_colors": "Gradients must consist of at least 2 colors",
+    "menu.mod_generator.exception.message.not_a_png": "Unsupported filetype: \"{path.name}\". Only .png files are supported.",
     "menu.mod_generator.exception.message.unknown": "{exception.type}: {exception.message}",
 
 

@@ -8,7 +8,7 @@ from modules.deployments import RobloxVersion, LatestVersion, DeployHistory
 from modules.networking import requests, Response, Api
 
 from .utils import MaskStorage
-from .dataclasses import IconBlacklist, RemoteConfig
+from .dataclasses import IconBlacklist, RemoteConfig, AdditionalFile
 from .exceptions import *
 
 from PIL import Image  # type: ignore
@@ -38,7 +38,7 @@ class ModGenerator:
 
 
     @classmethod
-    def generate_preview_image(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, angle: Optional[float] = None)  -> Image.Image:
+    def generate_preview_image(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, angle: Optional[float] = None, custom_roblox_icon: Optional[Image.Image] = None)  -> Image.Image:
         cls._validate_data(mode, data)
 
         index: Path = PREVIEW_DATA_DIR / "index.json"
@@ -58,9 +58,13 @@ class ModGenerator:
             icon_w: int = int(icon_size[0])
             icon_h: int = int(icon_size[1])
 
-            icon: Image.Image = image.crop((icon_x, icon_y, icon_x + icon_w, icon_y + icon_h))
-            cls.apply_mask(icon, mode, data, angle)
-            image.paste(icon, (icon_x, icon_y))
+            if custom_roblox_icon is not None and icon_name == "roblox":
+                custom_icon_resized: Image.Image = custom_roblox_icon.resize((icon_w, icon_h), resample=Image.Resampling.LANCZOS)
+                image.paste(custom_icon_resized, (icon_x, icon_y))
+            else:
+                icon: Image.Image = image.crop((icon_x, icon_y, icon_x + icon_w, icon_y + icon_h))
+                cls.apply_mask(icon, mode, data, angle)
+                image.paste(icon, (icon_x, icon_y))
         MaskStorage.cache.clear()
 
         return image

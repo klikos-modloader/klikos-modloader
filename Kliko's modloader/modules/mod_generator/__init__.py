@@ -1,17 +1,20 @@
 from typing import Literal, Optional
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import shutil
 import json
+import re
 
 from modules.logger import Logger
+from modules import filesystem
 from modules.deployments import RobloxVersion, LatestVersion, DeployHistory
 from modules.networking import requests, Response, Api
 
-from .utils import MaskStorage
+from .utils import MaskStorage, locate_imagesets, locate_imagesetdata, ImageSetData, ImageSet, ImageSetIcon
 from .dataclasses import IconBlacklist, RemoteConfig, AdditionalFile, GradientColor
 from .exceptions import *
 
-from PIL import Image  # type: ignore
+from PIL import Image, PngImagePlugin  # type: ignore
 
 
 PREVIEW_DATA_DIR: Path = Path(__file__).parent / "preview_data"
@@ -130,7 +133,7 @@ class ModGenerator:
 
 
     @classmethod
-    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False, custom_roblox_icon: Optional[Image.Image] = None) -> None:
+    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False, custom_roblox_icon: Optional[Image.Image] = None, additional_files: Optional[list[AdditionalFile]] = None) -> None:
         Logger.info(f"Generating mod (mode={mode})...", prefix=cls._LOG_PREFIX)
         cls._validate_data(mode, data)
         angle = angle or 0
@@ -140,10 +143,17 @@ class ModGenerator:
         else:
             deploy_history: DeployHistory = DeployHistory()
             for item in reversed(deploy_history.studio_deployments):
-                if deployment.file_version.minor == file_version:
+                if item.file_version.minor == file_version:
                     deployment = item
                     break
             else: raise InvalidVersionError(file_version)
+        mod_info: dict[str, str | int] = {
+            "clientVersionUpload": deployment.guid,
+            "file_version": deployment.file_version.minor,
+            "watermark": "Generated with Kliko's modloader"
+        }
+        metadata = PngImagePlugin.PngInfo()
+        metadata.add_text("Watermark", "Generated with Kliko's modloader")
 
         if use_remote_config:
             response: Response = requests.get(Api.GitHub.MOD_GENERATOR_CONFIG)
@@ -155,12 +165,95 @@ class ModGenerator:
         if output_dir.exists():
             raise FileExistsError(str(output_dir))
 
+        Logger.info("Creating temporary directory...", prefix=cls._LOG_PREFIX)
         with TemporaryDirectory() as tmp:
             temporary_directory: Path = Path(tmp)
+            temp_target: Path = temporary_directory / "mod"
+            temp_target.mkdir(parents=True, exist_ok=True)
+            luapackages_target: Path = temporary_directory / "luapackages"
 
+            Logger.info("Writing info.json...", prefix=cls._LOG_PREFIX)
+            with open(temp_target / "info.json", "w") as file:
+                json.dump(mod_info, file, indent=4)
+            
+            Logger.info("Downloading ImageSets...", prefix=cls._LOG_PREFIX)
+            filesystem.download(Api.Roblox.Deployment.download(deployment.guid, "extracontent-luapackages.zip"), temporary_directory / "luapackages.zip")
+            filesystem.extract(temporary_directory / "luapackages.zip", luapackages_target)
+
+            Logger.info("Locating ImageSets...", prefix=cls._LOG_PREFIX)
+            imagesetdata_path: Path = locate_imagesetdata(luapackages_target)
+            imagesets_dir: Path = locate_imagesets(luapackages_target)
+            temp_target_imageset_path: Path = temp_target / "ExtraContent" / "Luapackages" / imagesets_dir.relative_to(luapackages_target)
+            shutil.copytree(imagesets_dir, temp_target_imageset_path, dirs_exist_ok=True)
+
+            Logger.info("Preparing ImageSets...", prefix=cls._LOG_PREFIX)
+            if create_1x_only:
+                for path in temp_target_imageset_path.iterdir():
+                    if path.suffix != ".png":
+                        continue
+                    if path.name.startswith("img_set_2x") or path.name.startswith("img_set_3x"):
+                        path.unlink()
+
+            Logger.info(f"Parsing {imagesetdata_path.name}...", prefix=cls._LOG_PREFIX)
+            image_set_data: ImageSetData = ImageSetData(imagesetdata_path, temp_target_imageset_path, include_1x_only=create_1x_only)
+
+            Logger.info("Generating ImageSets...", prefix=cls._LOG_PREFIX)
             ROBLOX_LOGO_NAME: str = "icons/logo/block"
+            for imageset in image_set_data.imagesets:
+                with Image.open(imageset.path, formats=("PNG",)) as imageset_image_object:
+                    if imageset_image_object.mode != "RGBA":
+                        imageset_image_object = imageset_image_object.convert("RGBA")
 
+                    for icon in imageset.icons:
+                        if cls._is_icon_blacklisted(icon.name, remote_config.blacklist):
+                            continue
 
+                        if custom_roblox_icon is not None and icon.name == ROBLOX_LOGO_NAME:
+                            imageset_image_object.paste(custom_roblox_icon.resize((icon.w, icon.h), resample=Image.Resampling.LANCZOS), (icon.x, icon.y))
+                        else:
+                            cropped: Image.Image = imageset_image_object.crop((icon.x, icon.y, icon.x + icon.w, icon.y + icon.h))
+                            cls.apply_mask(cropped, mode=mode, data=data, angle=angle)
+                            imageset_image_object.paste(cropped, (icon.x, icon.y))
+                    imageset_image_object.save(imageset.path, format="PNG", pnginfo=metadata)
+
+            if additional_files:
+                Logger.info("Generating additional files...", prefix=cls._LOG_PREFIX)
+                for additional_file in additional_files:
+                    target: Path = Path(temp_target, *re.split(r"[\\/]", additional_file.target))
+
+                    if target.suffix != ".png":
+                        Logger.warning(f"Skipping file '{target.name}'... (Invalid filetype, must be '.png')")
+                        continue
+
+                    if create_1x_only and (target.stem.endswith("@2x") or target.stem.endswith("@3x")):
+                        Logger.warning(f"Skipping file '{target.name}'... (Only generating @1x sizes)")
+                        continue
+
+                    image_copy: Image.Image = additional_file.image.copy()
+                    if image_copy.mode != "RGBA":
+                        image_copy = image_copy.convert("RGBA")
+                    cls.apply_mask(image_copy, mode, data, angle)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    image_copy.save(target, format="PNG", pnginfo=metadata)
 
             if output_dir.exists():
                 raise FileExistsError(str(output_dir))
+            shutil.copytree(temp_target, output_dir, dirs_exist_ok=True)
+            Logger.info("Mod generated successfully!", prefix=cls._LOG_PREFIX)
+
+
+    @classmethod
+    def _is_icon_blacklisted(cls, name: str, blacklist: IconBlacklist) -> bool:
+        for prefix in blacklist.prefixes:
+            if name.startswith(prefix):
+                return True
+        for suffix in blacklist.suffixes:
+            if name.endswith(suffix):
+                return True
+        for keyword in blacklist.keywords:
+            if keyword in name:
+                return True
+        for strict in blacklist.strict:
+            if name == strict:
+                return True
+        return False

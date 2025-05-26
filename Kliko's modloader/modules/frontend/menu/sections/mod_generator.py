@@ -789,6 +789,7 @@ class ModGeneratorSection(ScrollableFrame):
         use_remote_config: bool = self.use_remote_config
         create_1x_only: bool = self.create_1x_only
         file_version: Optional[int] = self.file_version
+        additional_files: Optional[list[AdditionalFile]] = list(self.additional_files.values()) or None
 
         if mode == "gradient":
             if len(data) < 2:  # type: ignore
@@ -804,7 +805,7 @@ class ModGeneratorSection(ScrollableFrame):
         mod_name: str = self.mod_name
         if Directories.MODS.exists():
             existing_mods = {path.stem.lower() if path.is_file() else path.name.lower() for path in Directories.MODS.iterdir()}
-            if mod_name in existing_mods:
+            if mod_name.lower() in existing_mods:
                 self.root.send_banner(
                     title_key="menu.mod_generator.exception.title.generate",
                     message_key="menu.mod_generator.exception.message.mod_exists",
@@ -816,11 +817,8 @@ class ModGeneratorSection(ScrollableFrame):
         else:
             Directories.MODS.mkdir(parents=True, exist_ok=True)
 
-        import time
-        time.sleep(2)
-
         try:
-            ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon)
+            ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon, additional_files=additional_files)
 
         except Exception as e:
             self.root.send_banner(

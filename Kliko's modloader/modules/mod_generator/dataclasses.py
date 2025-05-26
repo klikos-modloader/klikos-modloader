@@ -16,7 +16,8 @@ class AdditionalFile:
     target: str
 
 
-class IconBlacklist(NamedTuple):
+@dataclass
+class IconBlacklist:
     prefixes: list[str]
     suffixes: list[str]
     keywords: list[str]

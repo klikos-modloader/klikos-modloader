@@ -62,12 +62,12 @@ def log_debug_info() -> None:
 
 def initialize_localization() -> None:
     Logger.info("Initializing localization...")
-    language: str = ConfigInterface.get_language()
     Localizer.initialize()
 
     if ConfigInterface.dev_mode_enabled():
         Localizer.add_strings_directory(Directories.DEV_TRANSLATIONS)
 
+    language: str = ConfigInterface.get_language()
     try: Localizer.set_language(language)
     except ValueError:
         Logger.error(f"Unsupported language: '{language}', reverting to default language")

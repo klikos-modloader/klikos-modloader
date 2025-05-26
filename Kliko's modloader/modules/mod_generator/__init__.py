@@ -114,18 +114,34 @@ class ModGenerator:
 
 
     @classmethod
+    def apply_mask(cls, image: Image.Image, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, angle: Optional[float] = None):
+        """Modifies the image in place. Assumes data has been validated"""
+
+        size = image.size
+        w, h = size
+        mask: Image.Image = cls.get_mask(mode, data, (w, h), angle)
+        if mode == "custom":
+            mask = Image.alpha_composite(image, mask)
+            mask.putalpha(image.getchannel("A"))
+            image.paste(mask)
+        else:
+            mask.putalpha(image.getchannel("A"))
+            image.paste(mask)
+
+
+    @classmethod
     def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False, custom_roblox_icon: Optional[Image.Image] = None) -> None:
         Logger.info(f"Generating mod (mode={mode})...", prefix=cls._LOG_PREFIX)
         cls._validate_data(mode, data)
         angle = angle or 0
 
         if file_version is None:
-            target_version: RobloxVersion = LatestVersion("WindowsStudio64")
+            deployment: RobloxVersion = LatestVersion("WindowsStudio64")
         else:
             deploy_history: DeployHistory = DeployHistory()
-            for deployment in reversed(deploy_history.studio_deployments):
+            for item in reversed(deploy_history.studio_deployments):
                 if deployment.file_version.minor == file_version:
-                    target_version = deployment
+                    deployment = item
                     break
             else: raise InvalidVersionError(file_version)
 
@@ -142,23 +158,9 @@ class ModGenerator:
         with TemporaryDirectory() as tmp:
             temporary_directory: Path = Path(tmp)
 
+            ROBLOX_LOGO_NAME: str = "icons/logo/block"
+
 
 
             if output_dir.exists():
                 raise FileExistsError(str(output_dir))
-
-
-    @classmethod
-    def apply_mask(cls, image: Image.Image, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, angle: Optional[float] = None):
-        """Modifies the image in place. Assumes data has been validated"""
-
-        size = image.size
-        w, h = size
-        mask: Image.Image = cls.get_mask(mode, data, (w, h), angle)
-        if mode == "custom":
-            mask = Image.alpha_composite(image, mask)
-            mask.putalpha(image.getchannel("A"))
-            image.paste(mask)
-        else:
-            mask.putalpha(image.getchannel("A"))
-            image.paste(mask)

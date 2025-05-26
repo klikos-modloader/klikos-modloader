@@ -25,6 +25,26 @@ class LocalizedCTkButton(CTkButton):
             self._update_localized_string()
 
 
+    def configure(self, **kwargs):
+        key = kwargs.pop("key", None)
+        modification = kwargs.pop("modification", ...)
+
+        update_text = False
+        if key is not None:
+            self._localizer_string_key = key
+            if self._localizer_callback_id is None:
+                self._localizer_callback_id = Localizer.add_callback(self._update_localized_string)
+            update_text = True
+        if modification is not ...:
+            self._localizer_string_modification = modification
+            update_text = True
+        if update_text:
+            self._update_localized_string()
+
+        kwargs.pop("text", None)
+        return super().configure(**kwargs)
+
+
     def destroy(self):
         if self._localizer_callback_id is not None: Localizer.remove_callback(self._localizer_callback_id)
         return super().destroy()
@@ -33,10 +53,10 @@ class LocalizedCTkButton(CTkButton):
     def _update_localized_string(self) -> None:
         string: str | None = Localizer.Strings.get(self._localizer_string_key)
         if string is None:
-            self.configure(text=self._localizer_string_key)
+            super().configure(text=self._localizer_string_key)
             return
 
         if self._localizer_string_modification is not None:
             string = self._localizer_string_modification(string)
 
-        self.configure(text=string)
+        super().configure(text=string)

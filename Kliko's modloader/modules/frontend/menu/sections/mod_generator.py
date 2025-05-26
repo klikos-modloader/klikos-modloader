@@ -30,9 +30,9 @@ class ModGeneratorSection(ScrollableFrame):
     _gradient_data_dict: dict[str, GradientColor]
     _additional_file_frames: dict[str, Frame]
     _custom_icon_preview_size: int = 218
-    _custom_mask_preview_size: int = 256
+    _custom_mask_preview_size: int = 260
     _addition_icon_preview_size: int = 24
-    _gradient_preview_size: int = 128
+    _gradient_preview_size: int = 148
 
     color_frame: Frame
     gradient_frame: Frame
@@ -42,6 +42,7 @@ class ModGeneratorSection(ScrollableFrame):
     custom_icon_preview_label: Label
     custom_mask_preview_label: Label
     gradient_preview_label: Label
+    generate_button: Button
 
     mode: Literal["color", "gradient", "custom"] = "color"
     color_data: tuple[int, int, int] = (255, 0, 0)
@@ -65,7 +66,7 @@ class ModGeneratorSection(ScrollableFrame):
     _SETTING_GAP: int = 8
     _SETTING_INNER_GAP: int = 8
     _ENTRY_GAP: int = 8
-    _ENTRY_INNER_GAP: int = 8
+    _ENTRY_INNER_GAP: int = 12
     _ENTRY_BOX_PADDING: tuple[int, int] = (6, 6)
 
 
@@ -209,7 +210,8 @@ class ModGeneratorSection(ScrollableFrame):
 
         setting_row_counter += 1
         generate_icon: CTkImage = get_ctk_image(Resources.Common.Light.START, Resources.Common.Dark.START, 24)
-        Button(settings_wrapper, "menu.mod_generator.content.button.generate", secondary=True, image=generate_icon, command=lambda:Thread(target=self.generate_mod, daemon=True).start()).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
+        self.generate_button = Button(settings_wrapper, "menu.mod_generator.content.button.generate", secondary=True, image=generate_icon, command=lambda:Thread(target=self.generate_mod, daemon=True).start())
+        self.generate_button.grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
 
         setting_row_counter += 1
         Label(settings_wrapper, "menu.mod_generator.content.settings.documentation_hyperlink", style="caption", autowrap=False, url=ProjectData.MOD_GENERATOR_DOCUMENTATION).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="w")
@@ -277,7 +279,7 @@ class ModGeneratorSection(ScrollableFrame):
         self.color_frame = Frame(general_info_wrapper, transparent=True)
         self.color_frame.grid_columnconfigure(0, weight=1)
         if self.mode == "color":
-            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._SECTION_GAP, 0))
 
         color_picker = ColorPicker(self.color_frame, advanced=False, on_update_callback=self.set_color_data)
         color_picker.set(value_rgb_normalized=self.color_data)
@@ -286,8 +288,9 @@ class ModGeneratorSection(ScrollableFrame):
 
         # region -  Gradient mode
         self.gradient_frame = Frame(general_info_wrapper, transparent=False, layer=2)
+        self.gradient_frame.grid_columnconfigure(0, weight=1)
         if self.mode == "gradient":
-            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._SECTION_GAP, 0))
 
         button_angle_wrapper = Frame(self.gradient_frame)
         button_angle_wrapper.grid(column=0, row=0, sticky="w")
@@ -304,6 +307,7 @@ class ModGeneratorSection(ScrollableFrame):
         angle_entry.grid(column=2, row=0, padx=(8, 0), sticky="w")
 
         self.gradient_colors_list = Frame(self.gradient_frame, transparent=True)
+        self.gradient_colors_list.grid_columnconfigure(0, weight=1)
         self.gradient_colors_list.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
 
         self.gradient_preview_label = Label(self.gradient_frame)
@@ -314,8 +318,9 @@ class ModGeneratorSection(ScrollableFrame):
 
         # region -  Custom mode
         self.custom_frame = Frame(general_info_wrapper, transparent=False, layer=2)
+        self.custom_frame.grid_columnconfigure(0, weight=1)
         if self.mode == "custom":
-            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._SECTION_GAP, 0))
 
         Button(self.custom_frame, "menu.mod_generator.content.button.add", secondary=True, image=add_image, command=self._choose_custom_mask).grid(column=0, row=0, sticky="w")
         self.custom_mask_preview_label = Label(self.custom_frame, width=self._custom_mask_preview_size, height=self._custom_mask_preview_size)
@@ -395,17 +400,17 @@ class ModGeneratorSection(ScrollableFrame):
         if normalized_value == "color":
             self.gradient_frame.grid_forget()
             self.custom_frame.grid_forget()
-            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+            self.color_frame.grid(column=0, row=1, sticky="nsew", pady=(self._SECTION_GAP, 0))
 
         elif normalized_value == "gradient":
             self.color_frame.grid_forget()
             self.custom_frame.grid_forget()
-            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+            self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._SECTION_GAP, 0))
 
         else:
             self.color_frame.grid_forget()
             self.gradient_frame.grid_forget()
-            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+            self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._SECTION_GAP, 0))
 
 
     def set_file_version(self, value: str) -> None:
@@ -438,7 +443,7 @@ class ModGeneratorSection(ScrollableFrame):
 
 # region gradient
     def _remove_gradient_color(self, id: str) -> None:
-        if len(self.gradient_data) == 2:
+        if len(self.gradient_data) <= 2:
             self.root.send_banner(
                 title_key="menu.mod_generator.exception.title.unknown",
                 message_key="menu.mod_generator.exception.message.gradient_not_enough_colors",
@@ -744,7 +749,7 @@ class ModGeneratorSection(ScrollableFrame):
         Button(wrapper, secondary=True, image=bin_image, command=lambda id=id: self._remove_additional_file(id)).grid(column=0, row=0)
 
         icon_image: CTkImage = get_ctk_image(additional_file.image, size=self._addition_icon_preview_size)
-        Label(wrapper, image=icon_image).grid(column=1, row=0, padx=self._ENTRY_INNER_GAP)
+        Label(wrapper, image=icon_image).grid(column=1, row=0, padx=(self._ENTRY_INNER_GAP, 0))
 
         target_entry: Entry = Entry(
             wrapper, command=lambda event, additional_file=additional_file: update_file_target(additional_file, event),
@@ -776,6 +781,7 @@ class ModGeneratorSection(ScrollableFrame):
             return
 
         self.generating = True
+        self.generate_button.configure(key="menu.mod_generator.content.button.generate_generating")
         mode: Literal['color', 'gradient', 'custom'] = self.mode
         angle: float = self.gradient_angle
         data: tuple[int, int, int] | list[GradientColor] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
@@ -792,6 +798,7 @@ class ModGeneratorSection(ScrollableFrame):
                     mode="warning", auto_close_after_ms=6000
                 )
                 self.generating = False
+                self.generate_button.configure(key="menu.mod_generator.content.button.generate")
                 return
 
         mod_name: str = self.mod_name
@@ -804,17 +811,32 @@ class ModGeneratorSection(ScrollableFrame):
                     mode="warning", auto_close_after_ms=6000
                 )
                 self.generating = False
+                self.generate_button.configure(key="menu.mod_generator.content.button.generate")
                 return
         else:
             Directories.MODS.mkdir(parents=True, exist_ok=True)
 
-        ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon)
+        import time
+        time.sleep(2)
 
-        self.root.send_banner(
-            title_key="menu.mod_generator.success.title.generate",
-            message_key="menu.mod_generator.success.message.generate",
-            message_modification=lambda string: Localizer.format(string, {"{mod.name}": mod_name}),
-            mode="success", auto_close_after_ms=4000
-        )
+        try:
+            ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon)
+
+        except Exception as e:
+            self.root.send_banner(
+                title_key="menu.mod_generator.exception.title.generate",
+                message_key="menu.mod_generator.exception.message.unknown",
+                message_modification=lambda string: Localizer.format(string, {"{exception.type}": f"{type(e).__module__}.{type(e).__qualname__}", "{exception.message}": str(e)}),
+                mode="error", auto_close_after_ms=6000
+            )
+
+        else:
+            self.root.send_banner(
+                title_key="menu.mod_generator.success.title.generate",
+                message_key="menu.mod_generator.success.message.generate",
+                message_modification=lambda string: Localizer.format(string, {"{mod.name}": mod_name}),
+                mode="success", auto_close_after_ms=4000
+            )
         self.generating = False
+        self.generate_button.configure(key="menu.mod_generator.content.button.generate")
 # endregion

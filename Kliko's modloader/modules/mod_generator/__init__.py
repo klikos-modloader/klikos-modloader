@@ -8,7 +8,7 @@ from modules.deployments import RobloxVersion, LatestVersion, DeployHistory
 from modules.networking import requests, Response, Api
 
 from .utils import MaskStorage
-from .dataclasses import IconBlacklist, RemoteConfig, AdditionalFile
+from .dataclasses import IconBlacklist, RemoteConfig, AdditionalFile, GradientColor
 from .exceptions import *
 
 from PIL import Image  # type: ignore
@@ -22,7 +22,7 @@ class ModGenerator:
 
 
     @classmethod
-    def get_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, size: tuple[int, int], angle: Optional[float] = None, dont_cache: bool = False)  -> Image.Image:
+    def get_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, size: tuple[int, int], angle: Optional[float] = None, dont_cache: bool = False)  -> Image.Image:
         """Assumes data has been validated"""
 
         match mode:
@@ -32,13 +32,13 @@ class ModGenerator:
 
 
     @classmethod
-    def generate_preview_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, size: tuple[int, int], angle: Optional[float] = None)  -> Image.Image:
+    def generate_preview_mask(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, size: tuple[int, int], angle: Optional[float] = None)  -> Image.Image:
         cls._validate_data(mode, data)
         return cls.get_mask(mode, data, size, angle, dont_cache=True)
 
 
     @classmethod
-    def generate_preview_image(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, angle: Optional[float] = None, custom_roblox_icon: Optional[Image.Image] = None)  -> Image.Image:
+    def generate_preview_image(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, angle: Optional[float] = None, custom_roblox_icon: Optional[Image.Image] = None)  -> Image.Image:
         cls._validate_data(mode, data)
 
         index: Path = PREVIEW_DATA_DIR / "index.json"
@@ -71,7 +71,7 @@ class ModGenerator:
 
 
     @classmethod
-    def _validate_data(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image) -> None:
+    def _validate_data(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image) -> None:
         match mode:
             case "color":
                 if (
@@ -90,21 +90,20 @@ class ModGenerator:
                     not isinstance(data, (tuple, list))
                     or len(data) < 2
                     or not all(  # type: ignore
-                        isinstance(stop_color, (tuple, list))
-                        and len(stop_color) == 2
-                        and isinstance(stop_color[0], (int, float))
-                        and stop_color[0] >= 0 and stop_color[0] <= 1
-                        and isinstance(stop_color[1], (tuple, list))
-                        and len(stop_color[1]) == 3
+                        isinstance(gradient_color, GradientColor)
+                        and isinstance(gradient_color.stop, (int, float))
+                        and gradient_color.stop >= 0 and gradient_color.stop <= 1
+                        and isinstance(gradient_color.color, (tuple, list))
+                        and len(gradient_color.color) == 3
                         and all(
                             isinstance(rgb_value, int)
                             and rgb_value >= 0
                             and rgb_value <= 255
-                            for rgb_value in stop_color[1]
+                            for rgb_value in gradient_color.color
                         )
-                        for stop_color in data
+                        for gradient_color in data
                     )
-                ): raise ValueError("data must be a list or tuple of a float value between 0 and 1 and a tuple of 3 int values between 0 and 255")
+                ): raise ValueError("data must be a GradientColor with a float stop value between 0 and tuple tuple color value of 3 int values between 0 and 255")
 
             case "custom":
                 if not isinstance(data, Image.Image):
@@ -115,7 +114,7 @@ class ModGenerator:
 
 
     @classmethod
-    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False) -> None:
+    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False) -> None:
         Logger.info(f"Generating mod (mode={mode})...", prefix=cls._LOG_PREFIX)
         cls._validate_data(mode, data)
         angle = angle or 0
@@ -150,7 +149,7 @@ class ModGenerator:
 
 
     @classmethod
-    def apply_mask(cls, image: Image.Image, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image, angle: Optional[float] = None):
+    def apply_mask(cls, image: Image.Image, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, angle: Optional[float] = None):
         """Modifies the image in place. Assumes data has been validated"""
 
         size = image.size

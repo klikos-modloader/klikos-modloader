@@ -1,5 +1,7 @@
 import math
 
+from ..dataclasses import GradientColor
+
 from PIL import Image  # type: ignore
 import numpy as np  # type: ignore
 
@@ -21,7 +23,7 @@ class MaskStorage:
 
 
     @classmethod  # AI-generated
-    def get_gradient(cls, colors: list[tuple[float, tuple[int, int, int]]], angle_degrees: float, size: tuple[int, int], dont_cache: bool = False) -> Image.Image:
+    def get_gradient(cls, colors: list[GradientColor], angle_degrees: float, size: tuple[int, int], dont_cache: bool = False) -> Image.Image:
         cache_key: str = f"{colors}-{angle_degrees}-{size}"
         cached_mask: Image.Image | None = cls.cache.get(cache_key)
         if cached_mask is not None:
@@ -40,11 +42,16 @@ class MaskStorage:
         pos = (pos - pos.min()) / (pos.max() - pos.min())
 
         img = np.zeros((height, width, 3), dtype=np.uint8)
-        sorted_colors: list[tuple[float, tuple[int, int, int]]] = sorted(colors, key=lambda item: item[0])
+        sorted_colors: list[GradientColor] = sorted(colors, key=lambda item: item.stop)
 
         for i in range(len(sorted_colors) - 1):
-            p0, c0 = sorted_colors[i]
-            p1, c1 = sorted_colors[i+1]
+            color_item0 = sorted_colors[i]
+            p0 = color_item0.stop
+            c0 = color_item0.color
+
+            color_item1 = sorted_colors[i+1]
+            p1 = color_item1.stop
+            c1 = color_item1.color
 
             if p0 == p1:
                 continue

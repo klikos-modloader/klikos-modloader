@@ -5,6 +5,12 @@ from PIL import Image  # type: ignore
 
 
 @dataclass
+class GradientColor:
+    stop: float
+    color: tuple[int, int, int]
+
+
+@dataclass
 class AdditionalFile:
     image: Image.Image
     target: str

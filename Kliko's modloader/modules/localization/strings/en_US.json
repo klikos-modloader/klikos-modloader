@@ -9,6 +9,7 @@
     "fatalerror.log": "If you need any help, please join the official support server: {discord}",
 
     "dialog.confirm.title": "{app.name} | Confirmation Dialog",
+    "dialog.color_picker.title": "{app.name} | Color Picker",
 
     "appearance.light": "Light",
     "appearance.dark": "Dark",
@@ -150,6 +151,10 @@
     "menu.mod_generator.content.custom_roblox_icon.description": "Replaces the in-game {roblox.common} icon in your topbar.",
     "menu.mod_generator.content.button.remove": "Remove",
     "menu.mod_generator.content.button.add": "Add",
+
+    "menu.mod_generator.content.gradient_angle": "Angle:",
+    "menu.mod_generator.content.gradient_endpoint": "Endpoint:",
+    "menu.mod_generator.content.gradient_color": "Color:",
 
     "menu.mod_generator.content.additional_files": "Additional files",
     "menu.mod_generator.content.button.reset": "Reset",

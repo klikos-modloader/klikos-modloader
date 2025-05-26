@@ -4,6 +4,7 @@ from pathlib import Path
 import uuid
 import json
 import re
+from random import randint
 
 from modules.project_data import ProjectData
 from ..windows import ModGeneratorPreviewWindow
@@ -11,7 +12,7 @@ from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button, Drop
 from modules.frontend.functions import get_ctk_image, crop_to_fit
 from modules.localization import Localizer
 from modules.filesystem import Resources, Directories
-from modules.mod_generator import ModGenerator, AdditionalFile
+from modules.mod_generator import ModGenerator, AdditionalFile, GradientColor
 
 if TYPE_CHECKING: from modules.frontend.widgets import Root
 
@@ -24,9 +25,9 @@ class ModGeneratorSection(ScrollableFrame):
     root: "Root"
     mode_variable: StringVar
     _language_change_callback_id: str | None = None
-    _gradient_list_frames: dict[tuple[float, tuple[int, int, int]], Frame]
+    _gradient_list_frames: dict[str, Frame]
+    _gradient_data_dict: dict[str, GradientColor]
     _additional_file_frames: dict[str, Frame]
-    _additional_file_ids: list[str]
     _custom_icon_preview_size: int = 218
     _custom_mask_preview_size: int = 256
     _addition_icon_preview_size: int = 24
@@ -35,12 +36,13 @@ class ModGeneratorSection(ScrollableFrame):
     gradient_frame: Frame
     custom_frame: Frame
     additional_files_list: Frame
+    gradient_colors_list: Frame
     custom_icon_preview_label: Label
     custom_mask_preview_label: Label
 
     mode: Literal["color", "gradient", "custom"] = "color"
     color_data: tuple[int, int, int] = (255, 0, 0)
-    gradient_data: list[tuple[float, tuple[int, int, int]]]
+    gradient_data: list[GradientColor]
     gradient_angle: float = 0
     image_data: Image.Image = Image.new(mode="RGBA", size=(1, 1))
     custom_roblox_icon: Optional[Image.Image] = None
@@ -66,10 +68,11 @@ class ModGeneratorSection(ScrollableFrame):
 
     def __init__(self, master):
         self.mod_name = Localizer.Strings["menu.mod_generator.content.mod_name_default"]
-        self.gradient_data = [(0, (255, 255, 255)), (1, (0, 0, 0))]
+        self._gradient_data_dict = {uuid.uuid4().hex: GradientColor(0, (255, 255, 255)), uuid.uuid4().hex: GradientColor(1, (0, 0, 0))}
+        self.gradient_data = list(self._gradient_data_dict.values())
         self.additional_files = {}
-        self._additional_file_ids = []
         self._additional_file_frames = {}
+        self._gradient_list_frames = {}
         super().__init__(master, transparent=False, round=True, border=True, layer=1)
         self.root = master
         self.grid_columnconfigure(0, weight=1)
@@ -282,6 +285,24 @@ class ModGeneratorSection(ScrollableFrame):
         self.gradient_frame = Frame(general_info_wrapper, transparent=False, layer=2)
         if self.mode == "gradient":
             self.gradient_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
+
+        button_angle_wrapper = Frame(self.gradient_frame)
+        button_angle_wrapper.grid(column=0, row=0, sticky="w")
+
+        add_image: CTkImage = get_ctk_image(Resources.Common.Light.ADD, Resources.Common.Dark.ADD, 24)
+        Button(button_angle_wrapper, "menu.mod_generator.content.button.add", secondary=True, image=add_image, command=self._add_gradient_color).grid(column=0, row=0, sticky="w")
+        Label(button_angle_wrapper, "menu.mod_generator.content.gradient_angle").grid(column=1, row=0, padx=(12, 0), sticky="w")
+        angle_entry: Entry = Entry(
+            button_angle_wrapper, command=self.set_gradient_angle,
+            on_focus_lost="command", run_command_if_empty=False, reset_if_empty=True, height=32, width=64,
+            validate="key", validatecommand=(self.register(lambda value: value.removeprefix("-") == "" or value.removeprefix("-").replace(".", "", 1).isdigit()), "%P")
+        )
+        angle_entry.set(str(self.gradient_angle))
+        angle_entry.grid(column=2, row=0, padx=(8, 0), sticky="w")
+        
+        self.gradient_colors_list = Frame(self.gradient_frame, transparent=True)
+        self.gradient_colors_list.grid(column=0, row=1, sticky="nsew", pady=(8, 0))
+        self._update_gradient_list()
         # endregion
 
         # region -  Custom mode
@@ -289,7 +310,6 @@ class ModGeneratorSection(ScrollableFrame):
         if self.mode == "custom":
             self.custom_frame.grid(column=0, row=1, sticky="nsew", pady=(self._ENTRY_GAP, 0))
 
-        add_image: CTkImage = get_ctk_image(Resources.Common.Light.ADD, Resources.Common.Dark.ADD, 24)
         Button(self.custom_frame, "menu.mod_generator.content.button.add", secondary=True, image=add_image, command=self._choose_custom_mask).grid(column=0, row=0, sticky="w")
         self.custom_mask_preview_label = Label(self.custom_frame, width=self._custom_mask_preview_size, height=self._custom_mask_preview_size)
         # endregion
@@ -401,11 +421,134 @@ class ModGeneratorSection(ScrollableFrame):
     def set_mod_name(self, value: str) -> None:
         self.mod_name = value
 
+    def set_gradient_angle(self, event) -> None:
+        value_string: str = event.value
+        try:
+            value_float: float = float(value_string)
+        except ValueError:
+            event.widget.set(str(self.gradient_angle))
+
+        self.gradient_angle = value_float
+        event.widget.set(str(self.gradient_angle))
+
     
     def set_color_data(self, value_hex: str) -> None:
         hex_without_prefix: str = value_hex.removeprefix("#")
         r, g, b = int(hex_without_prefix[0:2], 16), int(hex_without_prefix[2:4], 16), int(hex_without_prefix[4:6], 16)
         self.color_data = (r, g, b)
+# endregion
+
+
+# region gradient
+    def _remove_gradient_color(self, id: str) -> None:
+        if len(self.gradient_data) == 2:
+            self.root.send_banner(
+                title_key="menu.mod_generator.exception.title.unknown",
+                message_key="menu.mod_generator.exception.message.gradient_not_enough_colors",
+                mode="warning", auto_close_after_ms=6000
+            )
+            return
+        
+        gradient_data: dict[str, GradientColor] = self._gradient_data_dict
+        gradient_data.pop(id, None)
+        self.gradient_data = sorted(list(gradient_data.values()), key=lambda item: item.stop)
+        frame: Frame | None = self._gradient_list_frames.pop(id, None)
+        if frame:
+            frame.destroy()
+
+        self._update_gradient_list()
+
+
+    def _add_gradient_color(self) -> None:
+        self._gradient_data_dict[uuid.uuid4().hex] = GradientColor(1, (randint(0, 255), randint(0, 255), randint(0, 255)))
+        self._update_gradient_list()
+
+
+    def _update_gradient_list(self) -> None:
+        self._gradient_list_frames
+        self._gradient_data_dict
+
+        gradient_data: dict[str, GradientColor] = dict(sorted(self._gradient_data_dict.items(), key=lambda item: item[1].stop))
+        self.gradient_data = list(gradient_data.values())
+        gradient_frame_ids: list[str] = list(gradient_data.keys())
+
+        for id, frame in list(self._gradient_list_frames.items()):
+            if id not in gradient_frame_ids:
+                self._gradient_list_frames.pop(id)
+                frame.destroy()
+
+        for i, (id, gradient) in enumerate(gradient_data.items()):
+            pady = 0 if i == 0 else (self._ENTRY_GAP, 0)
+
+            frame = self._gradient_list_frames.get(id)  # type: ignore
+            if frame is not None:
+                if getattr(frame, "_row", None) != i:
+                    frame.grid(column=0, row=i, sticky="nsew", pady=pady)
+                    frame._row = i  # type: ignore
+
+            else:
+                frame = Frame(self.gradient_colors_list, layer=3)
+                frame._row = i  # type: ignore
+                frame.grid(column=0, row=i, sticky="nsew", pady=pady)
+                self._gradient_list_frames[id] = frame
+                self.after(10, self._load_gradient_frame, frame, id, gradient)
+
+
+    def _load_gradient_frame(self, frame: Frame, id: str, gradient: GradientColor) -> None:
+        def pick_gradient_color(frame: Frame, gradient: GradientColor) -> None:
+            current_r, current_g, current_b = gradient.color
+            current_color_hex: str = f"#{current_r:02x}{current_g:02x}{current_b:02x}"
+            color_hex: str = ask_color(self.root, Localizer.format(Localizer.Strings["dialog.color_picker.title"], {"{app.name}": ProjectData.NAME}), Resources.FAVICON, default_color=current_color_hex)
+            color_rgb = (int(color_hex[1:3], 16), int(color_hex[3:5], 16), int(color_hex[5:7], 16))
+            update_gradient_color(frame, gradient, color_rgb)
+
+        def update_gradient_color(frame: Frame, gradient: GradientColor, color_rgb: tuple[int, int, int]) -> None:
+            r, g, b = color_rgb
+            hex_color: str = f"#{r:02x}{g:02x}{b:02x}"
+            gradient.color = color_rgb
+            frame.preview_frame.configure(fg_color=hex_color)  # type: ignore
+
+        def update_gradient_endpoint(gradient: GradientColor, event) -> None:
+            value_string: str = event.value
+            try:
+                value_float: float = float(value_string)
+            except ValueError:
+                event.widget.set(str(gradient.stop))
+                return
+            
+            if value_float < 0 or value_float > 1:
+                event.widget.set(str(gradient.stop))
+                return
+
+            gradient.stop = value_float
+            event.widget.set(str(gradient.stop))
+            self._update_gradient_list()
+
+        frame.grid_columnconfigure(0, weight=1)
+
+        wrapper: Frame = Frame(frame, transparent=True)
+        wrapper.grid_columnconfigure(4, weight=1)
+        wrapper.grid(column=0, row=0, sticky="nsew", padx=self._ENTRY_BOX_PADDING[0], pady=self._ENTRY_BOX_PADDING[1])
+
+        bin_image: CTkImage = get_ctk_image(Resources.Common.Light.BIN, Resources.Common.Dark.BIN, 24)
+        Button(wrapper, secondary=True, image=bin_image, command=lambda id=id: self._remove_gradient_color(id)).grid(column=0, row=0)
+
+        Label(wrapper, "menu.mod_generator.content.gradient_endpoint").grid(column=1, row=0, padx=(self._ENTRY_INNER_GAP, 0))
+        endpoint_entry: Entry = Entry(
+            wrapper, command=lambda event, gradient=gradient: update_gradient_endpoint(gradient, event),
+            on_focus_lost="command", run_command_if_empty=False, reset_if_empty=True, height=32, width=64,
+            validate="key", validatecommand=(self.register(lambda value: value == "" or value.replace(".", "", 1).isdigit()), "%P")
+        )
+        endpoint_entry.set(str(gradient.stop))
+        endpoint_entry.grid(column=2, row=0, padx=(8, 0))
+
+        r, g, b = gradient.color
+        hex_color: str = f"#{r:02x}{g:02x}{b:02x}"
+        Label(wrapper, "menu.mod_generator.content.gradient_color").grid(column=3, row=0, padx=(self._ENTRY_INNER_GAP, 0))
+        frame.preview_frame = Frame(wrapper, layer=4, width=32, height=32, cursor="hand2")  # type: ignore
+        frame.preview_frame.configure(fg_color=hex_color)  # type: ignore
+        frame.preview_frame.grid(column=4, row=0, sticky="ew", padx=(8, 0))  # type: ignore
+        frame.preview_frame.bind("<ButtonPress-1>", lambda _, frame=frame, gradient=gradient: pick_gradient_color(frame, gradient))  # type: ignore
 # endregion
 
 
@@ -596,7 +739,7 @@ class ModGeneratorSection(ScrollableFrame):
     def show_preview(self) -> None:
         mode: Literal['color', 'gradient', 'custom'] = self.mode
         angle: float = self.gradient_angle
-        data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
+        data: tuple[int, int, int] | list[GradientColor] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
         custom_roblox_icon: Optional[Image.Image] = self.custom_roblox_icon
         image: Image.Image = ModGenerator.generate_preview_image(mode=mode, data=data, angle=angle, custom_roblox_icon=custom_roblox_icon)
         ModGeneratorPreviewWindow(self.root, image)
@@ -614,7 +757,7 @@ class ModGeneratorSection(ScrollableFrame):
         self.generating = True
         mode: Literal['color', 'gradient', 'custom'] = self.mode
         angle: float = self.gradient_angle
-        data: tuple[int, int, int] | list[tuple[float, tuple[int, int, int]]] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
+        data: tuple[int, int, int] | list[GradientColor] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
         custom_roblox_icon: Optional[Image.Image] = self.custom_roblox_icon
         use_remote_config: bool = self.use_remote_config
         create_1x_only: bool = self.create_1x_only

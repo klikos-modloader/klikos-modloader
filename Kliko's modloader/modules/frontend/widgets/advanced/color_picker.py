@@ -651,9 +651,27 @@ class ColorPicker(Frame):
 def ask_color(master=None, title: str = "ColorPicker", icon: Optional[str | Path] = None, default_color: Optional[str] = None, advanced: bool = False, **kwargs) -> str:
     window: Toplevel = Toplevel(title, icon, master=master)
     window.resizable(False, False)
+
+
     color_picker: ColorPicker = ColorPicker(window, default_color, advanced=advanced, **kwargs)
     color_picker.grid(padx=8, pady=8, sticky="nsew")
 
+    if master:  # center on master
+        master.update_idletasks()
+        window.update_idletasks()
+        root_scaling: float = ScalingTracker.get_window_scaling(master)
+        self_scaling: float = ScalingTracker.get_window_scaling(window)
+
+        root_x: int = master.winfo_rootx()
+        root_y: int = master.winfo_rooty()
+        root_w: int = int(master.winfo_width() / root_scaling)
+        root_h: int = int(master.winfo_height() / root_scaling)
+        width: int = int(window.winfo_reqwidth() / self_scaling)
+        height: int = int(window.winfo_reqheight() / self_scaling)
+
+        window.geometry(f"{width}x{height}+{root_x + int((root_w - width) / 2)}+{root_y + int((root_h - height) / 2)}")
+
+    window.grab_set()
     window.wait_window()
     return color_picker.value_hex
 # endregion

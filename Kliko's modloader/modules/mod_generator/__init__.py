@@ -114,7 +114,7 @@ class ModGenerator:
 
 
     @classmethod
-    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False) -> None:
+    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False, custom_roblox_icon: Optional[Image.Image] = None) -> None:
         Logger.info(f"Generating mod (mode={mode})...", prefix=cls._LOG_PREFIX)
         cls._validate_data(mode, data)
         angle = angle or 0

@@ -1,6 +1,7 @@
 from tkinter import TclError, StringVar, BooleanVar, filedialog
 from typing import Literal, Optional, TYPE_CHECKING
 from pathlib import Path
+from threading import Thread
 import uuid
 import json
 import re
@@ -31,6 +32,7 @@ class ModGeneratorSection(ScrollableFrame):
     _custom_icon_preview_size: int = 218
     _custom_mask_preview_size: int = 256
     _addition_icon_preview_size: int = 24
+    _gradient_preview_size: int = 128
 
     color_frame: Frame
     gradient_frame: Frame
@@ -39,6 +41,7 @@ class ModGeneratorSection(ScrollableFrame):
     gradient_colors_list: Frame
     custom_icon_preview_label: Label
     custom_mask_preview_label: Label
+    gradient_preview_label: Label
 
     mode: Literal["color", "gradient", "custom"] = "color"
     color_data: tuple[int, int, int] = (255, 0, 0)
@@ -206,7 +209,7 @@ class ModGeneratorSection(ScrollableFrame):
 
         setting_row_counter += 1
         generate_icon: CTkImage = get_ctk_image(Resources.Common.Light.START, Resources.Common.Dark.START, 24)
-        Button(settings_wrapper, "menu.mod_generator.content.button.generate", secondary=True, image=generate_icon, command=self.generate_mod).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
+        Button(settings_wrapper, "menu.mod_generator.content.button.generate", secondary=True, image=generate_icon, command=lambda:Thread(target=self.generate_mod, daemon=True).start()).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
 
         setting_row_counter += 1
         Label(settings_wrapper, "menu.mod_generator.content.settings.documentation_hyperlink", style="caption", autowrap=False, url=ProjectData.MOD_GENERATOR_DOCUMENTATION).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="w")
@@ -299,9 +302,13 @@ class ModGeneratorSection(ScrollableFrame):
         )
         angle_entry.set(str(self.gradient_angle))
         angle_entry.grid(column=2, row=0, padx=(8, 0), sticky="w")
-        
+
         self.gradient_colors_list = Frame(self.gradient_frame, transparent=True)
-        self.gradient_colors_list.grid(column=0, row=1, sticky="nsew", pady=(8, 0))
+        self.gradient_colors_list.grid(column=0, row=1, sticky="nsew", pady=(12, 0))
+
+        self.gradient_preview_label = Label(self.gradient_frame)
+        self.gradient_preview_label.grid(column=0, row=2, sticky="w", pady=(12, 0))
+
         self._update_gradient_list()
         # endregion
 
@@ -421,16 +428,6 @@ class ModGeneratorSection(ScrollableFrame):
     def set_mod_name(self, value: str) -> None:
         self.mod_name = value
 
-    def set_gradient_angle(self, event) -> None:
-        value_string: str = event.value
-        try:
-            value_float: float = float(value_string)
-        except ValueError:
-            event.widget.set(str(self.gradient_angle))
-
-        self.gradient_angle = value_float
-        event.widget.set(str(self.gradient_angle))
-
     
     def set_color_data(self, value_hex: str) -> None:
         hex_without_prefix: str = value_hex.removeprefix("#")
@@ -464,6 +461,15 @@ class ModGeneratorSection(ScrollableFrame):
         self._update_gradient_list()
 
 
+    def _update_gradient_preview(self) -> None:
+        mode: Literal["gradient"] = "gradient"
+        data: list[GradientColor] = self.gradient_data
+        preview_size: int = self._gradient_preview_size
+        angle: float = self.gradient_angle
+        image: CTkImage = get_ctk_image(ModGenerator.generate_preview_mask(mode, data, (preview_size, preview_size), angle), size=preview_size)
+        self.gradient_preview_label.configure(image=image)
+
+
     def _update_gradient_list(self) -> None:
         self._gradient_list_frames
         self._gradient_data_dict
@@ -493,6 +499,8 @@ class ModGeneratorSection(ScrollableFrame):
                 self._gradient_list_frames[id] = frame
                 self.after(10, self._load_gradient_frame, frame, id, gradient)
 
+        self._update_gradient_preview()
+
 
     def _load_gradient_frame(self, frame: Frame, id: str, gradient: GradientColor) -> None:
         def pick_gradient_color(frame: Frame, gradient: GradientColor) -> None:
@@ -507,6 +515,7 @@ class ModGeneratorSection(ScrollableFrame):
             hex_color: str = f"#{r:02x}{g:02x}{b:02x}"
             gradient.color = color_rgb
             frame.preview_frame.configure(fg_color=hex_color)  # type: ignore
+            self._update_gradient_preview()
 
         def update_gradient_endpoint(gradient: GradientColor, event) -> None:
             value_string: str = event.value
@@ -549,6 +558,18 @@ class ModGeneratorSection(ScrollableFrame):
         frame.preview_frame.configure(fg_color=hex_color)  # type: ignore
         frame.preview_frame.grid(column=4, row=0, sticky="ew", padx=(8, 0))  # type: ignore
         frame.preview_frame.bind("<ButtonPress-1>", lambda _, frame=frame, gradient=gradient: pick_gradient_color(frame, gradient))  # type: ignore
+
+
+    def set_gradient_angle(self, event) -> None:
+        value_string: str = event.value
+        try:
+            value_float: float = float(value_string)
+        except ValueError:
+            event.widget.set(str(self.gradient_angle))
+
+        self.gradient_angle = value_float
+        event.widget.set(str(self.gradient_angle))
+        self._update_gradient_preview()
 # endregion
 
 
@@ -761,6 +782,7 @@ class ModGeneratorSection(ScrollableFrame):
         custom_roblox_icon: Optional[Image.Image] = self.custom_roblox_icon
         use_remote_config: bool = self.use_remote_config
         create_1x_only: bool = self.create_1x_only
+        file_version: Optional[int] = self.file_version
 
         if mode == "gradient":
             if len(data) < 2:  # type: ignore
@@ -785,6 +807,8 @@ class ModGeneratorSection(ScrollableFrame):
                 return
         else:
             Directories.MODS.mkdir(parents=True, exist_ok=True)
+
+        ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon)
 
         self.root.send_banner(
             title_key="menu.mod_generator.success.title.generate",

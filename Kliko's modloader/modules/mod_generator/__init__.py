@@ -149,7 +149,7 @@ class ModGenerator:
             else: raise InvalidVersionError(file_version)
         mod_info: dict[str, str | int] = {
             "clientVersionUpload": deployment.guid,
-            "file_version": deployment.file_version.minor,
+            "fileVersion": deployment.file_version.minor,
             "watermark": "Generated with Kliko's modloader"
         }
         metadata = PngImagePlugin.PngInfo()

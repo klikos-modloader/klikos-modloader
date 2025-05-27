@@ -9,6 +9,8 @@ from modules.frontend.functions import get_ctk_image
 from modules.localization import Localizer
 from modules.filesystem import Resources
 
+from ..windows import FastFlagEditorWindow
+
 from customtkinter import CTkImage  # type: ignore
 
 
@@ -304,6 +306,5 @@ class FastFlagsSection(ScrollableFrame):
 
 # region configure profile
     def configure_profile(self, profile: FastFlagProfile) -> None:
-        print(profile.name)
-        # TODO
+        FastFlagEditorWindow(self.root, profile)
 # endregion

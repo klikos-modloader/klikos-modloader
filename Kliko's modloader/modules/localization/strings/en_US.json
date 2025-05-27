@@ -189,6 +189,8 @@
     "menu.fastflags.content.status.dropdown.studio": "{roblox.studio_alt} only",
     "menu.fastflags.content.status.dropdown.both": "Enabled",
     "menu.fastflags.content.status.dropdown.none": "Disabled",
+
+    "menu.fastflags.fastflag_editor.window_title": "{app.name} | FastFlag Editor",
     
     "menu.fastflags.input.new_profile.message": "Choose a name for your FastFlag profile",
 

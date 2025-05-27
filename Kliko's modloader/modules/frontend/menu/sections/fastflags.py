@@ -17,7 +17,8 @@ class FastFlagsSection(ScrollableFrame):
     root: "Root"
     profile_list: Frame
     _names: list[str]
-    _frames: dict[str, Frame]
+    _frames: dict[str, tuple[FastFlagProfile, Frame]]
+    _language_change_callback_id: str | None = None
 
     _SECTION_PADX: int | tuple[int, int] = (8, 4)
     _SECTION_PADY: int | tuple[int, int] = 8
@@ -63,6 +64,12 @@ class FastFlagsSection(ScrollableFrame):
 
         self._load_header(content)
         self._load_content(content)
+
+        if self._language_change_callback_id is not None:
+            Localizer.remove_callback(self._language_change_callback_id)
+            self._language_change_callback_id = None
+        self._language_change_callback_id = Localizer.add_callback(self._on_language_change)
+
         self.refresh_list()
 
         self.loaded = True
@@ -96,7 +103,7 @@ class FastFlagsSection(ScrollableFrame):
         if names == self._names: return
         self._names = names
 
-        for name, frame in list(self._frames.items()):
+        for name, (_, frame) in list(self._frames.items()):
             if name not in names:
                 self._frames.pop(name)
                 frame.destroy()
@@ -105,7 +112,7 @@ class FastFlagsSection(ScrollableFrame):
             pady = 0 if i == 0 else (self._ENTRY_GAP, 0)
 
             if profile.name in self._frames:
-                frame = self._frames[profile.name]
+                _, frame = self._frames[profile.name]
                 if getattr(frame, "_row", None) != i:
                     frame.grid(column=0, row=i, sticky="nsew", pady=pady)
                     frame._row = i  # type: ignore
@@ -114,7 +121,7 @@ class FastFlagsSection(ScrollableFrame):
                 frame = Frame(self.profile_list, layer=2)
                 frame._row = i  # type: ignore
                 frame.grid(column=0, row=i, sticky="nsew", pady=pady)
-                self._frames[profile.name] = frame
+                self._frames[profile.name] = (profile, frame)
                 self.after(10, self._load_profile_frame, frame, profile)
 
 
@@ -150,7 +157,10 @@ class FastFlagsSection(ScrollableFrame):
             "menu.fastflags.content.status.dropdown.studio",
             "menu.fastflags.content.status.dropdown.both"
         ]
-        frame.status_var: StringVar = StringVar(wrapper, value=Localizer.Strings[dropdown_string_keys[status]])  # type: ignore
+        frame.status_var: StringVar = StringVar(wrapper, value=Localizer.format(Localizer.Strings[dropdown_string_keys[status]], {  # type: ignore
+            "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"),
+            "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt"),
+        }))
         DropDownMenu(wrapper, value_keys=dropdown_string_keys, variable=frame.status_var, value_modifications=[  # type: ignore
                 None, lambda string: Localizer.format(string, {"{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt")}),
                 lambda string: Localizer.format(string, {"{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), None
@@ -161,6 +171,26 @@ class FastFlagsSection(ScrollableFrame):
 
 
 # region functions
+    def _on_language_change(self) -> None:
+        if not self.loaded:
+            self.after(100, self._on_language_change)
+            return
+
+        for profile, frame in list(self._frames.values()):
+            status: int = 3 if profile.player and profile.studio else 2 if profile.studio else 1 if profile.player else 0
+            status_dropdown_string_keys: list[str] = [
+                "menu.fastflags.content.status.dropdown.none",
+                "menu.fastflags.content.status.dropdown.player",
+                "menu.fastflags.content.status.dropdown.studio",
+                "menu.fastflags.content.status.dropdown.both"
+            ]
+            status_var: StringVar | None = getattr(frame, "status_var", None)
+            if isinstance(status_var, StringVar): status_var.set(Localizer.format(Localizer.Strings[status_dropdown_string_keys[status]], {
+                "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"),
+                "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")
+            }))  # type: ignore
+
+
     def create_profile(self) -> None:
         response: str | None = InputDialog(ProjectData.NAME, Resources.FAVICON, "Choose a name for your FastFlag profile", master=self.root).get_input()
         if not response: return

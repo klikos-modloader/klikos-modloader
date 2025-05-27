@@ -93,14 +93,19 @@ class App(Root):
 
         def sidebar_easter_egg(logo_label: Label, appname_label: Label, appversion_label: Label) -> None:
             self._sidebar_easter_egg_click_counter += 1
-            if self._sidebar_easter_egg_click_counter != 5: return
-            try:
-                logo_label.configure(image=get_ctk_image(Resources.Logo.TOAST, size=self._SIDEBAR_LOGO_SIZE))
-                appname_label.configure(text="ToastLoader")
-                appname_label._localizer_string_key = "ToastLoader"
-                appversion_label.configure(text="#CATSARETHEBEST")
-                appversion_label._localizer_string_key = "#CATSARETHEBEST"
-            except Exception: pass
+            normalized_counter: int = self._sidebar_easter_egg_click_counter % 10
+            if normalized_counter == 5:
+                try:
+                    logo_label.configure(image=get_ctk_image(Resources.Logo.TOAST, size=self._SIDEBAR_LOGO_SIZE))
+                    appname_label.configure(key="ToastLoader")
+                    appversion_label.configure(key="#CATSARETHEBEST")
+                except Exception: pass
+            elif normalized_counter == 0:
+                try:
+                    logo_label.configure(image=get_ctk_image(Resources.Logo.DEFAULT, size=self._SIDEBAR_LOGO_SIZE))
+                    appname_label.configure(key=ProjectData.NAME)
+                    appversion_label.configure(key="menu.sidebar.version")
+                except Exception: pass
 
         self.sidebar.grid_columnconfigure(0, weight=1)
         self.sidebar.grid_rowconfigure(1, weight=1)

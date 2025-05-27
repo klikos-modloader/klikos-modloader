@@ -212,7 +212,10 @@ class ModsSection(ScrollableFrame):
             "menu.mods.content.status.dropdown.studio",
             "menu.mods.content.status.dropdown.both"
         ]
-        frame.status_var: StringVar = StringVar(wrapper, value=Localizer.Strings[dropdown_string_keys[status]])  # type: ignore
+        frame.status_var: StringVar = StringVar(wrapper, value=Localizer.format(Localizer.Strings[dropdown_string_keys[status]], {  # type: ignore
+            "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"),
+            "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt"),
+        }))
         DropDownMenu(wrapper, value_keys=dropdown_string_keys, variable=frame.status_var, value_modifications=[  # type: ignore
                 None, lambda string: Localizer.format(string, {"{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt")}),
                 lambda string: Localizer.format(string, {"{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), None

@@ -143,7 +143,7 @@ class ModUpdater:
             temp_target: Path = temporary_directory / "mod"
             temp_target.mkdir(parents=True, exist_ok=True)
             old_luapackages_path: Path = temporary_directory / "luapackages_old"
-            new_luapackages_path: Path = temporary_directory / "luapackages_old"
+            new_luapackages_path: Path = temporary_directory / "luapackages_new"
 
 
             Logger.info("Copying mod...", prefix=cls._LOG_PREFIX)
@@ -239,7 +239,6 @@ class ModUpdater:
             for path in unmodded_imagesets:
                 path.unlink(missing_ok=True)
 
-
             Logger.info("Finishing mod update...", prefix=cls._LOG_PREFIX)
             # Remove old imagesets and empty folders leading up to it
             shutil.rmtree(old_temp_target_imageset_path)
@@ -273,7 +272,7 @@ class ModUpdater:
                 shutil.rmtree(backup)
 
 
-            Logger.info("Mod updated successfully!", prefix=cls._LOG_PREFIX)
+        Logger.info("Mod updated successfully!", prefix=cls._LOG_PREFIX)
 
 
     @staticmethod

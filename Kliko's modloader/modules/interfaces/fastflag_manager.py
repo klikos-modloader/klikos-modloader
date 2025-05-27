@@ -150,6 +150,12 @@ class FastFlagManager:
             fastflags.update(profile.data)
         if manual_override:
             fastflags.update(manual_override)
+        
+        if not fastflags:
+            Logger.info("No active profiles found!", prefix=cls.LOG_PREFIX)
+            target_file.unlink(missing_ok=True)
+            return
 
+        target_file.parent.mkdir(parents=True, exist_ok=True)
         with open(target_file, "w") as file:
             json.dump(fastflags, file, indent=4)

@@ -20,12 +20,14 @@ from modules.interfaces.roblox import RobloxInterface
 from modules.deployments import LatestVersion, Package, PackageManifest
 from modules.networking import requests, Response, Api
 from modules.filesystem import Directories
+from modules.mod_updater import ModUpdater
 from modules import filesystem
 
 
 LOG_PREFIX: str = "LauncherTasks"
 DEPLOYMENT_DETAILS_END_PROGRESS: float = 0.06
 DOWNLOAD_END_PROGRESS: float = 0.65
+MOD_UPDATER_START_PROGRESS: float = DOWNLOAD_END_PROGRESS
 MOD_UPDATER_END_PROGRESS: float = 0.85
 MOD_DEPLOY_END_PROGRESS: float = 0.90
 FASTFLAG_DEPLOY_END_PROGRESS: float = 0.92
@@ -86,6 +88,13 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
         config: Config = Config(confirm_launch, force_reinstall, disable_mods, disable_fastflags, static_version_folder, use_roblox_version_folder, mod_updates, multi_instance_launching, discord_rpc, installed_version, loaded_mods)
 
 
+        if config.disable_mods:
+            mods: list[Mod] = []
+        else:
+            mods = ModManager.get_active(mode.lower())  # type: ignore
+        mod_names: list[str] = [mod.name for mod in mods]
+
+
         # Deployment details
         Logger.info("Getting deployment details...", prefix=LOG_PREFIX)
         functions.set_status_label("launcher.progress.get_client_info")
@@ -102,11 +111,12 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
         # Updates
         Logger.info("Checking for updates...", prefix=LOG_PREFIX)
-        functions.set_status_label("launcher.progress.check_client_update")
+        functions.set_status_label("launcher.progress.check_for_update")
         if should_update(mode, latest_version, config):
             Logger.info("Updating Roblox...", prefix=LOG_PREFIX)
             functions.set_status_label("launcher.progress.client_update")
             update_roblox(mode, config, functions, stop_event, latest_version)
+            DataInterface.set_loaded_mods(mode, [])
         functions.update_progress_bars(DOWNLOAD_END_PROGRESS)
         if stop_event.is_set():
             return
@@ -139,20 +149,44 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
 
         # Mods
-        # TODO: Check loaded mods
         version_folder: Path = get_version_dir(mode, latest_version, config)
         if not skip_modloader or not config.disable_mods:
-            mods: list[Mod] = ModManager.get_active(mode.lower())  # type: ignore
-
             if config.mod_updates:
                 functions.set_status_label("launcher.progress.check_mod_update")
                 Logger.info("Checking for mod updates...", prefix=LOG_PREFIX)
-                # TODO
+
+                outdated_mods: list[Mod] = []
+                for mod in mods:
+                    if mod.archive:  # mod udpater is not compatible with archived mods
+                        continue
+
+                    if ModUpdater.check_for_updates(mod.path, latest_version):
+                        outdated_mods.append(mod)
+
+                if outdated_mods:
+                    functions.update_progress_bars(MOD_UPDATER_START_PROGRESS)
+                    functions.set_status_label("launcher.progress.mod_update")
+                    Logger.info(f"Updating mods...", prefix=LOG_PREFIX)
+
+                    failed_mod_updates: list[str] = []
+                    outdated_mod_count: int = len(outdated_mods)
+                    for i, mod in enumerate(outdated_mods, start=1):
+                        try:
+                            ModUpdater.update_mod(mod.path, latest_version)
+                        except Exception as e:
+                            Logger.error(f"Mod update failed: '{mod.name}'. {type(e).__name__}: {e}",prefix=LOG_PREFIX)
+                            failed_mod_updates.append(mod.name)
+                        progress: float = MOD_UPDATER_START_PROGRESS + ((MOD_UPDATER_END_PROGRESS - MOD_UPDATER_START_PROGRESS) / outdated_mod_count) * i
+                        functions.update_progress_bars(progress)
+
+                    if failed_mod_updates:
+                        messagebox.showwarning(ProjectData.NAME, Localizer.format(Localizer.Strings["launcher.warning.failed_mod_updates"], {"{failed_mods}": ", ".join(f"'{mod}'" for mod in failed_mod_updates)}))
             functions.update_progress_bars(MOD_UPDATER_END_PROGRESS)
 
             Logger.info("Deploying mods...", prefix=LOG_PREFIX)
             functions.set_status_label("launcher.progress.deploying_mods")
             ModManager.deploy_mods(version_folder, mods)  # type: ignore
+            DataInterface.set_loaded_mods(mode=mode, value=mod_names)
         functions.update_progress_bars(MOD_DEPLOY_END_PROGRESS)
         if stop_event.is_set():
             return
@@ -210,9 +244,9 @@ def should_update(mode: Literal["Player", "Studio"], latest_version: LatestVersi
     if config.force_reinstall:
         Logger.info("Forced Roblox reinstallation!")
         return True
-    elif config.installed_version != latest_version.guid:
-        return True
     elif not get_version_dir(mode, latest_version, config).is_dir():
+        return True
+    elif config.installed_version != latest_version.guid:
         return True
     return False
 

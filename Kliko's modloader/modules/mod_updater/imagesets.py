@@ -39,6 +39,7 @@ class ImageSet:
     name: str
     path: Path
     icons: list[ImageSetIcon]
+    size: str
 
 
 class ImageSetData:
@@ -63,7 +64,7 @@ class ImageSetData:
 
                 imageset_item: ImageSet | None = imageset_dict.get(image_set)
                 if imageset_item is None:
-                    imageset_item = ImageSet(image_set, directory / f"{image_set}.png", [])
+                    imageset_item = ImageSet(image_set, directory / f"{image_set}.png", [], size)
                     imageset_dict[image_set] = imageset_item
 
                 imageset_item.icons.append(icon)

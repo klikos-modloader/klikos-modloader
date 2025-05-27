@@ -185,5 +185,5 @@ class ModManager:
 
         for mod in mods:
             Logger.info(f"Deploying mod: {mod.name}...", prefix=cls.LOG_PREFIX)
-            if not mod.archive: shutil.copytree(mod.path, target_directory)
+            if not mod.archive: shutil.copytree(mod.path, target_directory, dirs_exist_ok=True)
             else: extract(mod.path, target_directory)

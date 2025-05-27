@@ -25,8 +25,8 @@ class ModUpdater:
     def check_for_updates(cls, mod: Path, latest_version: RobloxVersion) -> bool:
         Logger.info(f"Checking for updates: '{mod.name}'...", prefix=cls._LOG_PREFIX)
 
-        if not (mod / "info.json").exists():
-            raise FileNotFoundError(str(mod / "info.json"))
+        if not (mod / "info.json").exists():  # Mod not compatible
+            return False
         with open(mod / "info.json", "r") as file:
             mod_info: dict[str, str | int] = json.load(file)
 

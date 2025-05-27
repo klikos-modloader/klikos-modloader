@@ -1,16 +1,23 @@
 from typing import Literal, Any
 from datetime import datetime
+from threading import Thread
+from tkinter import messagebox
+import webbrowser
+import os
 
 from modules.project_data import ProjectData
 from modules.localization import Localizer
+from modules.logger import Logger
 from modules.frontend.widgets import Root, Frame, Label, Button
 from modules.filesystem import Resources
 from modules.interfaces.config import ConfigInterface
+from modules.networking import requests, Response, Api
 from modules.frontend.functions import get_ctk_image
 
 from .sections import ModsSection, MarketplaceSection, ModGeneratorSection, FastFlagsSection, GlobalBasicSettingsSection, IntegrationsSection, CustomIntegrationsSection, SettingsSection, AboutSection
 
 from customtkinter import CTkImage  # type: ignore
+from packaging.version import Version  # type: ignore
 
 
 class App(Root):
@@ -41,6 +48,10 @@ class App(Root):
         self.grid_columnconfigure(0, minsize=self._SIDEBAR_MIN_WIDTH)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
+
+        # Check for updates (async)
+        if ConfigInterface.get("check_for_updates"):
+            Thread(target=self._check_for_updates, daemon=True).start()
 
         # Create sidebar
         self.sidebar: Frame = Frame(self, transparent=True)
@@ -168,3 +179,28 @@ class App(Root):
         #         try: return get_ctk_image(Resources.Navigation.Light.ABOUT, Resources.Navigation.Dark.ABOUT, self._NAV_ICON_SIZE)
         #         except Exception: return None
         #     case _: return None
+
+
+    def _check_for_updates(self) -> None:
+        try:
+            Logger.info("Checking for updates...", prefix="App")
+            response: Response = requests.get(Api.GitHub.LATEST_VERSION, attempts=1, cache=False, ignore_cache=True)
+            data: dict = response.json()
+            latest: str = data["latest"]
+            current_version: Version = Version(ProjectData.VERSION)
+            latest_version: Version = Version(latest)
+            update_available: bool = latest_version > current_version
+
+        except Exception as e:
+            Logger.warning(f"Update check failed! {type(e).__name__}: {e}", prefix="App")
+
+        else:
+            if update_available:
+                Logger.info(f"A newer version is available: {latest}", prefix="App")
+                if messagebox.askyesno(
+                    title=f"{ProjectData.NAME} ({ProjectData.VERSION})",
+                    message=Localizer.format(Localizer.Strings["dialog.update_available.message"], {"{app.name}": ProjectData.NAME, "{latest_version}": latest})
+                ):
+                    Logger.info("User chose to update!", prefix="App")
+                    webbrowser.open_new_tab(ProjectData.LATEST_RELEASE)
+                    os._exit(os.EX_OK)

@@ -74,6 +74,7 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
         Logger.info("Getting config...", prefix=LOG_PREFIX)
         confirm_launch: bool = ConfigInterface.get("confirm_launch")
         force_reinstall: bool = ConfigInterface.get("force_reinstall")
+        if force_reinstall: ConfigInterface.set("force_reinstall", False)
         disable_mods: bool = ConfigInterface.get("disable_mods")
         disable_fastflags: bool = ConfigInterface.get("disable_fastflags")
         static_version_folder: bool = ConfigInterface.get("static_version_folder")

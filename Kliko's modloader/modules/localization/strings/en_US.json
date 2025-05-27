@@ -10,6 +10,7 @@
 
     "dialog.confirm.title": "{app.name} | Confirmation Dialog",
     "dialog.color_picker.title": "{app.name} | Color Picker",
+    "dialog.update_available.message": "A newer version is available: {latest_version}\nWould you like to update now?",
 
     "appearance.light": "Light",
     "appearance.dark": "Dark",
@@ -45,10 +46,6 @@
     "launcher.warning.custom_launcher_version.too_new": "You're using a custom launcher that was made for a newer version of {app.name}, the default launcher will be used instead.",
     "launcher.warning.custom_launcher_version.too_old": "You're using a custom launcher that was made for an older version of {app.name}, the default launcher will be used instead.",
     "launcher.warning.failed_mod_updates": "The following mods failed to update: {failed_mods}\nMore information may be available in the latest log file.",
-
-    "launcher.exception.insufficient_storage": "{app.name} is unable to download and install {roblox.common} because there is not enough disk space available.",
-    "launcher.exception.connection_failed": "Failed to connect to {endpoint}. Please check your internet connection and try again.",
-
 
 
 

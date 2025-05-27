@@ -65,12 +65,12 @@ class CommunityMod:
         timestamp: int | None = item.get("timestamp")
 
         if (
-            not url or
-            not md5 or
-            not timestamp or
-            url != self.thumbnail_url or
-            md5 != self._get_md5(target) or
-            timestamp < (time.time() - self._THUMBNAIL_CACHE_DURATION)
+            not url
+            or not md5
+            or not timestamp
+            or url != self.thumbnail_url
+            or md5 != self._get_md5(target)
+            or (time.time() - timestamp) < self._THUMBNAIL_CACHE_DURATION
         ): return self._attempt_thumbnail_download()
 
         try: return Image.open(target)

@@ -124,8 +124,7 @@
                         "row": 2,
                         "pady": [12, 0],
                         "sticky": "ew"
-                    },
-                    "action": "cancel"
+                    }
                 },
                 {
                     "type": "button",

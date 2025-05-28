@@ -5,7 +5,6 @@ import json
 
 from modules.project_data import ProjectData
 from modules.localization import Localizer
-from modules.logger import Logger
 from modules.filesystem import Resources, Directories
 from modules.frontend.widgets import Toplevel, Frame, Label, Button, Textbox
 if TYPE_CHECKING: from modules.frontend.widgets import Root
@@ -14,7 +13,6 @@ from modules.interfaces.fastflag_manager import FastFlagProfile
 
 import pyperclip  # type: ignore
 from customtkinter import CTkImage, ScalingTracker  # type: ignore
-import winaccent  # type; ignore
 
 
 class FastFlagEditorWindow(Toplevel):

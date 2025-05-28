@@ -97,6 +97,7 @@ def main() -> None:
             launcher.run("Studio", args.deeplink)
 
         elif args.presence:
+            raise NotImplementedError("RPC has not been implemented yet!")
             pass
 
     except Exception as e: exception_handler.run(e)

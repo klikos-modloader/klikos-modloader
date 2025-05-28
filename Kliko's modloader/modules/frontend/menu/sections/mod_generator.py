@@ -1,7 +1,7 @@
 from tkinter import TclError, StringVar, BooleanVar, filedialog
 from typing import Literal, Optional, TYPE_CHECKING
 from pathlib import Path
-from threading import Thread
+from threading import Thread, Event
 import uuid
 import json
 import re
@@ -25,6 +25,7 @@ class ModGeneratorSection(ScrollableFrame):
     loaded: bool = False
     root: "Root"
     mode_variable: StringVar
+    _stop_event: Event
     _language_change_callback_id: str | None = None
     _gradient_list_frames: dict[str, Frame]
     _gradient_data_dict: dict[str, GradientColor]
@@ -77,6 +78,7 @@ class ModGeneratorSection(ScrollableFrame):
         self.additional_files = {}
         self._additional_file_frames = {}
         self._gradient_list_frames = {}
+        self._stop_event = Event()
         super().__init__(master, transparent=False, round=True, border=True, layer=1)
         self.root = master
         self.grid_columnconfigure(0, weight=1)
@@ -202,16 +204,17 @@ class ModGeneratorSection(ScrollableFrame):
         ).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="ew")
 
         setting_row_counter += 1
-        setting = Frame(settings_wrapper, transparent=True)
-        setting.grid_columnconfigure(0, weight=1)
-        setting.grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
         eye_image: CTkImage = get_ctk_image(Resources.Common.Light.EYE, Resources.Common.Dark.EYE, 24)
-        Button(setting, "menu.mod_generator.content.settings.preview", secondary=True, image=eye_image, command=self.show_preview).grid(column=0, row=0, sticky="ew")
+        Button(settings_wrapper, "menu.mod_generator.content.settings.preview", secondary=True, image=eye_image, command=self.show_preview).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
 
         setting_row_counter += 1
         generate_icon: CTkImage = get_ctk_image(Resources.Common.Light.START, Resources.Common.Dark.START, 24)
         self.generate_button = Button(settings_wrapper, "menu.mod_generator.content.button.generate", secondary=True, image=generate_icon, command=lambda:Thread(target=self.generate_mod, daemon=True).start())
         self.generate_button.grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
+
+        setting_row_counter += 1
+        cancel_icon: CTkImage = get_ctk_image(Resources.Common.Light.STOP, Resources.Common.Dark.STOP, 24)
+        Button(settings_wrapper, "menu.mod_generator.content.button.cancel", secondary=True, image=cancel_icon, command=self.cancel_generation).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
 
         setting_row_counter += 1
         Label(settings_wrapper, "menu.mod_generator.content.settings.documentation_hyperlink", style="caption", autowrap=False, url=ProjectData.MOD_GENERATOR_DOCUMENTATION).grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="w")
@@ -771,6 +774,11 @@ class ModGeneratorSection(ScrollableFrame):
         ModGeneratorPreviewWindow(self.root, image)
 
 
+    def cancel_generation(self) -> None:
+        if self.generating:
+            self._stop_event.set()
+
+
     def generate_mod(self) -> None:
         if self.generating:
             self.root.send_banner(
@@ -818,7 +826,7 @@ class ModGeneratorSection(ScrollableFrame):
             Directories.MODS.mkdir(parents=True, exist_ok=True)
 
         try:
-            ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon, additional_files=additional_files)
+            result: bool = ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon, additional_files=additional_files, stop_event=self._stop_event)
 
         except Exception as e:
             self.root.send_banner(
@@ -829,12 +837,14 @@ class ModGeneratorSection(ScrollableFrame):
             )
 
         else:
-            self.root.send_banner(
-                title_key="menu.mod_generator.success.title.generate",
-                message_key="menu.mod_generator.success.message.generate",
-                message_modification=lambda string: Localizer.format(string, {"{mod.name}": mod_name}),
-                mode="success", auto_close_after_ms=4000
-            )
+            if result:
+                self.root.send_banner(
+                    title_key="menu.mod_generator.success.title.generate",
+                    message_key="menu.mod_generator.success.message.generate",
+                    message_modification=lambda string: Localizer.format(string, {"{mod.name}": mod_name}),
+                    mode="success", auto_close_after_ms=4000
+                )
         self.generating = False
+        self._stop_event.clear()
         self.generate_button.configure(key="menu.mod_generator.content.button.generate")
 # endregion

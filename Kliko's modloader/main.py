@@ -16,7 +16,7 @@ group.add_argument("-m", "--menu", action="store_true", help="Launches the modlo
 group.add_argument("-p", "--player", "-l", action="store_true", help="Launches Roblox Player", dest="player")
 group.add_argument("-s", "--studio", "-c", action="store_true", help="Launches Roblox Studio", dest="studio")
 group.add_argument("--presence", "-rpc", action="store_true", help="Launches the Activity Watcher", dest="presence")
-parser.add_argument("--presence-mode", choices=["Player", "Studio"], dest="presence_mode")
+parser.add_argument("--presence-mode", choices=["Player", "Studio"], help="Decides in which mode the Activity Watcher should run", dest="presence_mode")
 parser.add_argument("--deeplink", help="Optional deeplink arguments when launching Roblox", dest="deeplink")
 args = parser.parse_args()
 
@@ -97,8 +97,8 @@ def main() -> None:
             launcher.run("Studio", args.deeplink)
 
         elif args.presence:
-            raise NotImplementedError("RPC has not been implemented yet!")
-            pass
+            from modules.activity_watcher import ActivityWatcher
+            ActivityWatcher.run(args.presence_mode)
 
     except Exception as e: exception_handler.run(e)
     Logger.info("Shutting down...")

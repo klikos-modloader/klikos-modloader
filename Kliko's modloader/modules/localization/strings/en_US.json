@@ -142,6 +142,7 @@
     "menu.mod_generator.content.settings.preview": "Preview",
     "menu.mod_generator.content.button.generate": "Generate",
     "menu.mod_generator.content.button.generate_generating": "Generating...",
+    "menu.mod_generator.content.button.cancel": "Cancel",
 
     "menu.mod_generator.content.mod_name": "Mod name:",
     "menu.mod_generator.content.mod_name_default": "My Custom Mod",

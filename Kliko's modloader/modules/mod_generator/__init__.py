@@ -1,6 +1,7 @@
 from typing import Literal, Optional
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from threading import Event
 import shutil
 import json
 import re
@@ -133,7 +134,9 @@ class ModGenerator:
 
 
     @classmethod
-    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False, custom_roblox_icon: Optional[Image.Image] = None, additional_files: Optional[list[AdditionalFile]] = None) -> None:
+    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False, custom_roblox_icon: Optional[Image.Image] = None, additional_files: Optional[list[AdditionalFile]] = None, stop_event: Optional[Event] = None) -> bool:
+        """Returns True if the mod was generated, False if it was cancelled (stop_event.is_set())"""
+
         Logger.info(f"Generating mod (mode={mode})...", prefix=cls._LOG_PREFIX)
         cls._validate_data(mode, data)
         angle = angle or 0
@@ -155,11 +158,19 @@ class ModGenerator:
         metadata = PngImagePlugin.PngInfo()
         metadata.add_text("Watermark", "Generated with Kliko's modloader")
 
+        if stop_event is not None and stop_event.is_set():
+            Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+            return False
+
         if use_remote_config:
             response: Response = requests.get(Api.GitHub.MOD_GENERATOR_CONFIG)
             remote_config: RemoteConfig = RemoteConfig(response.json())
         else:
             remote_config = RemoteConfig({})
+
+        if stop_event is not None and stop_event.is_set():
+            Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+            return False
 
         output_dir = Path(output_dir).resolve()
         if output_dir.exists():
@@ -175,16 +186,28 @@ class ModGenerator:
             Logger.info("Writing info.json...", prefix=cls._LOG_PREFIX)
             with open(temp_target / "info.json", "w") as file:
                 json.dump(mod_info, file, indent=4)
+
+            if stop_event is not None and stop_event.is_set():
+                Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                return False
             
             Logger.info("Downloading ImageSets...", prefix=cls._LOG_PREFIX)
             filesystem.download(Api.Roblox.Deployment.download(deployment.guid, "extracontent-luapackages.zip"), temporary_directory / "luapackages.zip")
             filesystem.extract(temporary_directory / "luapackages.zip", luapackages_target)
+
+            if stop_event is not None and stop_event.is_set():
+                Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                return False
 
             Logger.info("Locating ImageSets...", prefix=cls._LOG_PREFIX)
             imagesetdata_path: Path = locate_imagesetdata(luapackages_target)
             imagesets_dir: Path = locate_imagesets(luapackages_target)
             temp_target_imageset_path: Path = temp_target / "ExtraContent" / "Luapackages" / imagesets_dir.relative_to(luapackages_target)
             shutil.copytree(imagesets_dir, temp_target_imageset_path, dirs_exist_ok=True)
+
+            if stop_event is not None and stop_event.is_set():
+                Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                return False
 
             Logger.info("Preparing ImageSets...", prefix=cls._LOG_PREFIX)
             if create_1x_only:
@@ -194,8 +217,16 @@ class ModGenerator:
                     if path.name.startswith("img_set_2x") or path.name.startswith("img_set_3x"):
                         path.unlink()
 
+            if stop_event is not None and stop_event.is_set():
+                Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                return False
+
             Logger.info(f"Parsing {imagesetdata_path.name}...", prefix=cls._LOG_PREFIX)
             image_set_data: ImageSetData = ImageSetData(imagesetdata_path, temp_target_imageset_path, include_1x_only=create_1x_only)
+
+            if stop_event is not None and stop_event.is_set():
+                Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                return False
 
             Logger.info("Generating ImageSets...", prefix=cls._LOG_PREFIX)
             ROBLOX_LOGO_NAME: str = "icons/logo/block"
@@ -216,9 +247,22 @@ class ModGenerator:
                             imageset_image_object.paste(cropped, (icon.x, icon.y))
                     imageset_image_object.save(imageset.path, format="PNG", pnginfo=metadata)
 
+                if stop_event is not None and stop_event.is_set():
+                    Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                    return False
+
             if additional_files:
                 Logger.info("Generating additional files...", prefix=cls._LOG_PREFIX)
+                additional_file_counter: int = 0
                 for additional_file in additional_files:
+                    additional_file_counter += 1
+
+                    if additional_file_counter % 20 == 0:
+                        if stop_event is not None and stop_event.is_set():
+                            Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                            return False
+
+
                     target: Path = Path(temp_target, *re.split(r"[\\/]", additional_file.target))
 
                     if target.suffix != ".png":
@@ -236,10 +280,15 @@ class ModGenerator:
                     target.parent.mkdir(parents=True, exist_ok=True)
                     image_copy.save(target, format="PNG", pnginfo=metadata)
 
+            if stop_event is not None and stop_event.is_set():
+                Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
+                return False
+
             if output_dir.exists():
                 raise FileExistsError(str(output_dir))
             shutil.copytree(temp_target, output_dir, dirs_exist_ok=True)
             Logger.info("Mod generated successfully!", prefix=cls._LOG_PREFIX)
+            return True
 
 
     @classmethod

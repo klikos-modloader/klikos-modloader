@@ -16,6 +16,7 @@ DEPENDENCIES: list[str] = [
     "requests~=2.32.3",
     "py7zr==0.22.0",
     "numpy==2.2.6",
+    "pypresence==4.3.0",
     "packaging"
 ]
 

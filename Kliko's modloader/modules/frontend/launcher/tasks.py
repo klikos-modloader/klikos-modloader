@@ -7,6 +7,7 @@ import subprocess
 import ctypes
 import shutil
 import hashlib
+import json
 
 from modules.logger import Logger
 from modules.project_data import ProjectData
@@ -183,6 +184,22 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
                     if failed_mod_updates:
                         messagebox.showwarning(ProjectData.NAME, Localizer.format(Localizer.Strings["launcher.warning.failed_mod_updates"], {"{failed_mods}": ", ".join(f"'{mod}'" for mod in failed_mod_updates)}))
             functions.update_progress_bars(MOD_UPDATER_END_PROGRESS)
+
+            # TODO: Check for font mods
+            Logger.info("Checking for font mods...")
+            font_dir: Path = version_folder / "content" / "fonts"
+            font_families_dir: Path = font_dir / "families"
+            font_target: Path = font_dir / "CustomFont.ttf"
+            if font_target.exists():
+                Logger.info(f"Applying custom font: '{font_target.name}'...")
+                apply_font_mod(font_target, font_families_dir)
+            else:
+                font_target = font_target.with_suffix(".otf")
+                if font_target.exists():
+                    Logger.info(f"Applying custom font: '{font_target.name}'...")
+                    apply_font_mod(font_target, font_families_dir)
+                else:
+                    Logger.info("No custom font found!")
 
             Logger.info("Deploying mods...", prefix=LOG_PREFIX)
             functions.set_status_label("launcher.progress.deploying_mods")
@@ -378,4 +395,27 @@ def create_singleton_mutexes() -> None:
             Logger.warning(f"Failed to create mutex: {mutex_name}. {ctypes.WinError()}", prefix=LOG_PREFIX)
         elif kernel32.GetLastError() == 193:
             Logger.warning(f"Mutex already exists: {mutex_name}", prefix=LOG_PREFIX)
+
+
+def apply_font_mod(font_target: Path, font_families_dir: Path) -> None:
+    if not font_families_dir.is_dir():
+        Logger.warning(f"Unable to apply custom font! Directory not found: {font_families_dir.name}")
+    
+    for path in font_families_dir.iterdir():
+        if not path.is_file():
+            continue
+        if path.suffix != ".json":
+            continue
+
+        try:
+            new_asset_id: str = f"rbxasset://fonts/{font_target.name}"
+            with open(path) as file:
+                data: dict = json.load(file)
+            for face in data["faces"]:
+                face["assetId"] = new_asset_id
+            with open(path, "w") as file:
+                json.dump(data, file, indent=4)
+
+        except Exception as e:
+            Logger.warning(f"Unable to overwrite font: '{path.name}'. {type(e).__name__}: {e}")
 # endregion

@@ -34,7 +34,6 @@ class Textbox(LocalizedCTkTextbox):
     def __init__(self, master, placeholder_key: Optional[str] = None, placeholder_modification: Optional[Callable[[str], str]] = None, command: Optional[Callable] = None, on_focus_lost: Optional[Literal["command", "reset"]] = None, run_command_if_empty: bool = False, reset_if_empty: bool = False, **kwargs):
         if "font" not in kwargs: kwargs["font"] = FontStorage.get(size=14)
         if "text_color" not in kwargs: kwargs["text_color"] = ("#1A1A1A", "#FFFFFF")
-        if "placeholder_text_color" not in kwargs: kwargs["placeholder_text_color"] = ("#5C5C5C", "#CCCCCC")
         if "corner_radius" not in kwargs: kwargs["corner_radius"] = 4
         if "border_width" not in kwargs: kwargs["border_width"] = 1
         if "height" not in kwargs: kwargs["height"] = 32
@@ -52,7 +51,8 @@ class Textbox(LocalizedCTkTextbox):
         self.bind("<FocusOut>", self._on_focus_out)
         self.bind("<Enter>", self._on_hover_in)
         self.bind("<Leave>", self._on_hover_out)
-        self.bind("<Return>", self._on_confirm)
+        self.bind("<Control-s>", self._on_confirm)
+        self.bind("<Command-s>", self._on_confirm)
 
 
     def set(self, value: str) -> None:
@@ -84,7 +84,7 @@ class Textbox(LocalizedCTkTextbox):
             return
         self.focused = False
         self._update_colors()
-        value: str = self.get("0.0", "end")
+        value: str = self.get("0.0", "end").strip()
 
         if self.reset_if_empty and value == "":
             self.set(self.last_value)

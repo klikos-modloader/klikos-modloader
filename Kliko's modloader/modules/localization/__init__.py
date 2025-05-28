@@ -116,7 +116,7 @@ class Localizer:
 
     @classmethod
     def _on_update(cls) -> None:
-        for callback in cls._callback_dict.values():
+        for callback in list(cls._callback_dict.values()):
             try: callback()
             except Exception: continue
 

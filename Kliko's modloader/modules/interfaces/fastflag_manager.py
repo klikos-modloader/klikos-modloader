@@ -58,6 +58,16 @@ class FastFlagProfile:
             raise
 
 
+    def set_data(self, data: dict[str, Any]) -> None:
+        old_data: dict = self.data
+        try:
+            self.data = data
+            FastFlagManager.update_config(self)
+        except Exception:
+            self.data = old_data
+            raise
+
+
 class FastFlagManager:
     LOG_PREFIX: str = "FastFlagManager"
     CONFIG_PATH: Path = Files.FASTFLAG_CONFIG

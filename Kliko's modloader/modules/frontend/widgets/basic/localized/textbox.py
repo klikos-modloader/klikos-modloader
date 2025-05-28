@@ -12,8 +12,7 @@ class LocalizedCTkTextbox(CTkTextbox):
 
 
     def __init__(self, master, placeholder_key: Optional[str] = None, placeholder_modification: Optional[Callable[[str], str]] = None, **kwargs):
-        kwargs.pop("text", None)
-        super().__init__(master, placeholder_text=placeholder_key or "", **kwargs)
+        super().__init__(master, **kwargs)
         self._localizer_string_key = placeholder_key
         if placeholder_key is None:
             self._localizer_string_modification = None

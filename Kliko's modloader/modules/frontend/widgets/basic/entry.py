@@ -32,7 +32,7 @@ class Entry(LocalizedCTkEntry):
     background_color_focused: tuple[str, str] = ("#FFFFFF", "#1F1F1F")
     border_color_focused: tuple[str, str] = (winaccent.accent_dark_1, winaccent.accent_light_2)
 
-    def __init__(self, master, placeholder_key: Optional[str] = None, placeholder_modification: Optional[Callable[[str], str]] = None, command: Optional[Callable] = None, on_focus_lost: Optional[Literal["command", "reset"]] = None, run_command_if_empty: bool = False, reset_if_empty: bool = False, **kwargs):
+    def __init__(self, master, command: Optional[Callable] = None, on_focus_lost: Optional[Literal["command", "reset"]] = None, run_command_if_empty: bool = False, reset_if_empty: bool = False, **kwargs):
         if "font" not in kwargs: kwargs["font"] = FontStorage.get(size=14)
         if "text_color" not in kwargs: kwargs["text_color"] = ("#1A1A1A", "#FFFFFF")
         if "placeholder_text_color" not in kwargs: kwargs["placeholder_text_color"] = ("#5C5C5C", "#CCCCCC")
@@ -42,7 +42,7 @@ class Entry(LocalizedCTkEntry):
         textvariable = kwargs.get("textvariable", None)
         if isinstance(textvariable, StringVar):
             self.last_value = textvariable.get()
-        super().__init__(master, placeholder_key=placeholder_key, placeholder_modification=placeholder_modification, **kwargs)
+        super().__init__(master, **kwargs)
         self.focused = False
         self.hovered = False
         self.command = command

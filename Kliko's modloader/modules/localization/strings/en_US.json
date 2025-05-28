@@ -191,6 +191,16 @@
     "menu.fastflags.content.status.dropdown.none": "Disabled",
 
     "menu.fastflags.fastflag_editor.window_title": "{app.name} | FastFlag Editor",
+    "menu.fastflags.fastflag_editor.button.import": "Import profile",
+    "menu.fastflags.fastflag_editor.button.export": "Export profile",
+    "menu.fastflags.fastflag_editor.button.copy_to_clipboard": "Copy to clipboard",
+    "menu.fastflags.fastflag_editor.exception.message.save": "Failed to save data!\n{exception.type}: {exception.message}",
+    "menu.fastflags.fastflag_editor.exception.message.import": "Failed to import data!\n{exception.type}: {exception.message}",
+    "menu.fastflags.fastflag_editor.exception.message.export": "Failed to export data!\n{exception.type}: {exception.message}",
+    "menu.fastflags.fastflag_editor.popup.import.title": "{app.name} | Import FastFlags",
+    "menu.fastflags.fastflag_editor.popup.import.filetype.supported": "Supported Files",
+    "menu.fastflags.fastflag_editor.popup.export.title": "{app.name} | Export FastFlags",
+    "menu.fastflags.fastflag_editor.popup.export.filetype.supported": "Supported Files",
     
     "menu.fastflags.input.new_profile.message": "Choose a name for your FastFlag profile",
 

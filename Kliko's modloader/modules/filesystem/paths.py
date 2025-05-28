@@ -115,6 +115,8 @@ class Resources:
             ADD: Path = Directories.RESOURCES / "common" / "light" / "add.png"
             START: Path = Directories.RESOURCES / "common" / "light" / "start.png"
             RESET: Path = Directories.RESOURCES / "common" / "light" / "reset.png"
+            COPY: Path = Directories.RESOURCES / "common" / "light" / "copy.png"
+            UPLOAD: Path = Directories.RESOURCES / "common" / "light" / "upload.png"
         class Dark:
             BIN: Path = Directories.RESOURCES / "common" / "dark" / "bin.png"
             SUCCESS: Path = Directories.RESOURCES / "common" / "dark" / "success.png"
@@ -132,6 +134,8 @@ class Resources:
             ADD: Path = Directories.RESOURCES / "common" / "dark" / "add.png"
             START: Path = Directories.RESOURCES / "common" / "dark" / "start.png"
             RESET: Path = Directories.RESOURCES / "common" / "dark" / "reset.png"
+            COPY: Path = Directories.RESOURCES / "common" / "dark" / "copy.png"
+            UPLOAD: Path = Directories.RESOURCES / "common" / "dark" / "upload.png"
 
     class Navigation:
         class Light:

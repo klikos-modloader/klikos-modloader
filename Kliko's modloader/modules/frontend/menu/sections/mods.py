@@ -284,7 +284,7 @@ class ModsSection(ScrollableFrame):
             is_file: bool = path.is_file()
             is_font: bool = is_file and path.suffix in {".ttf", ".otf"}
             target_name: str
-            if is_font: target_name = path.name
+            if is_font: target_name = f"Custom Font ({path.stem})"
             else:
                 try:
                     mod: Mod = Mod(path)
@@ -310,7 +310,7 @@ class ModsSection(ScrollableFrame):
                 continue
 
             try:
-                if is_font: self._import_font_mod(path)
+                if is_font: self._import_font_mod(path, target_name)
                 elif mod.archive: filesystem.extract(path, Directories.MODS / mod.name)
                 else: shutil.copytree(path, Directories.MODS / mod.name)
 
@@ -325,11 +325,12 @@ class ModsSection(ScrollableFrame):
                 continue
 
 
-    def _import_font_mod(self, path: Path) -> None:
-        if path.suffix not in {".ttf", ".otf"}: raise ValueError(f'Unsupported file format: "{path.suffix}". Must be ".ttf", ".otf"')
-        mod_path: Path = Directories.MODS / path.name
-        target_path: Path = (mod_path / "content" / "fonts" / path.name).with_name("CustomFont").with_suffix(path.suffix)
-        shutil.copy(path, target_path)
+    def _import_font_mod(self, source: Path, mod_name: str) -> None:
+        if source.suffix not in {".ttf", ".otf"}: raise ValueError(f'Unsupported file format: "{source.suffix}". Must be ".ttf", ".otf"')
+        mod_path: Path = Directories.MODS / mod_name
+        target_path: Path = mod_path / "content" / "fonts" / f"CustomFont{source.suffix}"
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(source, target_path)
 # endregion
 
 

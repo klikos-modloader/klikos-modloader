@@ -98,7 +98,7 @@ def main() -> None:
 
         elif args.presence:
             from modules.activity_watcher import ActivityWatcher
-            ActivityWatcher.run(args.presence_mode)
+            ActivityWatcher().run(args.presence_mode)
 
     except Exception as e: exception_handler.run(e)
     Logger.info("Shutting down...")

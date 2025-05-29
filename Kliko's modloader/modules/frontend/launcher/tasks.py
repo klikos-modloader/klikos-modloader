@@ -271,13 +271,12 @@ def should_update(latest_version: LatestVersion, config: Config, version_folder:
 
 def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: Functions, stop_event: Event, latest_version: LatestVersion, version_folder: Path) -> None:
     package_manifest = PackageManifest(latest_version.guid)
-    install_target: Path = Directories.VERSIONS / (mode if config.static_version_folder else latest_version.guid)
 
     # Get filemap
     response: Response = requests.get(Api.GitHub.FILEMAP)
     data: dict = response.json()
-    pacakage_map: dict[str, Path] = {key: Path(install_target, *value) for key, value in data["common"].items()}
-    pacakage_map.update({key: Path(install_target, *value) for key, value in data[mode.lower()].items()})
+    pacakage_map: dict[str, Path] = {key: Path(version_folder, *value) for key, value in data["common"].items()}
+    pacakage_map.update({key: Path(version_folder, *value) for key, value in data[mode.lower()].items()})
 
     # Kill existing instances
     if RobloxInterface.is_roblox_running(mode):

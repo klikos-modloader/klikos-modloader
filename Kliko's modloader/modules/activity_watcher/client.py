@@ -1,13 +1,22 @@
-from typing import Literal
+from typing import Literal, Optional
+from dataclasses import dataclass
 
 from modules.logger import Logger
 
-from pypresence import Presence  # type: ignore
+from pypresence import Presence, DiscordNotFound, PipeClosed  # type: ignore
 
 
-# TODO or REMOVE
+@dataclass
 class RichPresenceStatus:
-    pass
+    start: Optional[int] = None
+    end: Optional[int] = None
+    state: Optional[str] = None
+    details: Optional[str] = None
+    large_image: Optional[str] = None
+    large_text: Optional[str] = None
+    small_image: Optional[str] = None
+    small_text: Optional[str] = None
+    buttons: Optional[list[dict]] = None
 
 
 # TODO
@@ -28,6 +37,10 @@ class RichPresenceClient:
         Logger.info("Client ready!", prefix=self._LOG_PREFIX)
 
 
+    def update(self, status: RichPresenceStatus) -> None:
+        pass
+
+
     def __enter__(self):
         Logger.info("Connecting client...", prefix=self._LOG_PREFIX)
         self.client.connect()
@@ -39,6 +52,7 @@ class RichPresenceClient:
 
         try:
             self.client.clear()
+            self.client.update()
             self.client.close()
         except Exception as e:
             Logger.warning(f"Failed to close RPC client! {type(e).__name__}: {e}", prefix=self._LOG_PREFIX)

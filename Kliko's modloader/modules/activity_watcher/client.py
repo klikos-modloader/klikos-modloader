@@ -86,6 +86,17 @@ class RichPresenceClient:
         self._current_status = status_dict
 
 
+    def set_default_status(self, timestamp: int) -> None:
+        status = RichPresenceStatus(
+            start=timestamp,
+            state="Idle",
+            details=f"Roblox {self.mode}",
+            large_image=self.logo_asset_key,
+            large_text=f"Roblox {self.mode}"
+        )
+        self.update(status)
+
+
     def __enter__(self):
         Logger.info("Connecting client...", prefix=self._LOG_PREFIX)
         self.client.connect()

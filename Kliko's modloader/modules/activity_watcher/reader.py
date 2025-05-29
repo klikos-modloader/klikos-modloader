@@ -49,12 +49,12 @@ class LogReader:
         Logger.info("Initializing log reader...", prefix=self._LOG_PREFIX)
         self.mode = mode
         self._readlines = []
-        time.sleep(0.5)  # just to make sure the latest log file exists
         self._set_latest_log_file()
 
 
     def _set_latest_log_file(self) -> None:
         Logger.info("Finding latest log file...", prefix=self._LOG_PREFIX)
+        time.sleep(3)  # just to make sure the latest log file exists
         log_files: list[Path] = list(self.DIRECTORY.glob(f"*_{self.mode}_*.log", case_sensitive=False))
         if not log_files:
             raise FileNotFoundError("No log files found!")

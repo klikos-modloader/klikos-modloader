@@ -105,6 +105,7 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
             case "Studio": binary_type = "WindowsStudio64"
             case _: raise ValueError(f'Invalid launch mode: "{mode}"!')
         latest_version: LatestVersion = LatestVersion(binary_type)
+        version_folder: Path = get_version_dir(mode, latest_version, config)
         functions.set_deployment_details(latest_version)
         functions.update_progress_bars(DEPLOYMENT_DETAILS_END_PROGRESS)
         if stop_event.is_set():
@@ -114,10 +115,10 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
         # Updates
         Logger.info("Checking for updates...", prefix=LOG_PREFIX)
         functions.set_status_label("launcher.progress.check_for_update")
-        if should_update(mode, latest_version, config):
+        if should_update(latest_version, config, version_folder):
             Logger.info("Updating Roblox...", prefix=LOG_PREFIX)
             functions.set_status_label("launcher.progress.client_update")
-            update_roblox(mode, config, functions, stop_event, latest_version)
+            update_roblox(mode, config, functions, stop_event, latest_version, version_folder)
             DataInterface.set_loaded_mods(mode, [])
         functions.update_progress_bars(DOWNLOAD_END_PROGRESS)
         if stop_event.is_set():
@@ -151,7 +152,6 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
 
         # Mods
-        version_folder: Path = get_version_dir(mode, latest_version, config)
         if not skip_modloader or not config.disable_mods:
             if config.mod_updates:
                 functions.set_status_label("launcher.progress.check_mod_update")
@@ -258,18 +258,18 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
 
 # region update
-def should_update(mode: Literal["Player", "Studio"], latest_version: LatestVersion, config: Config) -> bool:
+def should_update(latest_version: LatestVersion, config: Config, version_folder: Path) -> bool:
     if config.force_reinstall:
         Logger.info("Forced Roblox reinstallation!")
         return True
-    elif not get_version_dir(mode, latest_version, config).is_dir():
+    elif not version_folder.is_dir():
         return True
     elif config.installed_version != latest_version.guid:
         return True
     return False
 
 
-def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: Functions, stop_event: Event, latest_version: LatestVersion) -> None:
+def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: Functions, stop_event: Event, latest_version: LatestVersion, version_folder: Path) -> None:
     package_manifest = PackageManifest(latest_version.guid)
     install_target: Path = Directories.VERSIONS / (mode if config.static_version_folder else latest_version.guid)
 
@@ -345,7 +345,6 @@ def update_roblox(mode: Literal["Player", "Studio"], config: Config, functions: 
 
     # Extract files to version folder
     Logger.info("Installing Roblox...")
-    version_folder: Path = get_version_dir(mode, latest_version, config)
     version_folder.mkdir(parents=True, exist_ok=True)
     for package in package_manifest.packages:
         source: Path = Directories.VERSIONS_CACHE / mode / package.md5

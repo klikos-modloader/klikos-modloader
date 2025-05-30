@@ -11,18 +11,8 @@ class Data:
 
 
         class Join:
-            prefix: str = "[FLog::Output]"
-            startswith: str = "! Joining game "
-
-
-        class PrivateServer:
-            prefix: str = "[FLog::GameJoinUtil]"
-            startswith: str = "GameJoinUtil::joinGamePostPrivateServer"
-
-
-        class ReservedServer:
-            prefix: str = "[FLog::GameJoinUtil]"
-            startswith: str = "GameJoinUtil::initiateTeleportToReservedServer"
+            prefix: str = "[FLog::GameJoinLoadTime]"
+            startswith: str = "Report game_join_loadtime"
 
 
         class Leave:
@@ -38,7 +28,8 @@ class Data:
     class Studio:
         class Join:
             prefix: str = "[FLog::StudioKeyEvents]"
-            startswith: str = "open place"
+            startswith: str = "open place (identifier = "
+            endswith: str = ") [start]"
 
 
         class Leave:

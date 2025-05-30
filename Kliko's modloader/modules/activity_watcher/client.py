@@ -1,5 +1,6 @@
 from typing import Literal, Optional
 from dataclasses import dataclass
+import json
 
 from modules.logger import Logger
 
@@ -59,7 +60,7 @@ class RichPresenceStatus:
 
 
 class RichPresenceClient:
-    APP_ID: str = "1229494846247665775"
+    APP_ID: str = "1280969971303841924"
     _LOG_PREFIX: str = "RichPresenceClient"
 
     mode: Literal["Player", "Studio"]
@@ -82,6 +83,7 @@ class RichPresenceClient:
         status_dict: dict = status.as_dict()
         if status_dict == self._current_status:
             return
+        # Logger.info(f"Updating RPC status: {json.dumps(status_dict)}", prefix=self._LOG_PREFIX)
         self.client.update(**status_dict)
         self._current_status = status_dict
 

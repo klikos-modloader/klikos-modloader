@@ -192,21 +192,23 @@ class Api:
                 """
                 
                 return rf"https://thumbnails.roblox.com/v1/games/icons?universeIds={universe_id}&returnPolicy=PlaceHolder&size={size}&format=Png&isCircular={str(circular).lower()}"
-            
+
             @staticmethod
-            def asset(asset_id: str) -> str:
+            def asset_thumbnail(asset_id: str, size: str = "512x512", circular: bool = False) -> str:
                 """
-                Returns the download URL for the specified Roblox asset.
+                Returns the API endpoint to retrieve the thumbnail of the specified asset.
 
                 Parameters:
                     asset_id (str): The ID of the Roblox asset.
+                    size (str): The size of the thumbnail (example: "512x512").
+                    circular (bool): Whether the thumbnail should be circular.
 
                 Returns:
-                    str: The download URL of the specified Roblox asset.
+                    str: The URL for the asset thumbnail API endpoint.
                 """
                 
-                return rf"https://assetdelivery.roblox.com/v1/asset/?id={asset_id}"
-            
+                return rf"https://thumbnails.roblox.com/v1/assets?assetIds={asset_id}&returnPolicy=PlaceHolder&size={size}&format=Png&isCircular={str(circular).lower()}"
+
             @staticmethod
             def user(user_id: str) -> str:
                 """

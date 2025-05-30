@@ -42,23 +42,25 @@ class DataInterface:
 
     @classmethod
     def get_loaded_mods(cls, mode: Literal["Player", "Studio"]) -> list[str]:
-        try: data: dict = cls._read()
-        except FileNotFoundError: return []
+        return []
+        # try: data: dict = cls._read()
+        # except FileNotFoundError: return []
 
-        match mode:
-            case "Player": return data.get("player_mods", [])
-            case "Studio": return data.get("studio_mods", [])
-            case _: raise ValueError(f"Invalid mode: {mode}")
+        # match mode:
+        #     case "Player": return data.get("player_mods", [])
+        #     case "Studio": return data.get("studio_mods", [])
+        #     case _: raise ValueError(f"Invalid mode: {mode}")
 
 
     @classmethod
     def set_loaded_mods(cls, mode: Literal["Player", "Studio"], value: list[str]) -> None:
-        try: data: dict = cls._read()
-        except FileNotFoundError: data = {}
+        return
+        # try: data: dict = cls._read()
+        # except FileNotFoundError: data = {}
 
-        match mode:
-            case "Player": data["player_mods"] = value
-            case "Studio": data["studio_mods"] = value
-            case _: raise ValueError(f"Invalid mode: {mode}")
+        # match mode:
+        #     case "Player": data["player_mods"] = value
+        #     case "Studio": data["studio_mods"] = value
+        #     case _: raise ValueError(f"Invalid mode: {mode}")
 
-        cls.EDITOR.write(data)
+        # cls.EDITOR.write(data)

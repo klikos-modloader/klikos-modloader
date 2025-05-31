@@ -25,6 +25,7 @@ class ModGeneratorSection(ScrollableFrame):
     loaded: bool = False
     root: "Root"
     mode_variable: StringVar
+    icon_size_variable: StringVar
     _stop_event: Event
     _language_change_callback_id: str | None = None
     _gradient_list_frames: dict[str, Frame]
@@ -55,7 +56,7 @@ class ModGeneratorSection(ScrollableFrame):
 
     mod_name: str = "My Custom Mod"
     use_remote_config: bool = True
-    create_1x_only: bool = False
+    icon_sizes: Literal[0, 1, 2, 3] = 0
     file_version: Optional[int] = None
 
     generating: bool = False
@@ -177,10 +178,11 @@ class ModGeneratorSection(ScrollableFrame):
         setting = Frame(settings_wrapper, transparent=True)
         setting.grid_columnconfigure(1, weight=1)
         setting.grid(column=0, row=setting_row_counter, pady=0 if setting_row_counter == 0 else (self._SETTING_GAP, 0), sticky="ew")
-        Label(setting, "menu.mod_generator.content.settings.1x_only", autowrap=False).grid(column=0, row=0, sticky="w")
-        value = self.create_1x_only
-        variable = BooleanVar(setting, value=value)
-        CheckBox(setting, width=0, command=lambda variable=variable: self.set_1x_only(variable.get()), variable=variable).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="e")
+        Label(setting, "menu.mod_generator.content.settings.icon_size", autowrap=False).grid(column=0, row=0, sticky="w")
+        icon_size_options: list[str] = ["menu.mod_generator.content.settings.icon_size.all", "menu.mod_generator.content.settings.icon_size.1x_only", "menu.mod_generator.content.settings.icon_size.2x_only", "menu.mod_generator.content.settings.icon_size.3x_only"]
+        icon_size: str = Localizer.Strings[icon_size_options[self.icon_sizes]]
+        self.icon_size_variable: StringVar = StringVar(setting, value=icon_size)
+        DropDownMenu(setting, icon_size_options, variable=self.icon_size_variable, command=self.set_icon_sizes).grid(column=1, row=0, padx=(self._SETTING_INNER_GAP, 0), sticky="ew")
 
         setting_row_counter += 1
         setting = Frame(settings_wrapper, transparent=True)
@@ -383,6 +385,11 @@ class ModGeneratorSection(ScrollableFrame):
         mode_value: str = Localizer.Strings[mode_option_keys[0 if mode == "color" else 1 if mode == "gradient" else 2]]
         self.mode_variable.set(mode_value)
 
+        icon_size_keys: list[str] = ["menu.mod_generator.content.settings.icon_size.all", "menu.mod_generator.content.settings.icon_size.1x_only", "menu.mod_generator.content.settings.icon_size.2x_only", "menu.mod_generator.content.settings.icon_size.3x_only"]
+        icon_sizes: Literal[0, 1, 2, 3] = self.icon_sizes
+        icon_size_value: str = Localizer.Strings[icon_size_keys[icon_sizes]]
+        self.icon_size_variable.set(icon_size_value)
+
 
     def set_generator_mode(self, value: str) -> None:
         color_value: str = Localizer.Strings["menu.mod_generator.content.settings.mode.color"]
@@ -429,8 +436,24 @@ class ModGeneratorSection(ScrollableFrame):
         self.use_remote_config = value
 
 
-    def set_1x_only(self, value: bool) -> None:
-        self.create_1x_only = value
+    def set_icon_sizes(self, value: str) -> None:
+        one_value: str = Localizer.Strings["menu.mod_generator.content.settings.icon_size.1x_only"]
+        two_value: str = Localizer.Strings["menu.mod_generator.content.settings.icon_size.2x_only"]
+        three_value: str = Localizer.Strings["menu.mod_generator.content.settings.icon_size.3x_only"]
+        all_value: str = Localizer.Strings["menu.mod_generator.content.settings.icon_size.all"]
+
+        if value not in {one_value, two_value, three_value, all_value}:
+            self.root.send_banner(
+                title_key="menu.mod_generator.exception.title.unknown",
+                message_key="menu.mod_generator.exception.message.unknown",
+                message_modification=lambda string: Localizer.format(string, {"{exception.type}": "ValueError", "{exception.message}": f'Bad value: "{value}". Expected one of "{one_value}", "{two_value}", "{three_value}", "{all_value}"'}),
+                mode="error", auto_close_after_ms=6000
+            )
+            return
+        
+        new_value: int = 3 if value == three_value else 2 if value == two_value else 1 if value == one_value else 0
+        self.icon_sizes = new_value
+        print(self.icon_sizes)
 
 
     def set_mod_name(self, value: str) -> None:
@@ -795,7 +818,7 @@ class ModGeneratorSection(ScrollableFrame):
         data: tuple[int, int, int] | list[GradientColor] | Image.Image = self.color_data if mode == "color" else self.gradient_data if mode == "gradient" else self.image_data
         custom_roblox_icon: Optional[Image.Image] = self.custom_roblox_icon
         use_remote_config: bool = self.use_remote_config
-        create_1x_only: bool = self.create_1x_only
+        icon_sizes: Literal[0, 1, 2, 3] = self.icon_sizes
         file_version: Optional[int] = self.file_version
         additional_files: Optional[list[AdditionalFile]] = list(self.additional_files.values()) or None
 
@@ -826,7 +849,7 @@ class ModGeneratorSection(ScrollableFrame):
             Directories.MODS.mkdir(parents=True, exist_ok=True)
 
         try:
-            result: bool = ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, create_1x_only=create_1x_only, custom_roblox_icon=custom_roblox_icon, additional_files=additional_files, stop_event=self._stop_event)
+            result: bool = ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, icon_sizes=icon_sizes, custom_roblox_icon=custom_roblox_icon, additional_files=additional_files, stop_event=self._stop_event)
 
         except Exception as e:
             self.root.send_banner(

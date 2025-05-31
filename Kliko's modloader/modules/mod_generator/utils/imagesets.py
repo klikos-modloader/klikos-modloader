@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 from dataclasses import dataclass
 import os
 import re
@@ -45,7 +46,7 @@ class ImageSetData:
     imagesets: list[ImageSet]
 
 
-    def __init__(self, filepath: Path, directory: Path, include_1x_only: bool = False):
+    def __init__(self, filepath: Path, directory: Path, icon_sizes: Literal[0, 1, 2, 3] = 0):
         with open(filepath) as file:
             content: str = file.read()
 
@@ -53,7 +54,7 @@ class ImageSetData:
 
         imageset_dict: dict[str, ImageSet] = {}
         for size, icons in parsed.items():
-            if include_1x_only and size != "1x":
+            if icon_sizes != 0 and size != f"{icon_sizes}x":
                 continue
 
             for name, data in icons.items():

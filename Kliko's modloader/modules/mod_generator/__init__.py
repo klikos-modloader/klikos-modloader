@@ -134,7 +134,7 @@ class ModGenerator:
 
 
     @classmethod
-    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, create_1x_only: bool = False, custom_roblox_icon: Optional[Image.Image] = None, additional_files: Optional[list[AdditionalFile]] = None, stop_event: Optional[Event] = None) -> bool:
+    def generate_mod(cls, mode: Literal["color", "gradient", "custom"], data: tuple[int, int, int] | list[GradientColor] | Image.Image, output_dir: str | Path, angle: Optional[float] = None, file_version: Optional[int] = None, use_remote_config: bool = True, icon_sizes: Literal[0, 1, 2, 3] = 0, custom_roblox_icon: Optional[Image.Image] = None, additional_files: Optional[list[AdditionalFile]] = None, stop_event: Optional[Event] = None) -> bool:
         """Returns True if the mod was generated, False if it was cancelled (stop_event.is_set())"""
 
         Logger.info(f"Generating mod (mode={mode})...", prefix=cls._LOG_PREFIX)
@@ -210,11 +210,11 @@ class ModGenerator:
                 return False
 
             Logger.info("Preparing ImageSets...", prefix=cls._LOG_PREFIX)
-            if create_1x_only:
+            if icon_sizes != 0:
                 for path in temp_target_imageset_path.iterdir():
                     if path.suffix != ".png":
                         continue
-                    if path.name.startswith("img_set_2x") or path.name.startswith("img_set_3x"):
+                    if not path.name.startswith(f"img_set_{icon_sizes}x"):
                         path.unlink()
 
             if stop_event is not None and stop_event.is_set():
@@ -222,7 +222,7 @@ class ModGenerator:
                 return False
 
             Logger.info(f"Parsing {imagesetdata_path.name}...", prefix=cls._LOG_PREFIX)
-            image_set_data: ImageSetData = ImageSetData(imagesetdata_path, temp_target_imageset_path, include_1x_only=create_1x_only)
+            image_set_data: ImageSetData = ImageSetData(imagesetdata_path, temp_target_imageset_path, icon_sizes=icon_sizes)
 
             if stop_event is not None and stop_event.is_set():
                 Logger.info("Mod generator cancelled!", prefix=cls._LOG_PREFIX)
@@ -269,9 +269,12 @@ class ModGenerator:
                         Logger.warning(f"Skipping file '{target.name}'... (Invalid filetype, must be '.png')")
                         continue
 
-                    if create_1x_only and (target.stem.endswith("@2x") or target.stem.endswith("@3x")):
-                        Logger.warning(f"Skipping file '{target.name}'... (Only generating @1x sizes)")
-                        continue
+                    match = re.search(r'@(\d+)x$', target.stem)
+                    if match:
+                        icon_size = int(match.group(1))
+                        if icon_size != icon_sizes:
+                            Logger.warning(f"Skipping file '{target.name}'... (Only generating @{icon_sizes}x sizes)")
+                            continue
 
                     image_copy: Image.Image = additional_file.image.copy()
                     if image_copy.mode != "RGBA":

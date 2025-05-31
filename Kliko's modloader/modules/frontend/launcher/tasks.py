@@ -133,9 +133,9 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
                 skip_modloader = True
 
             else:
-                if not messagebox.askokcancel(
+                if config.confirm_launch and not messagebox.askokcancel(
                     title=Localizer.format(Localizer.Strings["dialog.confirm.title"], {"{app.name}": ProjectData.NAME}),
-                    message=Localizer.format(Localizer.Strings["launcher.popup.permission_to_kill.on_update"], {
+                    message=Localizer.format(Localizer.Strings["launcher.popup.permission_to_kill"], {
                         "{roblox.dynamic}": Localizer.Key("roblox.player") if mode == "Player" else Localizer.Key("roblox.studio"),
                         "{roblox.common}": Localizer.Key("roblox.common"),
                         "{roblox.player}": Localizer.Key("roblox.player"),

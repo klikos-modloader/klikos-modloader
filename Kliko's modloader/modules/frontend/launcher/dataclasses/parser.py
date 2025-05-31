@@ -215,12 +215,10 @@ class Parser:
 
     # region - place
             case "place":
-                string_kwargs = {"anchor", "side", "fill"}
-                boolean_kwargs = {"expand"}
-                int_kwargs = {"ipadx", "ipady"}
-                tuple_or_int_kwargs = {"padx", "pady"}
+                string_kwargs = {"anchor"}
+                int_kwargs = {"x", "y", "width", "height"}
                 float_kwargs = {"relx", "rely", "relwidth", "relheight"}
-                valid_kwargs = string_kwargs | int_kwargs | float_kwargs | boolean_kwargs | tuple_or_int_kwargs
+                valid_kwargs = string_kwargs | int_kwargs | float_kwargs
 
                 for key in valid_kwargs:
                     value = data.get(key)
@@ -237,6 +235,31 @@ class Parser:
                         if isinstance(value, bool):
                             kwargs[key] = value
 
+                    elif key in string_kwargs:
+                        if not isinstance(value, str):
+                            continue
+
+                        if key == "anchor":
+                            anchor: str | None = cls._parse_anchor(value)
+                            if anchor:
+                                kwargs[key] = anchor
+    # endregion
+
+    # region - pack
+            case "pack":
+                int_kwargs = {"width", "height", "ipadx", "ipady"}
+                tuple_or_int_kwargs = {"padx", "pady"}
+                string_kwargs = {"side", "fill", "anchor"}
+                boolean_kwargs = {"expand"}
+                valid_kwargs = int_kwargs | tuple_or_int_kwargs | string_kwargs | boolean_kwargs
+
+                for key in valid_kwargs:
+                    value = data.get(key)
+
+                    if key in int_kwargs:
+                        if isinstance(value, int) and value >= 0:
+                            kwargs[key] = value
+
                     elif key in tuple_or_int_kwargs:
                         if isinstance(value, int) and value >= 0:
                             kwargs[key] = value
@@ -251,7 +274,7 @@ class Parser:
                             continue
 
                         if key == "anchor":
-                            anchor: str | None = cls._parse_anchor(value)
+                            anchor = cls._parse_anchor(value)
                             if anchor:
                                 kwargs[key] = anchor
 
@@ -262,31 +285,12 @@ class Parser:
 
                         elif key == "side":
                             value_lower = value.lower()
-                            if value_lower in {"top", "left", "bottom", "right"}:
+                            if value_lower in {"top", "bottom", "left", "right"}:
                                 kwargs[key] = value_lower
-    # endregion
 
-    # region - pack
-            case "pack":
-                int_kwargs = {"width", "height"}
-                string_kwargs = {"anchor"}
-                valid_kwargs = int_kwargs | string_kwargs
-
-                for key in valid_kwargs:
-                    value = data.get(key)
-
-                    if key in int_kwargs:
-                        if isinstance(value, int) and value >= 0:
+                    elif key in boolean_kwargs:
+                        if isinstance(value, bool):
                             kwargs[key] = value
-
-                    elif key in string_kwargs:
-                        if not isinstance(value, str):
-                            continue
-
-                        if key == "anchor":
-                            anchor = cls._parse_anchor(value)
-                            if anchor:
-                                kwargs[key] = anchor
     # endregion
         return kwargs
 # endregion
@@ -388,6 +392,24 @@ class Parser:
 # endregion
 
 
+# region cursor
+    @classmethod
+    def _parse_cursor(cls, cursor: str) -> str | None:
+        if cursor in {
+            "arrow", "based_arrow_down", "based_arrow_up", "boat", "bogosity", "bottom_left_corner", "bottom_right_corner",
+            "bottom_side", "bottom_tee", "box_spiral", "center_ptr", "circle", "clock", "coffee_mug", "cross", "cross_reverse",
+            "crosshair", "diamond_cross", "dot", "dotbox", "double_arrow", "draft_large", "draft_small", "draped_box", "exchange",
+            "fleur", "gobbler", "gumby", "hand1", "hand2", "heart", "icon", "iron_cross", "left_ptr", "left_side", "left_tee",
+            "leftbutton", "ll_angle", "lr_angle", "man", "middlebutton", "mouse", "pencil", "pirate", "plus", "question_arrow",
+            "right_ptr", "right_side", "right_tee", "rightbutton", "rtl_logo", "sailboat", "sb_down_arrow", "sb_h_double_arrow",
+            "sb_left_arrow", "sb_right_arrow", "sb_up_arrow", "sb_v_double_arrow", "shuttle", "sizing", "spider", "spraycan", "star",
+            "target", "tcross", "top_left_arrow", "top_left_corner", "top_right_corner", "top_side", "top_tee", "trek", "ul_angle",
+            "umbrella", "ur_angle", "watch", "xterm", "X_cursor"
+        }: return cursor
+        return None
+# endregion
+
+
 # region widget kwargs
     @classmethod
     def parse_widget_kwargs(cls, type: Literal["frame", "progress_bar", "label", "button", "status_label", "channel_label", "version_label", "file_version_label"], data: dict, base_directory: Path) -> dict:
@@ -476,7 +498,7 @@ class Parser:
 
                         elif key == "compound":
                             value_lower = value.lower()
-                            if value_lower in {"left", "right", "center"}:
+                            if value_lower in {"left", "right", "center", "top", "bottom"}:
                                 kwargs[key] = value_lower
                         
                         elif key == "justify":
@@ -532,7 +554,7 @@ class Parser:
 
                     elif key in color_kwargs:
                         color = cls.parse_color(value)
-                        if key in {"text_color", "text_color"} and color == "transparent":
+                        if key in {"text_color", "border_color"} and color == "transparent":
                             continue
                         if color:
                             kwargs[key] = color
@@ -553,6 +575,11 @@ class Parser:
 
                         elif key == "text":
                             kwargs[key] = value
+                        
+                        elif key == "cursor":
+                            cursor = cls._parse_cursor(value)
+                            if cursor is not None:
+                                kwargs["cursor"] = cursor
 
                     elif key in font_kwargs:
                         if isinstance(value, dict) and value:
@@ -565,8 +592,6 @@ class Parser:
                             image = cls._parse_image(value, base_directory)
                             if image:
                                 kwargs[key] = image
-
-                kwargs["cursor"] = kwargs.get("cursor", "hand2")
     # endregion
         return kwargs
 # endregion

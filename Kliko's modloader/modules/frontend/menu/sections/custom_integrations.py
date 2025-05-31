@@ -142,8 +142,8 @@ class CustomIntegrationsSection(ScrollableFrame):
 
         # Args
         args_entry: Entry = Entry(
-            content, "menu.custom_integrations.content.launch_args.placeholder", command=lambda event, integration=integration: self.reargs_integration(integration, event),
-            on_focus_lost="command", run_command_if_empty=True, reset_if_empty=False, width=256
+            content, command=lambda event, integration=integration: self.reargs_integration(integration, event),
+            on_focus_lost="command", run_command_if_empty=True, reset_if_empty=False, placeholder_key="menu.custom_integrations.content.launch_args.placeholder", width=256
         )
         if integration.args:
             args_entry.set(integration.args)

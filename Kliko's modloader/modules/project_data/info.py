@@ -1,0 +1,8 @@
+NAME: str = "Kliko's modloader"
+VERSION: str = "2.0.0"
+DISCORD: str = r"https://discord.gg/nEjUwdSP9P"
+REPOSITORY: str = r"https://github.com/klikos-modloader/klikos-modloader"
+WIKI: str = r"https://github.com/klikos-modloader/klikos-modloader/wiki"
+RELEASES: str = r"https://github.com/klikos-modloader/klikos-modloader/releases"
+LATEST_RELEASE: str = r"https://github.com/klikos-modloader/klikos-modloader/releases/latest"
+MOD_GENERATOR_DOCUMENTATION: str = r"https://github.com/klikos-modloader/klikos-modloader/wiki/Mod-Generator"

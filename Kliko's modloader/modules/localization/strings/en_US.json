@@ -1,0 +1,335 @@
+{
+    "roblox.player": "Roblox Player",
+    "roblox.player_alt": "Player",
+    "roblox.studio": "Roblox Studio",
+    "roblox.studio_alt": "Studio",
+    "roblox.common": "Roblox",
+
+    "fatalerror.message": "{app.name} crashed due to a fatal error!\n{exception.type}: {exception.message}\n\nMore information may be available in the latest log file",
+    "fatalerror.log": "If you need any help, please join the official support server: {discord}",
+
+    "dialog.confirm.title": "{app.name} | Confirmation Dialog",
+    "dialog.color_picker.title": "{app.name} | Color Picker",
+    "dialog.update_available.message": "A newer version is available: {latest_version}\nWould you like to update now?",
+
+    "appearance.light": "Light",
+    "appearance.dark": "Dark",
+    "appearance.system": "System",
+
+    "button.ok": "OK",
+    "button.cancel": "Cancel",
+
+
+
+
+
+
+    "launcher.deployment_info.channel": "Channel: {value}",
+    "launcher.deployment_info.file_version": "File Version: {value}",
+    "launcher.deployment_info.guid": "GUID: {value}",
+
+    "launcher.button.cancel": "Cancel",
+    "launcher.progress.preview": "Launcher preview...",
+    "launcher.progress.initializing": "Initializing...",
+    "launcher.progress.get_client_info": "Getting deployment details...",
+    "launcher.progress.check_for_update": "Checking for updates...",
+    "launcher.progress.client_update": "Updating {roblox.dynamic}...",
+    "launcher.progress.check_mod_update": "Checking for mod updates...",
+    "launcher.progress.mod_update": "Updating mods...",
+    "launcher.progress.deploying_mods": "Deploying mods...",
+    "launcher.progress.launch_integrations": "Launching custom integrations...",
+    "launcher.progress.launch_client": "Launching {roblox.dynamic}...",
+
+    "launcher.popup.permission_to_kill": "{roblox.common} is already running, launching a new instance will close the current one. Do you want to continue?",
+    "launcher.popup.permission_to_kill.on_update": "In order to update {roblox.common}, existing instances will be closed. Do you want to continue?",
+
+    "launcher.warning.custom_launcher_version.too_new": "You're using a custom launcher that was made for a newer version of {app.name}, the default launcher will be used instead.",
+    "launcher.warning.custom_launcher_version.too_old": "You're using a custom launcher that was made for an older version of {app.name}, the default launcher will be used instead.",
+    "launcher.warning.failed_mod_updates": "The following mods failed to update: {failed_mods}\nMore information may be available in the latest log file.",
+
+
+
+
+
+    "menu.sidebar.version": "Version {app.version}",
+    "menu.sidebar.navigation.mods": "Mods",
+    "menu.sidebar.navigation.marketplace": "Community Mods",
+    "menu.sidebar.navigation.mod_generator": "Mod Generator",
+    "menu.sidebar.navigation.fastflags": "FastFlags",
+    "menu.sidebar.navigation.global_basic_settings": "Global Basic Settings",
+    "menu.sidebar.navigation.integrations": "Integrations",
+    "menu.sidebar.navigation.custom_integrations": "Custom Integrations",
+    "menu.sidebar.navigation.settings": "Settings",
+    "menu.sidebar.navigation.about": "About",
+
+
+
+
+
+
+    "menu.mods.header.title": "Mods",
+    "menu.mods.header.description": "Manage your mods",
+    "menu.mods.header.button.open_mods_folder": "Open mods folder",
+    "menu.mods.content.dnd_target_frame": "Drag and drop to import mods",
+    "menu.mods.content.load_order": "Load order",
+    "menu.mods.content.status.dropdown.player": "{roblox.player_alt} only",
+    "menu.mods.content.status.dropdown.studio": "{roblox.studio_alt} only",
+    "menu.mods.content.status.dropdown.both": "Enabled",
+    "menu.mods.content.status.dropdown.none": "Disabled",
+
+    "menu.mods.popup.import.title": "{app.name} | Import Mods",
+    "menu.mods.popup.import.filetype.supported": "Supported Files",
+    "menu.mods.popup.import.filetype.zip": "ZIP Archive",
+    "menu.mods.popup.import.filetype.7z": "7-Zip Archive",
+    "menu.mods.popup.import.filetype.ttf": "TrueType Font",
+    "menu.mods.popup.import.filetype.otf": "OpenType Font",
+    "menu.mods.popup.delete.message": "Are you sure you want to remove this mod: \"{mod.name}\"\nThis action cannot be undone!",
+
+    "menu.mods.exception.title.rename": "Unable to rename mod: \"{mod.name}\"",
+    "menu.mods.exception.title.import": "Unable to import mod: \"{mod.name}\"",
+    "menu.mods.exception.title.remove": "Unable to remove mod: \"{mod.name}\"",
+    "menu.mods.exception.title.change_priority": "Unable to update load order of \"{mod.name}\"",
+    "menu.mods.exception.title.change_status": "Unable to update status of \"{mod.name}\"",
+
+    "menu.mods.exception.message.empty_filename": "Filenames cannot be empty or whitespace!",
+    "menu.mods.exception.message.reserved_filename": "\"{value}\" is a reserved filename and cannot be used!",
+    "menu.mods.exception.message.trailing_dot_filename": "Filenames cannot end with \".\"!",
+    "menu.mods.exception.message.invalid_filename": "\"{value}\" contains invalid characters and cannot be used!",
+    "menu.mods.exception.message.file_not_found": "File not found: \"{path}\"",
+    "menu.mods.exception.message.mod_exists": "Another mod with the same name already exists!",
+    "menu.mods.exception.message.unsupported_filetype": "Unsupported filetype: \"{filetype}\"",
+    "menu.mods.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
+
+
+
+
+    "menu.marketplace.header.title": "Community Mods",
+    "menu.marketplace.header.description": "Browse mods made by the community",
+    "menu.marketplace.content.failed_to_load.title": "Data failed to load!",
+    "menu.marketplace.content.failed_to_load.message": "Please try again later",
+
+    "menu.marketplace.mod_window.window_title": "{app.name} | Mod Browser",
+    "menu.marketplace.mod_window.mod_author": "By {mod.author}",
+    "menu.marketplace.mod_window.mod_author_unknown": "Unknown creator",
+    "menu.marketplace.mod_window.popup.mod_exists.message": "Another mod with the same name already exists, do you want to replace it?",
+    "menu.marketplace.banner.download_success.title": "Mod download complete!",
+    "menu.marketplace.banner.download_success.message": "\"{mod.name}\" has been added to your mods folder",
+    "menu.marketplace.banner.download_failed.title": "Mod download failed: \"{mod.name}\"",
+    "menu.marketplace.banner.download_failed.message": "{exception.type}: {exception.message}",
+
+    "menu.marketplace.exception.title.failed_to_load": "Unable to load content",
+    "menu.marketplace.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
+
+
+
+
+    "menu.mod_generator.header.title": "Mod Generator",
+    "menu.mod_generator.header.description": "Creating mods has never been easier",
+
+    "menu.mod_generator.content.settings.title": "Settings",
+    "menu.mod_generator.content.settings.documentation_hyperlink": "Documentation",
+    "menu.mod_generator.content.settings.mode": "Mode:",
+    "menu.mod_generator.content.settings.mode.color": "Single Color",
+    "menu.mod_generator.content.settings.mode.gradient": "Gradient",
+    "menu.mod_generator.content.settings.mode.custom": "Custom Mask",
+    "menu.mod_generator.content.settings.icon_size": "Icon size:",
+    "menu.mod_generator.content.settings.icon_size.1x_only": "1x Only",
+    "menu.mod_generator.content.settings.icon_size.2x_only": "2x Only",
+    "menu.mod_generator.content.settings.icon_size.3x_only": "3x Only",
+    "menu.mod_generator.content.settings.icon_size.all": "All sizes",
+    "menu.mod_generator.content.settings.use_remote_config": "Use remote configuration",
+    "menu.mod_generator.content.settings.version_specific": "File version:",
+    "menu.mod_generator.content.settings.preview": "Preview",
+    "menu.mod_generator.content.button.generate": "Generate",
+    "menu.mod_generator.content.button.generate_generating": "Generating...",
+    "menu.mod_generator.content.button.cancel": "Cancel",
+
+    "menu.mod_generator.content.mod_name": "Mod name:",
+    "menu.mod_generator.content.mod_name_default": "My Custom Mod",
+
+    "menu.mod_generator.content.custom_roblox_icon": "Custom {roblox.common} icon",
+    "menu.mod_generator.content.custom_roblox_icon.description": "Replaces the in-game {roblox.common} icon in your topbar.",
+    "menu.mod_generator.content.button.remove": "Remove",
+    "menu.mod_generator.content.button.add": "Add",
+
+    "menu.mod_generator.content.gradient_angle": "Angle:",
+    "menu.mod_generator.content.gradient_endpoint": "Endpoint:",
+    "menu.mod_generator.content.gradient_color": "Color:",
+
+    "menu.mod_generator.content.additional_files": "Additional files",
+    "menu.mod_generator.content.button.reset": "Reset",
+    "menu.mod_generator.content.button.remove_all": "Remove all",
+    "menu.mod_generator.content.dnd_target_frame": "Drag and drop to add files",
+
+    "menu.mod_generator.preview_window.window_title": "{app.name} | Mod Preview",
+    
+    "menu.mod_generator.popup.import.filetype.supported": "Supported Files",
+
+    "menu.mod_generator.success.title.generate": "Mod generated successfully!",
+    "menu.mod_generator.success.message.generate": "\"{mod.name}\" has been added to your mods folder",
+
+    "menu.mod_generator.exception.title.unknown": "Something went wrong!",
+    "menu.mod_generator.exception.title.generate": "Unable to generate mod!",
+
+    "menu.mod_generator.exception.message.generator_busy": "Another mod is already being generated. Please wait for the current mod to finish before generating a new one.",
+    "menu.mod_generator.exception.message.mod_exists": "Another mod with the same name already exists!",
+    "menu.mod_generator.exception.message.gradient_not_enough_colors": "Gradients must consist of at least 2 colors",
+    "menu.mod_generator.exception.message.not_a_png": "Unsupported filetype: \"{path.name}\". Only .png files are supported.",
+    "menu.mod_generator.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
+
+
+
+
+    "menu.fastflags.header.title": "FastFlags",
+    "menu.fastflags.header.description": "Customize your {roblox.common} experience by adjusting client settings",
+    "menu.fastflags.header.button.new_profile": "Create new profile",
+    "menu.fastflags.content.configure": "Configure",
+    "menu.fastflags.content.status.dropdown.player": "{roblox.player_alt} only",
+    "menu.fastflags.content.status.dropdown.studio": "{roblox.studio_alt} only",
+    "menu.fastflags.content.status.dropdown.both": "Enabled",
+    "menu.fastflags.content.status.dropdown.none": "Disabled",
+
+    "menu.fastflags.fastflag_editor.window_title": "{app.name} | FastFlag Editor",
+    "menu.fastflags.fastflag_editor.button.import": "Import profile",
+    "menu.fastflags.fastflag_editor.button.export": "Export profile",
+    "menu.fastflags.fastflag_editor.button.copy_to_clipboard": "Copy to clipboard",
+    "menu.fastflags.fastflag_editor.exception.message.save": "Failed to save data!\n{exception.type}: {exception.message}",
+    "menu.fastflags.fastflag_editor.exception.message.import": "Failed to import data!\n{exception.type}: {exception.message}",
+    "menu.fastflags.fastflag_editor.exception.message.export": "Failed to export data!\n{exception.type}: {exception.message}",
+    "menu.fastflags.fastflag_editor.popup.import.title": "{app.name} | Import FastFlags",
+    "menu.fastflags.fastflag_editor.popup.import.filetype.supported": "Supported Files",
+    "menu.fastflags.fastflag_editor.popup.export.title": "{app.name} | Export FastFlags",
+    "menu.fastflags.fastflag_editor.popup.export.filetype.supported": "Supported Files",
+    
+    "menu.fastflags.input.new_profile.message": "Choose a name for your FastFlag profile",
+
+    "menu.fastflags.popup.delete.message": "Are you sure you want to remove this profile: \"{profile.name}\"\nThis action cannot be undone!",
+
+    "menu.fastflags.exception.title.rename": "Unable to rename profile: \"{profile.name}\"",
+    "menu.fastflags.exception.title.create": "Unable to create profile: \"{profile.name}\"",
+    "menu.fastflags.exception.title.remove": "Unable to remove profile: \"{profile.name}\"",
+    "menu.fastflags.exception.title.change_status": "Unable to update status of \"{profile.name}\"",
+
+    "menu.fastflags.exception.message.profile_exists": "Another profile with the same name already exists!",
+    "menu.fastflags.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
+
+
+
+
+    "menu.global_basic_settings.header.title": "Global Basic Settings",
+    "menu.global_basic_settings.header.description": "Configure global {roblox.common} settings",
+
+    "menu.global_basic_settings.content.file_not_found": "File not found: {file.name}",
+    "menu.global_basic_settings.content.value": "Value:",
+    "menu.global_basic_settings.content.x_value": "X:",
+    "menu.global_basic_settings.content.y_value": "Y:",
+
+
+
+
+
+
+    "menu.integrations.header.title": "Integrations",
+    "menu.integrations.header.description": "Configure extended functionality",
+    "menu.integrations.content.mod_updates.title": "Automatic Mod Updates",
+    "menu.integrations.content.mod_updates.description": "Automatically update compatible mods",
+    "menu.integrations.content.multi_instance_launching.title": "Multi-Instance Launching",
+    "menu.integrations.content.multi_instance_launching.description": "Run multiple {roblox.common} instances at once",
+    "menu.integrations.content.discord_rpc.title": "Discord RPC",
+    "menu.integrations.content.discord_rpc.description": "Replace the default RPC to show more details",
+    "menu.integrations.content.activity_joining.title": "Activity Joining",
+    "menu.integrations.content.activity_joining.description": "Allow others to join your game through Discord",
+    "menu.integrations.content.show_user_in_rpc.title": "User Profile in RPC",
+    "menu.integrations.content.show_user_in_rpc.description": "Show your {roblox.common} profile in your Discord RPC",
+    "menu.integrations.content.bloxstrap_rpc_sdk.title": "BloxstrapRPC SDK",
+    "menu.integrations.content.bloxstrap_rpc_sdk.description": "Allow games to customize your RPC status",
+
+
+
+
+
+
+    "menu.custom_integrations.header.title": "Custom Integrations",
+    "menu.custom_integrations.header.description": "Add your own integrations",
+    "menu.custom_integrations.header.button.add_new": "New",
+    "menu.custom_integrations.content.launch_args.placeholder": "Launch arguments",
+    "menu.custom_integrations.content.status.dropdown.player": "{roblox.player_alt} only",
+    "menu.custom_integrations.content.status.dropdown.studio": "{roblox.studio_alt} only",
+    "menu.custom_integrations.content.status.dropdown.both": "Enabled",
+    "menu.custom_integrations.content.status.dropdown.none": "Disabled",
+
+    "menu.custom_integrations.popup.add.title": "{app.name} | Custom Integrations",
+    "menu.custom_integrations.popup.delete.message": "Are you sure you want to remove this integration: \"{integration.name}\"\nThis action cannot be undone!",
+
+    "menu.custom_integrations.exception.title.add": "Unable to add integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.update": "Unable to update integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.create": "Unable to create integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.remove": "Unable to remove integration: \"{integration.name}\"",
+    "menu.custom_integrations.exception.title.change_status": "Unable to update status of \"{integration.name}\"",
+
+    "menu.custom_integrations.exception.message.already_exists": "Another integration for the same file already exists!",
+    "menu.custom_integrations.exception.message.file_not_found": "File not found: \"{path}\"",
+    "menu.custom_integrations.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
+
+
+
+
+    "menu.settings.header.title": "Settings",
+    "menu.settings.header.description": "Configure your settings",
+    "menu.settings.content.appearance.title": "Appearance Mode",
+    "menu.settings.content.appearance.light": "{appearance.light}",
+    "menu.settings.content.appearance.dark": "{appearance.dark}",
+    "menu.settings.content.appearance.system": "{appearance.system}",
+    "menu.settings.content.language.title": "Language",
+    "menu.settings.content.custom_launcher.title": "Custom Launcher",
+    "menu.settings.content.custom_launcher.description": "Use a custom launcher when launching {roblox.common}",
+    "menu.settings.content.custom_launcher.preview_button": "Preview",
+    "menu.settings.content.check_for_updates.title": "Check for Updates",
+    "menu.settings.content.check_for_updates.description": "Check for updates when launching {app.name}",
+    "menu.settings.content.confirm_launch.title": "Launch Confirmation",
+    "menu.settings.content.confirm_launch.description": "Ask for confirmation to end existing instances when launching {roblox.common}",
+    "menu.settings.content.deployment_info.title": "Show Deployment Info",
+    "menu.settings.content.deployment_info.description": "Show deployment information when launching {roblox.common}",
+    "menu.settings.content.force_reinstall.title": "Force {roblox.common} Reinstallation",
+    "menu.settings.content.force_reinstall.description": "Reinstall {roblox.common} next time you run the launcher",
+    "menu.settings.content.disable_mods.title": "Disable all mods",
+    "menu.settings.content.disable_mods.description": "Prevents any mods from being applied",
+    "menu.settings.content.disable_fastflags.title": "Disable all FastFlags",
+    "menu.settings.content.disable_fastflags.description": "Prevents any FastFlags from being applied",
+    "menu.settings.content.static_version_folder.title": "Static Version Folder",
+    "menu.settings.content.static_version_folder.description": "Use static names for the {roblox.common} version folder",
+    "menu.settings.content.registry_keys.title": "Registry Keys",
+    "menu.settings.content.registry_keys.description": "Set registry keys when launching {app.name}. Enabling this settings allows you to launch {roblox.common} from the website",
+    "menu.settings.content.use_roblox_version_folder.title": "Use {roblox.common} Directory",
+    "menu.settings.content.use_roblox_version_folder.description": "Install {roblox.common} updates to Roblox's default directroy",
+
+    "menu.settings.exception.title.failed_to_update": "Failed to update setting: \"{setting.name}\"",
+    "menu.settings.exception.title.launcher_preview_failed": "Failed to load launcher preview!",
+    "menu.settings.exception.message.unknown": "{exception.type}: {exception.message}",
+
+
+
+
+
+
+    "menu.about.header.title": "About",
+    "menu.about.header.description": "{app.name} is an open-source modloader for Roblox, allowing users to manage multiple mods with ease.",
+    "menu.about.header.button.discord": "Join our Discord",
+    "menu.about.header.button.github": "Source Code",
+    "menu.about.header.button.releases": "Changelog",
+    "menu.about.content.licenses": "Licenses",
+    "menu.about.content.credits": "Credits",
+    "menu.about.content.credits.contributors": "Contributors",
+    "menu.about.content.credits.feature_suggestions": "Feature Suggestions",
+    "menu.about.content.credits.special_thanks": "Special Thanks"
+}

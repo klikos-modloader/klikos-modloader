@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="GitHub Files/Images/banner.png" alt="banner"/>
+<img src="images/banner.png" alt="banner"/>
 
 [<img alt="GitHub License" src="https://img.shields.io/github/license/thekliko/klikos-modloader?style=for-the-badge&labelColor=cc0037&color=353639">](https://github.com/TheKliko/klikos-modloader/blob/main/LICENSE)
 [<img alt="GitHub Release" src="https://img.shields.io/github/v/release/thekliko/klikos-modloader?filter=!v*.*.*-beta&style=for-the-badge&labelColor=cc0037&color=353639">](https://github.com/thekliko/klikos-modloader/releases/latest)
@@ -14,9 +14,9 @@
 <h3>Roblox mods made easy</h3>
 
 
-Kliko's Modloader is an open-source modloader for <a href="https://www.roblox.com">Roblox</a>, allowing users to manage multiple mods with ease.
+Kliko's modloader is an open-source modloader for <a href="https://www.roblox.com">Roblox</a>, it serves as a wrapper around Roblox's default launcher. If you have any questions, please read the FAQ, [check the wiki](https://github.com/klikos-modloader/klikos-modloader/wiki) or join our official [support server](https://discord.gg/nEjUwdSP9P).
 
-<img src="GitHub Files/Images/preview-marketplace.png" alt="preview"/>
+<img src="images/preview.png" alt="preview"/>
 
 
 
@@ -32,7 +32,7 @@ Kliko's Modloader is an open-source modloader for <a href="https://www.roblox.co
         <a href="#support-server">Support Server</a>
     </li>
     <li>
-        <a href="#goals-inspiration">Goals & Inspiration</a>
+        <a href="#inspiration">Inspiration</a>
     </li>
 </ul>
 
@@ -40,46 +40,20 @@ Kliko's Modloader is an open-source modloader for <a href="https://www.roblox.co
 
 <h2 id="features">Features</h2>
 
-<h3>Advanced Mod Mangaer</h3>
+<h3>Advanced modloader</h3>
+Each mod can be toggled on or off, change the load order to make sure your mods are applied in the right order.
 
-- Manage multiple mods at once
-- Enable/disable mods
-- Change load order
-- Import from .zip files
+<h3>Mod generator</h3>
+Don't know how to make mods yourself? Try out our mod generator, creating mods has never been easier!
 
+<h3>Automatic mod updates</h3>
+I have integrated my <a href="https://github.com/TheKliko/klikos-modding-tool">modding tool</a> to automatically update compatible mods.
 
-<h3>Mod Generator</h3>
+<h3>Community mods</h3>
+Browse community-made mods within the modloader menu.
 
-- Creating mods has never been easier!
-- Generate mods with a single color or a two-color gradient
-
-
-<h3>Automatic Mod Updates</h3>
-
-- Keep you mods compatible with the latest version of Roblox
-
-
-<h3>Discord RPC</h3>
-
-- Shows your current game on Discord
-- Allow friends to join your server
-- Custom RPC using <a href="https://github.com/pizzaboxer/bloxstrap/wiki/Integrating-Bloxstrap-functionality-into-your-game">BloxstrapRPC SDK</a>
-
-
-<h3>Multi-Instance Support</h3>
-
-- Ability to launch multiple Roblox instances at once
-
-
-<h3>FastFlags Editor</h3>
-
-- Modify Roblox's client settings
-
-
-<h3>Free & Open Source</h3>
-
-- 100% free, forever
-- No paywalls, no hidden secrets
+<h3>Discord RPC and BloxstrapRPC SDK</h3>
+Shows your current game on Discord. The <a href="https://github.com/pizzaboxer/bloxstrap/wiki/Integrating-Bloxstrap-functionality-into-your-game">BloxstrapRPC</a> SDK allows games to set custom RPC data.
 
 
 
@@ -121,22 +95,13 @@ Find more mods — or share your own — in our #mod-sharing channel.
 
 
 
-<h2 id="goals-inspiration">Goals & Inspiration</h2>
+<h2 id="inspiration">Inspiration</h2>
 
-<h3>Goals</h3>
-My goals for this project are:
-<ul>
-    <li>
-        Getting more experience in Python
-    </li>
-    <li>
-        Making Roblox mods accessible to everyone
-    </li>
-    <li>
-        Making a website 😎
-    </li>
+This project is inspired by <a href='https://github.com/pizzaboxer/bloxstrap'>Bloxstrap</a>, an alternative bootstrapper for Roblox with a bunch of
+extra features. Bloxstrap is what introduced me to the world of Roblox modding and what led to me creating my own mods. However, at the time of writing this, Bloxstrap’s mod support is very limited, even more so when you are managing and developing many different mods at the same time. Because of this, I’ve decided to build my own software dedicated to Roblox modding.
 
-</ul>
 
-<h3>Inspiration</h3>
-This project was inspired by <a href='https://github.com/pizzaboxer/bloxstrap'>Bloxstrap</a>, an open-source, alternative bootstrapper for Roblox. Bloxstrap is what introduced me to the Roblox modding community. This project, my Roblox mods and my modding tool would not have existed without it.
+
+<h2 id="disclaimer">Disclaimer</h2>
+
+Kliko’s Modloader is an independently developed project by TheKliko. It is not affiliated with, endorsed by, or associated with Kliko Groep B.V. in any way.

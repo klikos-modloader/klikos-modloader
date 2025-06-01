@@ -1,0 +1,143 @@
+{
+    "version": "1.0.0",
+
+    "window": {
+        "resizable": false,
+        "grid_columnconfigure": {
+            "0": {"weight": 1}
+        },
+        "grid_rowconfigure": {
+            "1": {"weight": 1}
+        },
+        "theme": "{RESOURCES}/theme.json"
+    },
+
+    "widgets": [
+        {
+            "type": "frame",
+            "kwargs": {
+                "height": 32
+            },
+            "placement_mode": "grid",
+            "placement_kwargs": {
+                "column": 0,
+                "row": 0,
+                "sticky": "nsew",
+                "padx": 8,
+                "pady": 4
+            },
+            "grid_columnconfigure": {
+                "1": {"weight": 1}
+            },
+            "widgets": [
+                {
+                    "type": "file_version_label",
+                    "kwargs": {
+                        "text_color": ["#5C5C5C", "#CCCCCC"],
+                        "font": {"size": 12}
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 0,
+                        "sticky": "w"
+                    }
+                },
+                {
+                    "type": "version_label",
+                    "kwargs": {
+                        "text_color": ["#5C5C5C", "#CCCCCC"],
+                        "font": {"size": 12}
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 1,
+                        "row": 0
+                    }
+                },
+                {
+                    "type": "channel_label",
+                    "kwargs": {
+                        "text_color": ["#5C5C5C", "#CCCCCC"],
+                        "font": {"size": 12}
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 2,
+                        "row": 0,
+                        "sticky": "e"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "frame",
+            "placement_mode": "grid",
+            "placement_kwargs": {
+                "column": 0,
+                "row": 1,
+                "sticky": "nsew",
+                "padx": 32,
+                "pady": 16
+            },
+            "grid_columnconfigure": {
+                "0": {"weight": 1}
+            },
+            "widgets": [
+                {
+                    "type": "label",
+                    "kwargs": {
+                        "image": {
+                            "light": "{RESOURCES}/logo.png",
+                            "size": 128
+                        }
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 0
+                    }
+                },
+                {
+                    "type": "status_label",
+                    "kwargs": {
+                        "font": {"size": 16}
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 1,
+                        "pady": [12, 0],
+                        "sticky": "ew"
+                    }
+                },
+                {
+                    "type": "progress_bar",
+                    "kwargs": {
+                        "width": 456,
+                        "height": 8,
+                        "mode": "indeterminate"
+                    },
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 2,
+                        "pady": [12, 0],
+                        "sticky": "ew"
+                    }
+                },
+                {
+                    "type": "button",
+                    "localized_string": "launcher.button.cancel",
+                    "placement_mode": "grid",
+                    "placement_kwargs": {
+                        "column": 0,
+                        "row": 3,
+                        "pady": [12, 0]
+                    },
+                    "action": "cancel"
+                }
+            ]
+        }
+    ]
+}

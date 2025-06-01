@@ -1,0 +1,2 @@
+class BloxstrapRPC:
+    pass

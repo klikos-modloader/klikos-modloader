@@ -1,0 +1,43 @@
+[
+    "like_off 0x0 72x72",
+    "rocket_off 74x0 72x72",
+    "heart_on 148x0 72x72",
+    "trophy_off 222x0 72x72",
+    "heart_off 296x0 72x72",
+    "report_off 370x0 72x72",
+
+    "dislike_off 0x74 72x72",
+    "music 74x74 72x72",
+    "player_count 148x74 72x72",
+    "selfview_on 222x74 72x72",
+    "notification_off 296x74 72x72",
+    "send 370x74 72x72",
+
+    "like_on 0x148 72x72",
+    "robux 74x148 72x72",
+    "backpack_on 148x148 72x72",
+    "report_on 222x148 72x72",
+    "search 296x148 72x72",
+    "notification_on 370x148 72x72",
+
+    "dislike_on 0x222 72x72",
+    "chat_on 74x222 72x72",
+    "backpack_off 148x222 72x72",
+    "fingerprint 222x222 72x72",
+    "roblox 296x222 72x72",
+    "roblox_studio 370x222 72x72",
+
+    "notepad 0x296 72x72",
+    "chat_off 74x296 72x72",
+    "close 148x296 72x72",
+    "add 222x296 72x72",
+    "sync 296x296 72x72",
+    "pin 370x296 72x72",
+
+    "picture 0x370 72x72",
+    "enlarge 74x370 72x72",
+    "headset_locked 148x370 72x72",
+    "friends_off 222x370 72x72",
+    "friends_on 296x370 72x72",
+    "person_camera 370x370 72x72"
+]

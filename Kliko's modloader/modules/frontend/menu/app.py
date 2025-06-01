@@ -138,13 +138,13 @@ class App(Root):
         navigation: Frame = Frame(self.sidebar, transparent=True)
         navigation.grid_columnconfigure(0, weight=1)
         navigation.grid(column=0, row=1, sticky="nsew", padx=4, pady=4)
-        for i, key in enumerate(["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations"]): Button(navigation, key=f"menu.sidebar.navigation.{key}", transparent=True, anchor="w", image=self._get_nav_icon(key), command=lambda key=key: self._set_active_section(key)).grid(column=0, row=i, sticky="ew", pady=0 if i == 0 else (4, 0))  # type: ignore
+        for i, key in enumerate(["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations"]): Button(navigation, key=f"menu.sidebar.navigation.{key}", modification=lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME, "{roblox.common}": Localizer.Key("roblox.common"), "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"), "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), transparent=True, anchor="w", image=self._get_nav_icon(key), command=lambda key=key: self._set_active_section(key)).grid(column=0, row=i, sticky="ew", pady=0 if i == 0 else (4, 0))  # type: ignore
 
         # Footer navigation
         footer: Frame = Frame(self.sidebar, transparent=True)
         footer.grid_columnconfigure(0, weight=1)
         footer.grid(column=0, row=2, sticky="nsew", padx=4, pady=(4, 8))
-        for i, key in enumerate(["settings", "about"]): Button(footer, key=f"menu.sidebar.navigation.{key}", transparent=True, anchor="w", image=self._get_nav_icon(key), command=lambda key=key: self._set_active_section(key)).grid(column=0, row=i, sticky="ew", pady=0 if i == 0 else (4, 0))  # type: ignore
+        for i, key in enumerate(["settings", "about"]): Button(footer, key=f"menu.sidebar.navigation.{key}", modification=lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME, "{roblox.common}": Localizer.Key("roblox.common"), "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"), "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), transparent=True, anchor="w", image=self._get_nav_icon(key), command=lambda key=key: self._set_active_section(key)).grid(column=0, row=i, sticky="ew", pady=0 if i == 0 else (4, 0))  # type: ignore
 
 
     def _get_nav_icon(self, key: Literal["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations", "settings", "about"]) -> CTkImage | None:

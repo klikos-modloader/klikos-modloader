@@ -15,7 +15,8 @@ FEATURE_SUGGESTIONS: list[Contributor] = [
     Contributor("return_request", r"https://github.com/returnrqt"),
     Contributor("kw_roblox"),
     Contributor("NetSoftworks", r"https://github.com/netsoftwork"),
-    Contributor("dooM", r"https://github.com/MistressDoom")
+    Contributor("dooM", r"https://github.com/MistressDoom"),
+    Contributor("toast")
 ]
 
 SPECIAL_THANKS: list[Contributor] = []

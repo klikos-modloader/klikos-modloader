@@ -22,7 +22,7 @@ REGISTRY_KEYS: dict[str, list[dict[str, str]]] = {
         },
         {
             "path": r"Software\Classes\roblox\shell\open\command",
-            "value": rf'"{sys.executable}" -l %1'
+            "value": rf'"{sys.executable}" -l --deeplink %1'
         },
     ],
     "roblox-player": [
@@ -41,7 +41,7 @@ REGISTRY_KEYS: dict[str, list[dict[str, str]]] = {
         },
         {
             "path": r"Software\Classes\roblox-player\shell\open\command",
-            "value": rf'"{sys.executable}" -l %1'
+            "value": rf'"{sys.executable}" -l --deeplink %1'
         },
     ],
     "roblox-studio": [
@@ -60,7 +60,7 @@ REGISTRY_KEYS: dict[str, list[dict[str, str]]] = {
         },
         {
             "path": r"Software\Classes\roblox-studio\shell\open\command",
-            "value": rf'"{sys.executable}" -s %1'
+            "value": rf'"{sys.executable}" -s --deeplink %1'
         },
     ],
     "Roblox.Place": [
@@ -78,7 +78,7 @@ REGISTRY_KEYS: dict[str, list[dict[str, str]]] = {
         },
         {
             "path": r"Software\Classes\Roblox.Place\shell\Open\command",
-            "value": rf'"{sys.executable}" -s %1'
+            "value": rf'"{sys.executable}" -s --deeplink %1'
         }
     ],
     "roblox-studio-auth": [
@@ -97,7 +97,7 @@ REGISTRY_KEYS: dict[str, list[dict[str, str]]] = {
         },
         {
             "path": r"Software\Classes\roblox-studio-auth\shell\open\command",
-            "value": rf'"{sys.executable}" -s %1'
+            "value": rf'"{sys.executable}" -s --deeplink %1'
         },
     ]
 }
@@ -107,7 +107,7 @@ def set_registry_keys() -> None:
     if platform.system() != "Windows":
         Logger.warning("Cannot set registry keys! User is not on Windows.")
         return
-    
+
     if not IS_FROZEN:
         Logger.warning("Cannot set registry keys! Environment not frozen.")
         return

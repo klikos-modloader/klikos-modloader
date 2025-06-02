@@ -178,7 +178,7 @@ class ModGenerator:
 
         Logger.info("Creating temporary directory...", prefix=cls._LOG_PREFIX)
         with TemporaryDirectory() as tmp:
-            temporary_directory: Path = Path(tmp)
+            temporary_directory: Path = Path(tmp).resolve()
             temp_target: Path = temporary_directory / "mod"
             temp_target.mkdir(parents=True, exist_ok=True)
             luapackages_target: Path = temporary_directory / "luapackages"

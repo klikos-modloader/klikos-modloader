@@ -7,6 +7,7 @@ import json
 import re
 from random import randint
 
+from modules.logger import Logger
 from modules.project_data import ProjectData
 from ..windows import ModGeneratorPreviewWindow
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button, DropDownMenu, Entry, CheckBox, ColorPicker, ask_color
@@ -22,6 +23,7 @@ from PIL import Image  # type: ignore
 
 
 class ModGeneratorSection(ScrollableFrame):
+    _LOG_PREFIX: str = "ModGeneratorSection"
     loaded: bool = False
     root: "Root"
     mode_variable: StringVar
@@ -852,6 +854,7 @@ class ModGeneratorSection(ScrollableFrame):
             result: bool = ModGenerator.generate_mod(mode, data, Directories.MODS / mod_name, angle=angle, file_version=file_version, use_remote_config=use_remote_config, icon_sizes=icon_sizes, custom_roblox_icon=custom_roblox_icon, additional_files=additional_files, stop_event=self._stop_event)
 
         except Exception as e:
+            Logger.error(f"Failed to generate mod! {type(e).__name__}: {e}", prefix=self._LOG_PREFIX)
             self.root.send_banner(
                 title_key="menu.mod_generator.exception.title.generate",
                 message_key="menu.mod_generator.exception.message.unknown",

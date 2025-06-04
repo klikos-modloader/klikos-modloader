@@ -194,7 +194,7 @@ class FastFlagsSection(ScrollableFrame):
 
 
     def create_profile(self) -> None:
-        response: str | None = InputDialog(ProjectData.NAME, Resources.FAVICON, "Choose a name for your FastFlag profile", master=self.root).get_input()
+        response: str | None = InputDialog(ProjectData.NAME, Resources.FAVICON, "menu.fastflags.input.new_profile.message", master=self.root).get_input()
         if not response: return
 
         response = response.strip()

@@ -70,7 +70,7 @@ class CommunityMod:
             or not timestamp
             or url != self.thumbnail_url
             or md5 != self._get_md5(target)
-            or (time.time() - timestamp) < self._THUMBNAIL_CACHE_DURATION
+            or (time.time() - timestamp) > self._THUMBNAIL_CACHE_DURATION
         ): return self._attempt_thumbnail_download()
 
         try: return Image.open(target)

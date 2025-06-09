@@ -12,7 +12,6 @@ DEPENDENCIES: list[str] = [
     "pyperclip~=1.9.0",
     "pillow~=11.1.0",
     "natsort==8.4.0",
-    "packaging==25.0",
     "requests~=2.32.3",
     "py7zr==0.22.0",
     "numpy==2.2.6",

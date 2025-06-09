@@ -65,6 +65,7 @@ class Directories:
     CACHE: Path = ROOT / "cache"
     VERSIONS_CACHE: Path = CACHE / "downloads"
     MARKETPLACE_CACHE: Path = CACHE / "marketplace"
+    SHORTCUTS_CACHE: Path = CACHE / "shortcuts"
     MEIPASS: Optional[Path] = Path(sys._MEIPASS) if FROZEN else None  # type: ignore
     RESOURCES: Path = (MEIPASS if FROZEN else ROOT) / "resources"  # type: ignore
     MOD_GENERATOR_FILES: Path = RESOURCES / "mod_generator_files"
@@ -83,6 +84,7 @@ class Files:
     FASTFLAG_CONFIG: Path = Directories.CONFIG / "fastflags.json"
     CUSTOM_INTEGRATIONS_CONFIG: Path = Directories.CONFIG / "launch_integrations.json"
     MARKETPLACE_CACHE_INDEX: Path = Directories.MARKETPLACE_CACHE / "index.json"
+    SHORTCUTS_CACHE_INDEX: Path = Directories.SHORTCUTS_CACHE / "index.json"
     GLOBAL_BASIC_SETTINGS: Path = Directories.ROBLOX / "GlobalBasicSettings_13.xml"
 
 
@@ -148,6 +150,7 @@ class Resources:
             GLOBAL_BASIC_SETTINGS: Path = Directories.RESOURCES / "nav" / "light" / "global_basic_settings.png"
             INTEGRATIONS: Path = Directories.RESOURCES / "nav" / "light" / "integrations.png"
             CUSTOM_INTEGRATIONS: Path = Directories.RESOURCES / "nav" / "light" / "custom_integrations.png"
+            SHORTCUTS: Path = Directories.RESOURCES / "nav" / "light" / "shortcuts.png"
             SETTINGS: Path = Directories.RESOURCES / "nav" / "light" / "settings.png"
             ABOUT: Path = Directories.RESOURCES / "nav" / "light" / "about.png"
         class Dark:
@@ -158,6 +161,7 @@ class Resources:
             GLOBAL_BASIC_SETTINGS: Path = Directories.RESOURCES / "nav" / "dark" / "global_basic_settings.png"
             INTEGRATIONS: Path = Directories.RESOURCES / "nav" / "dark" / "integrations.png"
             CUSTOM_INTEGRATIONS: Path = Directories.RESOURCES / "nav" / "dark" / "custom_integrations.png"
+            SHORTCUTS: Path = Directories.RESOURCES / "nav" / "dark" / "shortcuts.png"
             SETTINGS: Path = Directories.RESOURCES / "nav" / "dark" / "settings.png"
             ABOUT: Path = Directories.RESOURCES / "nav" / "dark" / "about.png"
 
@@ -175,6 +179,12 @@ class Resources:
             PLACEHOLDER: Path = Directories.RESOURCES / "marketplace" / "light" / "placeholder.png"
         class Dark:
             PLACEHOLDER: Path = Directories.RESOURCES / "marketplace" / "dark" / "placeholder.png"
+
+    class Shortcuts:
+        class Light:
+            PLACEHOLDER: Path = Directories.RESOURCES / "shortcuts" / "light" / "placeholder.png"
+        class Dark:
+            PLACEHOLDER: Path = Directories.RESOURCES / "shortcuts" / "dark" / "placeholder.png"
 
     class Brands:
         class Light:

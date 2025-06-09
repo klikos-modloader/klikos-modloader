@@ -59,6 +59,7 @@
     "menu.sidebar.navigation.global_basic_settings": "Global Basic Settings",
     "menu.sidebar.navigation.integrations": "Integrations",
     "menu.sidebar.navigation.custom_integrations": "Custom Integrations",
+    "menu.sidebar.navigation.shortcuts": "Shortcuts",
     "menu.sidebar.navigation.settings": "Settings",
     "menu.sidebar.navigation.about": "About",
 
@@ -279,6 +280,17 @@
     "menu.custom_integrations.exception.message.file_not_found": "File not found: \"{path}\"",
     "menu.custom_integrations.exception.message.unknown": "{exception.type}: {exception.message}",
 
+
+
+
+
+    "menu.shortcuts.header.title": "Shortcuts",
+    "menu.shortcuts.header.description": "Quick access to your favorite games",
+    "menu.shortcuts.header.button.add_new": "New",
+    "menu.shortcuts.content.creator": "By {creator}",
+
+    "menu.shortcuts.exception.title.failed_to_launch": "Failed to launch shortcut",
+    "menu.shortcuts.exception.message.unknown": "{exception.type}: {exception.message}",
 
 
 

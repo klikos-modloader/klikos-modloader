@@ -5,5 +5,6 @@ from .fastflags import FastFlagsSection
 from .global_basic_settings import GlobalBasicSettingsSection
 from .integrations import IntegrationsSection
 from .custom_integrations import CustomIntegrationsSection
+from .shortcuts import ShortcutsSection
 from .settings import SettingsSection
 from .about import AboutSection

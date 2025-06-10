@@ -73,7 +73,7 @@ class Localizer:
                         if name not in known_languages:
                             languages.append(name)
                             known_languages.add(name)
-        cls._available_languages = languages
+        cls._available_languages = sorted(languages)
 
 
     @classmethod

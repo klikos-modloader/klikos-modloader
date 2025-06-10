@@ -83,6 +83,7 @@ class Files:
     MOD_CONFIG: Path = Directories.CONFIG / "mods.json"
     FASTFLAG_CONFIG: Path = Directories.CONFIG / "fastflags.json"
     CUSTOM_INTEGRATIONS_CONFIG: Path = Directories.CONFIG / "launch_integrations.json"
+    SHORTCUTS_CONFIG: Path = Directories.CONFIG / "shortcuts.json"
     MARKETPLACE_CACHE_INDEX: Path = Directories.MARKETPLACE_CACHE / "index.json"
     SHORTCUTS_CACHE_INDEX: Path = Directories.SHORTCUTS_CACHE / "index.json"
     GLOBAL_BASIC_SETTINGS: Path = Directories.ROBLOX / "GlobalBasicSettings_13.xml"

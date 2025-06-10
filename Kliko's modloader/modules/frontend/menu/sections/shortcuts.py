@@ -1,35 +1,43 @@
-from tkinter import TclError
+from tkinter import TclError, messagebox
 from threading import Thread
 from typing import TYPE_CHECKING
 
 from modules.logger import Logger
 from modules.project_data import ProjectData
-from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button
+from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button, InputDialog
 from modules.frontend.functions import get_ctk_image
 from modules.frontend.menu.dataclasses import Shortcut
 from modules.localization import Localizer
 from modules.filesystem import Resources
+from modules.interfaces.shortcuts import ShortcutsInterface
+from modules.networking import requests, Response, Api, RequestException
 
 if TYPE_CHECKING: from modules.frontend.widgets import Root
 
 from PIL import Image  # type: ignore
-from customtkinter import CTkImage  # type: ignore
+from customtkinter import CTkImage, ScalingTracker  # type: ignore
 
 
 class ShortcutsSection(ScrollableFrame):
     loaded: bool = False
     root: "Root"
+    shortcuts_wrapper: Frame
+    _frames: dict[str, Frame]
+
+    _update_id: str | None = None
+    _debounce: int = 100
 
     placeholder_thumbnail: tuple[Image.Image, Image.Image]
     THUMBNAIL_SIZE: int = 144
 
     _SECTION_PADX: int | tuple[int, int] = (8, 4)
     _SECTION_PADY: int | tuple[int, int] = 8
-
     _SECTION_GAP: int = 16
     _ENTRY_GAP: int = 8
     _ENTRY_PADDING: tuple[int, int] = (12, 8)
     _ENTRY_INNER_GAP: int = 4
+
+    _FRAME_WIDTH: int = THUMBNAIL_SIZE + 2 * _ENTRY_PADDING[0]
 
 
     def __init__(self, master):
@@ -59,10 +67,12 @@ class ShortcutsSection(ScrollableFrame):
     def load(self) -> None:
         if self.loaded: return
 
+        self._frames = {}
         self.placeholder_thumbnail = (Image.open(Resources.Shortcuts.Light.PLACEHOLDER), Image.open(Resources.Shortcuts.Dark.PLACEHOLDER))
 
         content: Frame = Frame(self, transparent=True)
         content.grid_columnconfigure(0, weight=1)
+        content.grid_rowconfigure(1, weight=1)
         content.grid(column=0, row=0, sticky="nsew", padx=self._SECTION_PADX, pady=self._SECTION_PADY)
 
         self._load_header(content)
@@ -87,18 +97,64 @@ class ShortcutsSection(ScrollableFrame):
 
 
     def _load_content(self, master) -> None:
-        wrapper: Frame = Frame(master, transparent=True)
-        wrapper.grid_columnconfigure(0, weight=1)
-        wrapper.grid_rowconfigure(1, weight=1)
-        wrapper.grid(column=0, row=1, sticky="nsew")
+        self.shortcuts_wrapper: Frame = Frame(master, transparent=True)
+        self.shortcuts_wrapper.bind("<Configure>", self._on_configure)
 
-        frame = Frame(wrapper, layer=2)
-        frame.grid(column=0, row=0, sticky="nw")
-        Thread(target=self.load_shortcut_frame_async, args=(frame, Shortcut("740581508", self.placeholder_thumbnail)), daemon=True).start()
+        self._update_frames()
+
+
+    def _update_frames(self) -> None:
+        shortcut_ids: list[str] = ShortcutsInterface.get_all()
+        if not shortcut_ids:
+            for shortcut_id, frame in list(self._frames.items()):
+                self._frames.pop(shortcut_id)
+                frame.destroy()
+            if self.shortcuts_wrapper.winfo_ismapped():
+                self.shortcuts_wrapper.grid_forget()
+            return
+        elif not self.shortcuts_wrapper.winfo_ismapped():
+            self.shortcuts_wrapper.grid(column=0, row=1, sticky="nsew")
+
+
+        self.update_idletasks()
+        total_width: int = int(self.shortcuts_wrapper.winfo_width() / ScalingTracker.get_widget_scaling(self))
+        column_width: int = self._FRAME_WIDTH
+        gap: int = self._ENTRY_GAP
+
+        columns: int = max(1, (total_width + gap) // (column_width + gap))
+        self.shortcuts_wrapper.grid_columnconfigure(list(range(columns)), minsize=column_width+gap)
+        self.shortcuts_wrapper.grid_columnconfigure(0, minsize=column_width)
+
+        for shortcut_id, frame in list(self._frames.items()):
+            if shortcut_id not in shortcut_ids:
+                self._frames.pop(shortcut_id)
+                frame.destroy()
+
+        for i, shortcut_id in enumerate(shortcut_ids):
+            column: int = i % columns
+            row: int = i // columns
+
+            padx = 0 if column == 0 else (self._ENTRY_GAP, 0)
+            pady = 0 if row == 0 else (self._ENTRY_GAP, 0)
+
+            if shortcut_id in self._frames:
+                frame = self._frames[shortcut_id]
+                if getattr(frame, "column", None) != column or getattr(frame, "row", None) != row:
+                    frame.grid(column=column, row=row, sticky="nw", padx=padx, pady=pady)
+                    frame._column = column  # type: ignore
+                    frame._row = row  # type: ignore
+
+            else:
+                frame = Frame(self.shortcuts_wrapper, layer=2)
+                frame._column = column  # type: ignore
+                frame._row = row  # type: ignore
+                frame.grid(column=column, row=row, sticky="nw", padx=padx, pady=pady)
+                self._frames[shortcut_id] = frame
+                Thread(target=self.load_shortcut_frame_async, args=(frame, shortcut_id), daemon=True).start()
 
 
 # region frame
-    def load_shortcut_frame_async(self, frame: Frame, shortcut: Shortcut) -> None:
+    def load_shortcut_frame_async(self, frame: Frame, shortcut_id: str) -> None:
         def load_content_sync(frame: Frame, shortcut: Shortcut, thumbnail: CTkImage) -> None:
             wrapper: Frame = Frame(frame, transparent=True)
             wrapper.grid(column=0, row=0, sticky="nsew", padx=self._ENTRY_PADDING[0], pady=self._ENTRY_PADDING[1])
@@ -109,6 +165,10 @@ class ShortcutsSection(ScrollableFrame):
             play_image = get_ctk_image(Resources.Common.Light.START, Resources.Common.Dark.START, 24)
             Button(wrapper, image=play_image, width=self.THUMBNAIL_SIZE, command=lambda shortcut=shortcut: self.launch_game(shortcut.place_id)).grid(column=0, row=3, pady=(self._ENTRY_INNER_GAP, 0))
 
+            bin_image = get_ctk_image(Resources.Common.Light.BIN, Resources.Common.Dark.BIN, 24)
+            Button(wrapper, secondary=True, image=bin_image, width=32, command=lambda shortcut=shortcut: self.remove_shortcut(shortcut.universe_id), corner_radius=0).grid(column=0, row=0, sticky="ne")
+
+        shortcut: Shortcut = Shortcut(shortcut_id, self.placeholder_thumbnail)
         thumbnail: Image.Image | tuple[Image.Image, Image.Image] = shortcut.get_thumbnail()
         thumbnail_ctk = get_ctk_image(thumbnail[0], thumbnail[1], size=self.THUMBNAIL_SIZE) if isinstance(thumbnail, tuple) else get_ctk_image(thumbnail, size=self.THUMBNAIL_SIZE)
         self.after(10, load_content_sync, frame, shortcut, thumbnail_ctk)
@@ -117,18 +177,55 @@ class ShortcutsSection(ScrollableFrame):
 
 
 # region functions
-    def add_new_shortcut(self) -> None:
-        shortcut: Shortcut = Shortcut("740581508", self.placeholder_thumbnail)
-        print(shortcut.place_id, shortcut.name, shortcut.creator)
-        thumbnail: Image.Image | tuple[Image.Image, Image.Image] = shortcut.get_thumbnail()
-        if isinstance(thumbnail, tuple): thumbnail = thumbnail[1]
-        thumbnail.show()
+    def _on_configure(self, _) -> None:
+        if self._update_id is not None: self.after_cancel(self._update_id)
+        self._update_id = self.after(self._debounce, self._update_frames)
 
-        import os
-        import time
-        time.sleep(5)
-        os.system("TASKKILL /F /IM photos.exe")
-        # self.launch_game("740581508")
+
+    def add_new_shortcut(self) -> None:
+        dialog: InputDialog = InputDialog(ProjectData.NAME, Resources.FAVICON, "menu.shortcuts.input.new_shortcuts.message", master=self.root)
+        place_id: str = dialog.get_input()
+
+        if not place_id:
+            return
+        place_id = place_id.strip()
+
+        if not place_id.isdigit():
+            self.root.send_banner(
+                title_key="menu.shortcuts.exception.title.failed_to_add",
+                message_key="menu.shortcuts.exception.message.invalid_place_id",
+                message_modification=lambda string: Localizer.format(string, {"{place_id}": place_id}),
+                mode="warning", auto_close_after_ms=6000
+            )
+            return
+
+        try:
+            response: Response = requests.get(Api.Roblox.Activity.universe_id(place_id))
+            data: dict = response.json()
+            universe_id: int | None = data["universeId"]
+        except (RequestException, RuntimeError):
+            self.root.send_banner(
+                title_key="menu.shortcuts.exception.title.failed_to_add",
+                message_key="menu.shortcuts.exception.message.connection_error",
+                mode="error", auto_close_after_ms=6000
+            )
+            return
+        if universe_id is None:
+            self.root.send_banner(
+                title_key="menu.shortcuts.exception.title.failed_to_add",
+                message_key="menu.shortcuts.exception.message.universe_not_found",
+                message_modification=lambda string: Localizer.format(string, {"{place_id}": place_id}),
+                mode="warning", auto_close_after_ms=6000
+            )
+            return
+
+        ShortcutsInterface.add(str(universe_id))
+        self._update_frames()
+
+
+    def remove_shortcut(self, universe_id: str) -> None:
+        ShortcutsInterface.remove(universe_id)
+        self._update_frames()
 
 
     def launch_game(self, place_id: str) -> None:

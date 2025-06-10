@@ -16,6 +16,7 @@ from PIL import Image  # type: ignore
 class Shortcut:
     name: str
     creator: str
+    universe_id: str
     place_id: str
     thumbnail_url: str
 
@@ -26,26 +27,23 @@ class Shortcut:
     _LOG_PREFIX: str = "Shortcut"
 
 
-    def __init__(self, place_id: str, placeholder_thumbnail: tuple[Image.Image, Image.Image]):
-        if isinstance(place_id, int): place_id = str(place_id)
-        self.place_id = place_id
+    def __init__(self, universe_id: str | int, placeholder_thumbnail: tuple[Image.Image, Image.Image]):
+        if isinstance(universe_id, int): universe_id = str(universe_id)
+        self.universe_id = universe_id
         self._thumbnail_placeholder = placeholder_thumbnail
         self.set_game_info()
 
 
 # region game info
     def set_game_info(self) -> None:
-        response: Response = requests.get(Api.Roblox.Activity.universe_id(self.place_id))
-        data: dict = response.json()
-        universe_id = data["universeId"]
-
-        response = requests.get(Api.Roblox.Activity.game(universe_id))
+        response = requests.get(Api.Roblox.Activity.game(self.universe_id))
         data = response.json()
         actual_data = data["data"][0]
         self.name = actual_data["name"]
         self.creator = actual_data["creator"]["name"]
+        self.place_id = actual_data["rootPlaceId"]
 
-        response = requests.get(Api.Roblox.Activity.thumbnail(universe_id))
+        response = requests.get(Api.Roblox.Activity.thumbnail(self.universe_id))
         data = response.json()
         actual_data = data["data"][0]
         self.thumbnail_url = actual_data["imageUrl"]

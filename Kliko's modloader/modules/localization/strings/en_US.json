@@ -289,8 +289,15 @@
     "menu.shortcuts.header.button.add_new": "New",
     "menu.shortcuts.content.creator": "By {creator}",
 
+    "menu.shortcuts.input.new_shortcuts.message": "Enter a place ID",
+
     "menu.shortcuts.exception.title.failed_to_launch": "Failed to launch shortcut",
+    "menu.shortcuts.exception.title.failed_to_add": "Failed to create shortcut",
+
     "menu.shortcuts.exception.message.unknown": "{exception.type}: {exception.message}",
+    "menu.shortcuts.exception.message.invalid_place_id": "Invalid place ID: '{place_id}', value must be a number!",
+    "menu.shortcuts.exception.message.universe_not_found": "No game with the given place ID was found: '{place_id}'",
+    "menu.shortcuts.exception.message.connection_error": "Connection error, please try again later!",
 
 
 

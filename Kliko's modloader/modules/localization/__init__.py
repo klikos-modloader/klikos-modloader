@@ -10,6 +10,7 @@ class Localizer:
         DEFAULT_LANGUAGE: str = "en_US"
         LANGUAGES: dict[str, str] = {
             "en_US": "English (United States)",
+            "nl_NL": "Nederlands",
             "fr_FR": "Français",
             "tr_TR": "Türkçe"
         }

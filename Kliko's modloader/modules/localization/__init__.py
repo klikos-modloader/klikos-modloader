@@ -12,7 +12,8 @@ class Localizer:
             "en_US": "English (United States)",
             "nl_NL": "Nederlands",
             "fr_FR": "Français",
-            "tr_TR": "Türkçe"
+            "tr_TR": "Türkçe",
+            "ru_RU": "Русский"
         }
         LANGUAGES_REVERSE_DICT: dict[str, str] = {value: key for key, value in LANGUAGES.items()}
     class Key:

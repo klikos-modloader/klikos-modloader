@@ -68,7 +68,7 @@ class AboutSection(ScrollableFrame):
         header.grid_columnconfigure(0, weight=1)
         header.grid(column=0, row=0, sticky="nsew", pady=(0,16))
 
-        Label(header, "menu.about.header.title", style="title", autowrap=True).grid(column=0, row=0, sticky="ew")
+        Label(header, "menu.about.header.title", lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME}), style="title", autowrap=True).grid(column=0, row=0, sticky="ew")
         Label(header, "menu.about.header.description", lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME}), style="caption", autowrap=True).grid(column=0, row=1, sticky="ew")
 
         button_wrapper: Frame = Frame(header, transparent=True)

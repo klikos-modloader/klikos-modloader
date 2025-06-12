@@ -42,6 +42,7 @@ class Shortcut:
         self.name = actual_data["name"]
         self.creator = actual_data["creator"]["name"]
         self.place_id = actual_data["rootPlaceId"]
+        if isinstance(self.place_id, int): self.place_id = str(self.place_id)
 
         response = requests.get(Api.Roblox.Activity.thumbnail(self.universe_id))
         data = response.json()

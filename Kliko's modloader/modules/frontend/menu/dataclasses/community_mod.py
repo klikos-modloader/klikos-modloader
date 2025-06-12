@@ -58,7 +58,8 @@ class CommunityMod:
         with open(Files.MARKETPLACE_CACHE_INDEX) as file:
             data: dict = json.load(file)
         item: dict | None = data.get(self.id)
-        if not item: return self._attempt_thumbnail_download()
+        if not item:
+            return self._attempt_thumbnail_download()
 
         url: str | None = item.get("url")
         md5: str | None = item.get("md5")
@@ -101,7 +102,7 @@ class CommunityMod:
                 data: dict = json.load(file)
         else: data = {}
 
-        md5: str = hashlib.md5(response.content).hexdigest().upper()
+        md5: str = self._get_md5(target)
         timestamp: int = int(time.time())
         data[self.id] = {"url": self.thumbnail_url, "md5": md5, "timestamp": timestamp}
 

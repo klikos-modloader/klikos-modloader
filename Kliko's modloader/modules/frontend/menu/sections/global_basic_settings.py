@@ -79,7 +79,7 @@ class GlobalBasicSettingsSection(ScrollableFrame):
         header.grid_columnconfigure(0, weight=1)
         header.grid(column=0, row=0, sticky="nsew", pady=(0,16))
 
-        Label(header, "menu.global_basic_settings.header.title", style="title", autowrap=True).grid(column=0, row=0, sticky="ew")
+        Label(header, "menu.global_basic_settings.header.title", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common"), "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"), "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), style="title", autowrap=True).grid(column=0, row=0, sticky="ew")
         Label(header, "menu.global_basic_settings.header.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="ew")
 
 

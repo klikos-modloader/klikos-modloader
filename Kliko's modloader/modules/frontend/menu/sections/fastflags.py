@@ -82,7 +82,7 @@ class FastFlagsSection(ScrollableFrame):
         header.grid_columnconfigure(0, weight=1)
         header.grid(column=0, row=0, sticky="nsew", pady=(0,16))
 
-        Label(header, "menu.fastflags.header.title", style="title", autowrap=True).grid(column=0, row=0, sticky="ew")
+        Label(header, "menu.fastflags.header.title", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common"), "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"), "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), style="title", autowrap=True).grid(column=0, row=0, sticky="ew")
         Label(header, "menu.fastflags.header.description", lambda string: Localizer.format(string, {"{roblox.common}": Localizer.Key("roblox.common")}), style="caption", autowrap=True).grid(column=0, row=1, sticky="ew")
 
         button_wrapper: Frame = Frame(header, transparent=True)
@@ -194,7 +194,7 @@ class FastFlagsSection(ScrollableFrame):
 
 
     def create_profile(self) -> None:
-        response: str | None = InputDialog(ProjectData.NAME, Resources.FAVICON, "Choose a name for your FastFlag profile", master=self.root).get_input()
+        response: str | None = InputDialog(ProjectData.NAME, Resources.FAVICON, "menu.fastflags.input.new_profile.message", master=self.root).get_input()
         if not response: return
 
         response = response.strip()

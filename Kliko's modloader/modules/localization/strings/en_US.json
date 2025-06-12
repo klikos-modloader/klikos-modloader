@@ -59,6 +59,7 @@
     "menu.sidebar.navigation.global_basic_settings": "Global Basic Settings",
     "menu.sidebar.navigation.integrations": "Integrations",
     "menu.sidebar.navigation.custom_integrations": "Custom Integrations",
+    "menu.sidebar.navigation.shortcuts": "Shortcuts",
     "menu.sidebar.navigation.settings": "Settings",
     "menu.sidebar.navigation.about": "About",
 
@@ -283,6 +284,24 @@
 
 
 
+    "menu.shortcuts.header.title": "Shortcuts",
+    "menu.shortcuts.header.description": "Quick access to your favorite games",
+    "menu.shortcuts.header.button.add_new": "New",
+    "menu.shortcuts.content.creator": "By {creator}",
+
+    "menu.shortcuts.input.new_shortcuts.message": "Enter a place ID",
+
+    "menu.shortcuts.exception.title.failed_to_launch": "Failed to launch shortcut",
+    "menu.shortcuts.exception.title.failed_to_add": "Failed to create shortcut",
+
+    "menu.shortcuts.exception.message.unknown": "{exception.type}: {exception.message}",
+    "menu.shortcuts.exception.message.invalid_place_id": "Invalid place ID: '{place_id}', value must be a number!",
+    "menu.shortcuts.exception.message.universe_not_found": "No game with the given place ID was found: '{place_id}'",
+    "menu.shortcuts.exception.message.connection_error": "Connection error, please try again later!",
+
+
+
+
 
     "menu.settings.header.title": "Settings",
     "menu.settings.header.description": "Configure your settings",
@@ -311,7 +330,7 @@
     "menu.settings.content.registry_keys.title": "Registry Keys",
     "menu.settings.content.registry_keys.description": "Set registry keys when launching {app.name}. Enabling this settings allows you to launch {roblox.common} from the website",
     "menu.settings.content.use_roblox_version_folder.title": "Use {roblox.common} Directory",
-    "menu.settings.content.use_roblox_version_folder.description": "Install {roblox.common} updates to Roblox's default directroy",
+    "menu.settings.content.use_roblox_version_folder.description": "Install {roblox.common} updates to Roblox's default directory",
 
     "menu.settings.exception.title.failed_to_update": "Failed to update setting: \"{setting.name}\"",
     "menu.settings.exception.title.launcher_preview_failed": "Failed to load launcher preview!",

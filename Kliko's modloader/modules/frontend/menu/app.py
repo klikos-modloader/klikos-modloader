@@ -14,7 +14,7 @@ from modules.interfaces.config import ConfigInterface
 from modules.networking import requests, Response, Api
 from modules.frontend.functions import get_ctk_image
 
-from .sections import ModsSection, MarketplaceSection, ModGeneratorSection, FastFlagsSection, GlobalBasicSettingsSection, IntegrationsSection, CustomIntegrationsSection, SettingsSection, AboutSection
+from .sections import ModsSection, MarketplaceSection, ModGeneratorSection, FastFlagsSection, GlobalBasicSettingsSection, IntegrationsSection, CustomIntegrationsSection, ShortcutsSection, SettingsSection, AboutSection
 
 from customtkinter import CTkImage  # type: ignore
 from packaging.version import Version  # type: ignore
@@ -32,6 +32,7 @@ class App(Root):
     global_basic_settings_section: GlobalBasicSettingsSection
     integrations_section: IntegrationsSection
     custom_integrations_section: CustomIntegrationsSection
+    shortcuts_section: ShortcutsSection
     settings_section: SettingsSection
     about_section: AboutSection
 
@@ -66,6 +67,7 @@ class App(Root):
         self.global_basic_settings_section = GlobalBasicSettingsSection(self)
         self.integrations_section = IntegrationsSection(self)
         self.custom_integrations_section = CustomIntegrationsSection(self)
+        self.shortcuts_section = ShortcutsSection(self)
         self.settings_section = SettingsSection(self)
         self.about_section = AboutSection(self)
 
@@ -74,7 +76,7 @@ class App(Root):
 
 
 
-    def _set_active_section(self, section: Literal["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations", "settings", "about"]) -> None:
+    def _set_active_section(self, section: Literal["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations", "shortcuts", "settings", "about"]) -> None:
         if self.active_section == section: return
 
         section_frame = getattr(self, f"{section}_section", None)
@@ -138,7 +140,7 @@ class App(Root):
         navigation: Frame = Frame(self.sidebar, transparent=True)
         navigation.grid_columnconfigure(0, weight=1)
         navigation.grid(column=0, row=1, sticky="nsew", padx=4, pady=4)
-        for i, key in enumerate(["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations"]): Button(navigation, key=f"menu.sidebar.navigation.{key}", modification=lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME, "{roblox.common}": Localizer.Key("roblox.common"), "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"), "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), transparent=True, anchor="w", image=self._get_nav_icon(key), command=lambda key=key: self._set_active_section(key)).grid(column=0, row=i, sticky="ew", pady=0 if i == 0 else (4, 0))  # type: ignore
+        for i, key in enumerate(["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations", "shortcuts"]): Button(navigation, key=f"menu.sidebar.navigation.{key}", modification=lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME, "{roblox.common}": Localizer.Key("roblox.common"), "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"), "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), transparent=True, anchor="w", image=self._get_nav_icon(key), command=lambda key=key: self._set_active_section(key)).grid(column=0, row=i, sticky="ew", pady=0 if i == 0 else (4, 0))  # type: ignore
 
         # Footer navigation
         footer: Frame = Frame(self.sidebar, transparent=True)
@@ -147,7 +149,7 @@ class App(Root):
         for i, key in enumerate(["settings", "about"]): Button(footer, key=f"menu.sidebar.navigation.{key}", modification=lambda string: Localizer.format(string, {"{app.name}": ProjectData.NAME, "{roblox.common}": Localizer.Key("roblox.common"), "{roblox.player}": Localizer.Key("roblox.player"), "{roblox.player_alt}": Localizer.Key("roblox.player_alt"), "{roblox.studio}": Localizer.Key("roblox.studio"), "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt")}), transparent=True, anchor="w", image=self._get_nav_icon(key), command=lambda key=key: self._set_active_section(key)).grid(column=0, row=i, sticky="ew", pady=0 if i == 0 else (4, 0))  # type: ignore
 
 
-    def _get_nav_icon(self, key: Literal["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations", "settings", "about"]) -> CTkImage | None:
+    def _get_nav_icon(self, key: Literal["mods", "mod_generator", "marketplace", "fastflags", "global_basic_settings", "integrations", "custom_integrations", "shortcuts", "settings", "about"]) -> CTkImage | None:
         try: return get_ctk_image(getattr(Resources.Navigation.Light, key.upper(), None), getattr(Resources.Navigation.Dark, key.upper(), None), self._NAV_ICON_SIZE)
         except ValueError: return None
         # match key:

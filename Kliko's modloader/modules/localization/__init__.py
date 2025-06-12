@@ -9,7 +9,11 @@ class Localizer:
         DEFAULT_DIRECTORY: Path = Path(__file__).parent.resolve() / "strings"
         DEFAULT_LANGUAGE: str = "en_US"
         LANGUAGES: dict[str, str] = {
-            "en_US": "English (United States)"
+            "en_US": "English (United States)",
+            "nl_NL": "Nederlands",
+            "fr_FR": "Français",
+            "tr_TR": "Türkçe",
+            "ru_RU": "Русский"
         }
         LANGUAGES_REVERSE_DICT: dict[str, str] = {value: key for key, value in LANGUAGES.items()}
     class Key:
@@ -71,7 +75,7 @@ class Localizer:
                         if name not in known_languages:
                             languages.append(name)
                             known_languages.add(name)
-        cls._available_languages = languages
+        cls._available_languages = sorted(languages)
 
 
     @classmethod

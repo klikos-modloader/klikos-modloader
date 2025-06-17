@@ -304,7 +304,6 @@
     "menu.shortcuts.infobar.message.no_shortcuts_found": "You need to create a new shortcut before you can add them to your desktop",
 
     "menu.shortcuts.shortcut_to_desktop_window.window_title": "{app.name} | Shortcuts",
-    "menu.shortcuts.shortcut_to_desktop_window.button.add_to_desktop": "Add to desktop",
     "menu.shortcuts.exception.message.desktop_not_found": "Failed to resolve path to Desktop environment",
 
 

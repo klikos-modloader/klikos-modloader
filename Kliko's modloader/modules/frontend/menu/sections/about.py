@@ -99,7 +99,7 @@ class AboutSection(ScrollableFrame):
         # Label(banner_frame, image=banner_image).grid(column=0, row=0)
 
 
-        # Licenses
+        # region Licenses
         if ProjectData.LICENSES:
             section_counter += 1
             licenses_frame: Frame = Frame(wrapper, transparent=True)
@@ -128,7 +128,7 @@ class AboutSection(ScrollableFrame):
                     box.grid(column=column, row=row, padx=0 if column == 0 else (self._ENTRY_GAP, 0), pady=0 if row == 0 else (self._ENTRY_GAP, 0), sticky="nsew")
 
 
-        # Contributors, Feature suggestions & Special thanks
+        # region Credits
         has_contributors: bool = bool(ProjectData.CONTRIBUTORS)
         has_feature_suggestions: bool = bool(ProjectData.FEATURE_SUGGESTIONS)
         has_special_thanks: bool = bool(ProjectData.SPECIAL_THANKS)
@@ -181,7 +181,7 @@ class AboutSection(ScrollableFrame):
 # endregion
 
 
-# functions
+# region functions
     def _create_license_box(self, master, license: License, arrow_image: CTkImage) -> Frame:
         frame: Frame = Frame(master, layer=2)
         frame.grid_columnconfigure(0, weight=1)

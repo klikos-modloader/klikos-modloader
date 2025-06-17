@@ -8,15 +8,15 @@ class Contributor:
     url: Optional[str] = None
 
 
-CONTRIBUTORS: list[Contributor] = []
+CONTRIBUTORS: list[Contributor] = sorted([], key=lambda item: item.name.casefold())
 
-FEATURE_SUGGESTIONS: list[Contributor] = [
+FEATURE_SUGGESTIONS: list[Contributor] = sorted([
     Contributor("Vortex", r"https://github.com/VolVortex"),
     Contributor("return_request", r"https://github.com/returnrqt"),
     Contributor("kw_roblox"),
     Contributor("NetSoftworks", r"https://github.com/netsoftwork"),
     Contributor("dooM", r"https://github.com/MistressDoom"),
     Contributor("toast")
-]
+], key=lambda item: item.name.casefold())
 
-SPECIAL_THANKS: list[Contributor] = []
+SPECIAL_THANKS: list[Contributor] = sorted([], key=lambda item: item.name.casefold())

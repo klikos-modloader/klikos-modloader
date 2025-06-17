@@ -1,14 +1,16 @@
-from tkinter import TclError, messagebox
+from tkinter import TclError
 from threading import Thread
 from typing import TYPE_CHECKING
+from pathlib import Path
 
 from modules.logger import Logger
 from modules.project_data import ProjectData
 from modules.frontend.widgets import ScrollableFrame, Frame, Label, Button, InputDialog
 from modules.frontend.functions import get_ctk_image
 from modules.frontend.menu.dataclasses import Shortcut
+from modules.frontend.menu.windows import ShortcutToDesktopWindow
 from modules.localization import Localizer
-from modules.filesystem import Resources
+from modules.filesystem import Resources, Directories
 from modules.interfaces.shortcuts import ShortcutsInterface
 from modules.networking import requests, Response, Api, RequestException
 
@@ -23,6 +25,7 @@ class ShortcutsSection(ScrollableFrame):
     root: "Root"
     shortcuts_wrapper: Frame
     _frames: dict[str, Frame]
+    _shortcuts: dict[str, Shortcut]
 
     _update_id: str | None = None
     _debounce: int = 100
@@ -68,6 +71,7 @@ class ShortcutsSection(ScrollableFrame):
         if self.loaded: return
 
         self._frames = {}
+        self._shortcuts = {}
         self.placeholder_thumbnail = (Image.open(Resources.Shortcuts.Light.PLACEHOLDER), Image.open(Resources.Shortcuts.Dark.PLACEHOLDER))
 
         content: Frame = Frame(self, transparent=True)
@@ -94,6 +98,7 @@ class ShortcutsSection(ScrollableFrame):
 
         add_image: CTkImage = get_ctk_image(Resources.Common.Light.ADD, Resources.Common.Dark.ADD, size=24)
         Button(button_wrapper, "menu.shortcuts.header.button.add_new", secondary=True, image=add_image, command=self.add_new_shortcut).grid(column=0, row=0)
+        Button(button_wrapper, "menu.shortcuts.header.button.add_to_desktop", secondary=True, image=add_image, command=self.add_to_desktop).grid(column=1, row=0, padx=(8, 0))
 
 
     def _load_content(self, master) -> None:
@@ -107,7 +112,8 @@ class ShortcutsSection(ScrollableFrame):
         shortcut_ids: list[str] = ShortcutsInterface.get_all()
         if not shortcut_ids:
             for shortcut_id, frame in list(self._frames.items()):
-                self._frames.pop(shortcut_id)
+                self._frames.pop(shortcut_id, None)
+                self._shortcuts.pop(shortcut_id, None)
                 frame.destroy()
             if self.shortcuts_wrapper.winfo_ismapped():
                 self.shortcuts_wrapper.grid_forget()
@@ -128,6 +134,7 @@ class ShortcutsSection(ScrollableFrame):
         for shortcut_id, frame in list(self._frames.items()):
             if shortcut_id not in shortcut_ids:
                 self._frames.pop(shortcut_id)
+                self._shortcuts.pop(shortcut_id, None)
                 frame.destroy()
 
         for i, shortcut_id in enumerate(shortcut_ids):
@@ -150,6 +157,7 @@ class ShortcutsSection(ScrollableFrame):
                 frame._row = row  # type: ignore
                 frame.grid(column=column, row=row, sticky="nw", padx=padx, pady=pady)
                 self._frames[shortcut_id] = frame
+                self._shortcuts.pop(shortcut_id, None)
                 Thread(target=self.load_shortcut_frame_async, args=(frame, shortcut_id), daemon=True).start()
 
 
@@ -169,6 +177,7 @@ class ShortcutsSection(ScrollableFrame):
             Button(wrapper, secondary=True, image=bin_image, width=32, command=lambda shortcut=shortcut: self.remove_shortcut(shortcut.universe_id), corner_radius=0).grid(column=0, row=0, sticky="ne")
 
         shortcut: Shortcut = Shortcut(shortcut_id, self.placeholder_thumbnail)
+        self._shortcuts[shortcut_id] = shortcut
         thumbnail: Image.Image | tuple[Image.Image, Image.Image] = shortcut.get_thumbnail()
         thumbnail_ctk = get_ctk_image(thumbnail[0], thumbnail[1], size=self.THUMBNAIL_SIZE) if isinstance(thumbnail, tuple) else get_ctk_image(thumbnail, size=self.THUMBNAIL_SIZE)
         self.after(10, load_content_sync, frame, shortcut, thumbnail_ctk)
@@ -180,6 +189,27 @@ class ShortcutsSection(ScrollableFrame):
     def _on_configure(self, _) -> None:
         if self._update_id is not None: self.after_cancel(self._update_id)
         self._update_id = self.after(self._debounce, self._update_frames)
+
+
+    def add_to_desktop(self) -> None:
+        desktop: Path = Directories.DESKTOP
+        if not desktop.is_dir():
+            self.root.send_banner(
+                title_key="menu.shortcuts.exception.title.cant_add_to_desktop",
+                message_key="menu.shortcuts.exception.message.desktop_not_found",
+                mode="warning", auto_close_after_ms=6000
+            )
+            return
+
+        shortcuts: list[Shortcut] = list(self._shortcuts.values())
+        if not shortcuts:
+            self.root.send_banner(
+                title_key="menu.shortcuts.infobar.title.no_shortcuts_found",
+                message_key="menu.shortcuts.infobar.message.no_shortcuts_found",
+                mode="attention", auto_close_after_ms=6000
+            )
+            return
+        ShortcutToDesktopWindow(self.root, shortcuts, desktop)
 
 
     def add_new_shortcut(self) -> None:

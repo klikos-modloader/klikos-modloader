@@ -6,6 +6,41 @@ import os
 
 FROZEN: bool = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
 
+def _get_known_folder_path(uuidstr):
+    # https://stackoverflow.com/a/35851955
+    import ctypes
+    from ctypes import windll, wintypes
+    from uuid import UUID
+
+    # ctypes GUID copied from MSDN sample code
+    class GUID(ctypes.Structure):
+        _fields_ = [
+            ("Data1", wintypes.DWORD),
+            ("Data2", wintypes.WORD),
+            ("Data3", wintypes.WORD),
+            ("Data4", wintypes.BYTE * 8)
+        ] 
+
+        def __init__(self, uuidstr):
+            uuid = UUID(uuidstr)
+            ctypes.Structure.__init__(self)
+            self.Data1, self.Data2, self.Data3, \
+                self.Data4[0], self.Data4[1], rest = uuid.fields
+            for i in range(2, 8):
+                self.Data4[i] = rest>>(8-i-1)*8 & 0xff
+
+    SHGetKnownFolderPath = windll.shell32.SHGetKnownFolderPath
+    SHGetKnownFolderPath.argtypes = [
+        ctypes.POINTER(GUID), wintypes.DWORD,
+        wintypes.HANDLE, ctypes.POINTER(ctypes.c_wchar_p)
+    ]
+
+    pathptr = ctypes.c_wchar_p()
+    guid = GUID(uuidstr)
+    if SHGetKnownFolderPath(ctypes.byref(guid), 0, 0, ctypes.byref(pathptr)):
+        raise ctypes.WinError()
+    return pathptr.value
+
 
 def _get_downloads_directory() -> Path:
     home: Path = Path.home()
@@ -13,43 +48,19 @@ def _get_downloads_directory() -> Path:
     if os.name != "nt": return fallback
 
     try:
-        # https://stackoverflow.com/a/35851955
-        import ctypes
-        from ctypes import windll, wintypes
-        from uuid import UUID
-
-        # ctypes GUID copied from MSDN sample code
-        class GUID(ctypes.Structure):
-            _fields_ = [
-                ("Data1", wintypes.DWORD),
-                ("Data2", wintypes.WORD),
-                ("Data3", wintypes.WORD),
-                ("Data4", wintypes.BYTE * 8)
-            ] 
-
-            def __init__(self, uuidstr):
-                uuid = UUID(uuidstr)
-                ctypes.Structure.__init__(self)
-                self.Data1, self.Data2, self.Data3, \
-                    self.Data4[0], self.Data4[1], rest = uuid.fields
-                for i in range(2, 8):
-                    self.Data4[i] = rest>>(8-i-1)*8 & 0xff
-
-        SHGetKnownFolderPath = windll.shell32.SHGetKnownFolderPath
-        SHGetKnownFolderPath.argtypes = [
-            ctypes.POINTER(GUID), wintypes.DWORD,
-            wintypes.HANDLE, ctypes.POINTER(ctypes.c_wchar_p)
-        ]
-
-        def _get_known_folder_path(uuidstr):
-            pathptr = ctypes.c_wchar_p()
-            guid = GUID(uuidstr)
-            if SHGetKnownFolderPath(ctypes.byref(guid), 0, 0, ctypes.byref(pathptr)):
-                raise ctypes.WinError()
-            return pathptr.value
-
         FOLDERID_Download = '{374DE290-123F-4565-9164-39C4925E467B}'
+        return Path(_get_known_folder_path(FOLDERID_Download))
 
+    except Exception: return fallback
+
+
+def _get_desktop_directory() -> Path:
+    home: Path = Path.home()
+    fallback: Path = home / "Desktop"
+    if os.name != "nt": return fallback
+
+    try:
+        FOLDERID_Download = '{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}'
         return Path(_get_known_folder_path(FOLDERID_Download))
 
     except Exception: return fallback
@@ -66,11 +77,13 @@ class Directories:
     VERSIONS_CACHE: Path = CACHE / "downloads"
     MARKETPLACE_CACHE: Path = CACHE / "marketplace"
     SHORTCUTS_CACHE: Path = CACHE / "shortcuts"
+    SHORTCUTS_DESKTOP_ICON_CACHE: Path = CACHE / "shortcuts" / "desktop_icons"
     MEIPASS: Optional[Path] = Path(sys._MEIPASS) if FROZEN else None  # type: ignore
     RESOURCES: Path = (MEIPASS if FROZEN else ROOT) / "resources"  # type: ignore
     MOD_GENERATOR_FILES: Path = RESOURCES / "mod_generator_files"
 
     DOWNLOADS: Path = _get_downloads_directory().resolve()
+    DESKTOP: Path = _get_desktop_directory().resolve()
     ROBLOX: Path = Path.home() / "AppData" / "Local" / "Roblox"
 
     DEV: Path = ROOT / "dev"

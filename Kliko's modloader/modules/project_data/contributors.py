@@ -17,7 +17,7 @@ FEATURE_SUGGESTIONS: list[Contributor] = sorted([
     Contributor("NetSoftworks", r"https://github.com/netsoftwork"),
     Contributor("dooM", r"https://github.com/MistressDoom"),
     Contributor("toast"),
-    Contributor("ult", r"https://www.roblox.com/users/2486881394/profile")
+    Contributor("xale", r"https://github.com/fakexale")
 ], key=lambda item: item.name.casefold())
 
 SPECIAL_THANKS: list[Contributor] = sorted([], key=lambda item: item.name.casefold())

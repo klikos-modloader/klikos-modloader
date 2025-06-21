@@ -287,17 +287,24 @@
     "menu.shortcuts.header.title": "Shortcuts",
     "menu.shortcuts.header.description": "Quick access to your favorite games",
     "menu.shortcuts.header.button.add_new": "New",
+    "menu.shortcuts.header.button.add_to_desktop": "Add to desktop",
     "menu.shortcuts.content.creator": "By {creator}",
 
     "menu.shortcuts.input.new_shortcuts.message": "Enter a place ID",
 
     "menu.shortcuts.exception.title.failed_to_launch": "Failed to launch shortcut",
     "menu.shortcuts.exception.title.failed_to_add": "Failed to create shortcut",
+    "menu.shortcuts.exception.title.cant_add_to_desktop": "Can't add shortcuts to desktop",
+    "menu.shortcuts.infobar.title.no_shortcuts_found": "No shortcuts found!",
 
     "menu.shortcuts.exception.message.unknown": "{exception.type}: {exception.message}",
     "menu.shortcuts.exception.message.invalid_place_id": "Invalid place ID: '{place_id}', value must be a number!",
     "menu.shortcuts.exception.message.universe_not_found": "No game with the given place ID was found: '{place_id}'",
     "menu.shortcuts.exception.message.connection_error": "Connection error, please try again later!",
+    "menu.shortcuts.infobar.message.no_shortcuts_found": "You need to create a new shortcut before you can add them to your desktop",
+
+    "menu.shortcuts.shortcut_to_desktop_window.window_title": "{app.name} | Shortcuts",
+    "menu.shortcuts.exception.message.desktop_not_found": "Failed to resolve path to Desktop environment",
 
 
 

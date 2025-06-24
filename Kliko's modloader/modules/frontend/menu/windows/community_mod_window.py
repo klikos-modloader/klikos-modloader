@@ -7,6 +7,7 @@ from modules.project_data import ProjectData
 from modules.localization import Localizer
 from modules.logger import Logger
 from modules.filesystem import Resources, DownloadStream, Directories
+from modules import filesystem
 from modules.frontend.widgets import Toplevel, Frame, Label, Button, ProgressBar
 from modules.frontend.widgets.basic.utils import FontStorage, WinAccentTracker
 if TYPE_CHECKING: from modules.frontend.widgets import Root
@@ -177,9 +178,10 @@ class CommunityModWindow(Toplevel):
         self.progress_bar.set(self._current_progress)
         self.show_progress_bar()
 
-        target: Path = Directories.MODS / f"{self.mod.name}.zip"
-        stream: DownloadStream = DownloadStream(on_progress=self._on_progress, on_success=self._on_success, on_error=self._on_error, on_cancel=self._on_cancel)
-        stream.download_file(self.mod.download_url, target)
+        target: Path = Directories.MODS / f"{self.mod.name}"
+        temp_target: Path = Directories.MODS / f"{self.mod.name}.zip"
+        stream: DownloadStream = DownloadStream(on_progress=self._on_progress, on_success=lambda target=target, temp_target=temp_target: self._on_success(temp_target, target), on_error=self._on_error, on_cancel=self._on_cancel)
+        stream.download_file(self.mod.download_url, temp_target)
 
 
     def _on_progress(self, downloaded: int, total: int) -> None:
@@ -193,9 +195,18 @@ class CommunityModWindow(Toplevel):
             self.progress_bar.set(self._current_progress)
 
 
-    def _on_success(self) -> None:
+    def _on_success(self, temp_target: Path, target: Path) -> None:
         self.hide_progress_bar()
         self._downloading = False
+
+        try:
+            Logger.info("Extracting downloaded files...", prefix=self._LOG_PREFIX)
+            filesystem.extract(temp_target, target)
+            temp_target.unlink()
+
+        except Exception as e:
+            Logger.warning(f"Failed to extract mod after download! {type(e).__name__}: {e}", prefix=self._LOG_PREFIX)
+            if target.exists(): shutil.rmtree(target)
 
         self.root.send_banner(
             title_key="menu.marketplace.banner.download_success.title",

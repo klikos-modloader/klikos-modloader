@@ -1,2 +1,2 @@
-from .basic import Root, Toplevel, Frame, Button, Entry, CheckBox, RadioButton, DropDownMenu, Label, ScrollableFrame, Textbox, ToggleSwitch, ProgressBar, InputDialog
+from .basic import Root, Toplevel, Frame, Button, Entry, CheckBox, RadioButton, DropDownMenu, Label, ScrollableFrame, Textbox, ToggleSwitch, ProgressBar, InputDialog, GifObject
 from .advanced import FlexBox, ColorPicker, ask_color

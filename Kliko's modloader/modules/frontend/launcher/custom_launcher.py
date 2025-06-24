@@ -8,7 +8,7 @@ from modules import exception_handler
 from modules.logger import Logger
 from modules.project_data import ProjectData
 from modules.filesystem import Directories
-from modules.frontend.widgets import Root
+from modules.frontend.widgets import Root, Label, GifObject
 from modules.frontend.widgets.basic.localized import LocalizedCTkLabel, LocalizedCTkButton
 from modules.localization import Localizer
 from modules.interfaces.config import ConfigInterface
@@ -22,7 +22,7 @@ from packaging.version import Version, InvalidVersion as pacakaging_invalid_vers
 from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkProgressBar, CTkFont, CTkImage, ScalingTracker, set_default_color_theme, set_appearance_mode  # type: ignore
 
 
-LAUNCHER_VERSION: Version = Version("1.0.0")
+LAUNCHER_VERSION: Version = Version("1.0.1")
 
 
 class CustomLauncher:
@@ -170,10 +170,13 @@ class CustomLauncher:
                 if font_data: kwargs["font"] = CTkFont(**font_data)
                 image_data: dict | None = kwargs.pop("image", None)
                 if image_data: kwargs["image"] = CTkImage(**image_data)
+                gif_data: dict | None = kwargs.pop("gif", None)
+                if gif_data: kwargs["gif"] = GifObject(**gif_data)
 
                 match config.type:
                     case "status_label":
                         kwargs.pop("text", None)
+                        kwargs.pop("gif", None)
                         widget = LocalizedCTkLabel(
                             parent, key="launcher.progress.initializing",
                             modification=lambda string: Localizer.format(string, {
@@ -182,29 +185,34 @@ class CustomLauncher:
                                 "{roblox.studio}": Localizer.Key("roblox.studio"),
                                 "{roblox.studio_alt}": Localizer.Key("roblox.studio_alt"),
                                 "{roblox.common}": Localizer.Key("roblox.common"),
-                                "{roblox.dynamic}": Localizer.Key("roblox.player") if self.mode == "Player" else Localizer.Key("roblox.studio")
+                                "{roblox.dynamic}": Localizer.Key("roblox.common")
                             }), **kwargs)
                         self._status_labels.append(widget)
+
                     case "channel_label":
                         kwargs.pop("text", None)
+                        kwargs.pop("gif", None)
                         widget = LocalizedCTkLabel(parent, key=None, modification=None, **kwargs)
                         self._channel_labels.append(widget)
+
                     case "version_label":
                         kwargs.pop("text", None)
+                        kwargs.pop("gif", None)
                         widget = LocalizedCTkLabel(parent, key=None, modification=None, **kwargs)
                         self._guid_labels.append(widget)
+
                     case "file_version_label":
                         kwargs.pop("text", None)
+                        kwargs.pop("gif", None)
                         widget = LocalizedCTkLabel(parent, key=None, modification=None, **kwargs)
                         self._file_version_labels.append(widget)
 
                     case "label":
-                        widget = CTkLabel(parent, **kwargs)
-
                         if config.localized_string is not None:
+                            kwargs.pop("gif", None)
                             widget = LocalizedCTkLabel(parent, key=config.localized_string, modification=config.localized_string_modification, **kwargs)
                         else:
-                            widget = CTkLabel(parent, **kwargs)
+                            widget = Label(parent, **kwargs)
 # endregion
 
 # region - button

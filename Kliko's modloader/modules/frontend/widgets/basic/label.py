@@ -1,10 +1,11 @@
-from typing import Optional, Callable, Literal
+from typing import Optional, Callable, Literal, NamedTuple
 import webbrowser
 
 from .localized import LocalizedCTkLabel
 from .utils import FontStorage, WinAccentTracker
 
-from customtkinter import CTkFont  # type: ignore
+from customtkinter import CTkFont, CTkImage  # type: ignore
+from PIL import Image  # type: ignore
 import winaccent  # type: ignore
 
 
@@ -12,6 +13,8 @@ class Label(LocalizedCTkLabel):
     autowrap: bool
     _update_debounce: int = 100
     _update_id = None
+
+    _gif: Optional["GifObject"]
 
     _url: Optional[str]
     _url_color_default: tuple[str, str]
@@ -24,13 +27,19 @@ class Label(LocalizedCTkLabel):
     _url_pressed: bool = False
 
 
-    def __init__(self, master, key: Optional[str] = None, modification: Optional[Callable[[str], str]] = None, weight: Literal['normal', 'bold'] | None = None, slant: Literal['italic', 'roman'] = "roman", underline: bool = False, overstrike: bool = False, style: Optional[Literal["caption", "body", "body_strong", "subtitle", "title", "title_large", "display"]] = None, autowrap: bool = False, url: Optional[str] = None, **kwargs):
+    def __init__(self, master, key: Optional[str] = None, modification: Optional[Callable[[str], str]] = None, weight: Literal['normal', 'bold'] | None = None, slant: Literal['italic', 'roman'] = "roman", underline: bool = False, overstrike: bool = False, style: Optional[Literal["caption", "body", "body_strong", "subtitle", "title", "title_large", "display"]] = None, autowrap: bool = False, url: Optional[str] = None, gif: Optional["GifObject"] = None, **kwargs):
         if style is not None: kwargs["font"] = self._get_font_from_style(style, underline=underline, overstrike=overstrike)
         elif "font" not in kwargs: kwargs["font"] = FontStorage.get(14, weight=weight, slant=slant, underline=underline, overstrike=overstrike)
         if "text_color" not in kwargs: kwargs["text_color"] = ("#1A1A1A", "#FFFFFF")
         if "justify" not in kwargs and "anchor" not in kwargs:
             kwargs["justify"] = "left"
             kwargs["anchor"] = "w"
+        if gif is None: gif = kwargs.pop("gif", None)
+        self._gif = gif
+        if self._gif is not None:
+            kwargs.pop("image", None)
+
+        kwargs.pop("gif", None)
         super().__init__(master, key=key, modification=modification, **kwargs)
         self.autowrap = autowrap
         self.bind("<Configure>", self.update_wraplength)
@@ -50,6 +59,10 @@ class Label(LocalizedCTkLabel):
             self.bind("<Leave>", self._on_url_unhover)
             self.bind("<ButtonPress-1>", self._on_url_press)
             self.bind("<ButtonRelease-1>", self._on_url_unpress)
+
+        if self._gif is not None:
+            gif_player = GifPlayer(self, self._gif)
+            self.after(200, gif_player.start())
 
 
     def update_wraplength(self, event):
@@ -129,3 +142,53 @@ class Label(LocalizedCTkLabel):
         if self._url_pressed: self.configure(font=self._url_font_pressed, text_color=self._url_color_pressed)
         elif self._url_hovered: self.configure(font=self._url_font_hovered, text_color=self._url_color_hovered)
         else: self.configure(font=self._url_font_default, text_color=self._url_color_default)
+
+
+# region GifPlayer
+class GifObject(NamedTuple):
+    size: tuple[int, int]
+    gif: Image.Image
+
+
+class GifPlayer:
+    label: Label
+    gif: Image.Image
+    loop: int
+    size: tuple[int, int]
+    _remaining: int
+
+    _LOOP_FALLBACK: int = 0
+    _DURATION_FALLBACK: int = 100
+
+    def __init__(self, label: Label, gif: GifObject) -> None:
+        self.label = label
+        self.gif = gif.gif
+        self.size = gif.size
+        self.loop = self.gif.info.get("loop", self._LOOP_FALLBACK)
+        if not isinstance(self.loop, int): self.loop = self._LOOP_FALLBACK
+
+
+    def start(self) -> None:
+        self._remaining = self.loop
+        self.next(0)
+
+
+    def next(self, index: int) -> None:
+        try:
+            self.gif.seek(index)
+        except EOFError:
+            if self._remaining == 1:
+                return
+            elif self._remaining > 1:
+                self._remaining -= 1
+            self.label.after(0, self.start)
+            return
+
+        duration = self.gif.info.get("duration", self._DURATION_FALLBACK)
+        if not isinstance(duration, int): duration = self._DURATION_FALLBACK
+
+        frame = self.gif.copy()
+        self.label.configure(image=CTkImage(frame, size=self.size))
+
+        self.label.after(duration, self.next, index+1)
+# endregion

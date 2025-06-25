@@ -231,10 +231,6 @@ class Parser:
                         if (isinstance(value, int) or isinstance(value, float)) and value >= 0 and value <= 1:
                             kwargs[key] = value
 
-                    elif key in boolean_kwargs:
-                        if isinstance(value, bool):
-                            kwargs[key] = value
-
                     elif key in string_kwargs:
                         if not isinstance(value, str):
                             continue

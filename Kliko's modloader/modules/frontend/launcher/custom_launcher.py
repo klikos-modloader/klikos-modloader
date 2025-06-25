@@ -212,6 +212,7 @@ class CustomLauncher:
                             kwargs.pop("gif", None)
                             widget = LocalizedCTkLabel(parent, key=config.localized_string, modification=config.localized_string_modification, **kwargs)
                         else:
+                            kwargs["dont_localize"] = True
                             widget = Label(parent, **kwargs)
 # endregion
 

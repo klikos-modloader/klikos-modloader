@@ -92,7 +92,7 @@ class CustomLauncher:
 
 
     def check_version_compatibility(self) -> bool:
-        if LAUNCHER_VERSION > self.version:
+        if self.version > LAUNCHER_VERSION:
             message: str = Localizer.format(Localizer.Strings["launcher.warning.custom_launcher_version.too_new"], {"{app.name}": ProjectData.NAME})
         elif (LAUNCHER_VERSION.major, LAUNCHER_VERSION.minor) != (self.version.major, self.version.minor):
             message = Localizer.format(Localizer.Strings["launcher.warning.custom_launcher_version.too_old"], {"{app.name}": ProjectData.NAME})

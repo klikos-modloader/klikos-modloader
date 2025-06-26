@@ -393,8 +393,10 @@ class Parser:
     def _parse_gif(cls, data: dict, base_directory: Path) -> dict | None:
         path: Any = data.get("path")
         size = data.get("size")
+        loop = data.get("loop")
 
         gif: dict = {}
+        gif["loop"] = None
         has_size: bool = False
         has_gif: bool = False
 
@@ -416,6 +418,9 @@ class Parser:
             if filepath.suffix == ".gif" and filepath.is_file():
                 gif["gif"] = Image.open(filepath)
                 has_gif = True
+
+        if isinstance(loop, int) and loop >= 0:
+            gif["loop"] = loop
 
         if has_size and has_gif:
             return gif

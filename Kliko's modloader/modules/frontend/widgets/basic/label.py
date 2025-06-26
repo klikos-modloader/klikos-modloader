@@ -148,6 +148,7 @@ class Label(LocalizedCTkLabel):
 class GifObject(NamedTuple):
     size: tuple[int, int]
     gif: Image.Image
+    loop: Optional[int]
 
 
 class FrameDisposal:
@@ -176,8 +177,13 @@ class GifPlayer:
         self.label = label
         self.gif = gif.gif
         self.size = gif.size
-        self.loop = self.gif.info.get("loop", self._LOOP_FALLBACK)
-        if not isinstance(self.loop, int): self.loop = self._LOOP_FALLBACK
+
+        self.loop = gif.loop
+        if self.loop is None:
+            self.loop = self.gif.info.get("loop", None)
+        if not isinstance(self.loop, int):
+            self.loop = self._LOOP_FALLBACK
+
         background_index = self.gif.info.get("background", None)
         palette = self.gif.getpalette()
         if background_index is not None and palette:

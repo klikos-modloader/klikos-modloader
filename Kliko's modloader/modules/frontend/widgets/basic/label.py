@@ -150,12 +150,24 @@ class GifObject(NamedTuple):
     gif: Image.Image
 
 
+class FrameDisposal:
+    UNSPECIFIED: Literal[0] = 0
+    DO_NOT_DISPOSE: Literal[1] = 1
+    RESTORE_TO_BACKGROUND: Literal[2] = 2
+    RESTORE_TO_PREVIOUS: Literal[3] = 3
+    DEFAULT = DO_NOT_DISPOSE
+
+
 class GifPlayer:
     label: Label
     gif: Image.Image
     loop: int
     size: tuple[int, int]
+    background_color: tuple[int, int, int, int]
     _remaining: int
+
+    _previous: Image.Image | None
+    _last_saved: Image.Image | None
 
     _LOOP_FALLBACK: int = 0
     _DURATION_FALLBACK: int = 100
@@ -166,9 +178,20 @@ class GifPlayer:
         self.size = gif.size
         self.loop = self.gif.info.get("loop", self._LOOP_FALLBACK)
         if not isinstance(self.loop, int): self.loop = self._LOOP_FALLBACK
+        background_index = self.gif.info.get("background", None)
+        palette = self.gif.getpalette()
+        if background_index is not None and palette:
+            r = palette[background_index * 3]
+            g = palette[background_index * 3 + 1]
+            b = palette[background_index * 3 + 2]
+            self.background_color = (r, g, b, 255)
+        else:
+            self.background_color = (0, 0, 0, 0)
 
 
     def start(self) -> None:
+        self._previous = None
+        self._last_saved = None
         self._remaining = self.loop
         self.next(0)
 
@@ -186,9 +209,49 @@ class GifPlayer:
 
         duration = self.gif.info.get("duration", self._DURATION_FALLBACK)
         if not isinstance(duration, int): duration = self._DURATION_FALLBACK
+        disposal = self.get_frame_disposal()
 
-        frame = self.gif.copy()
+        new_frame: Image.Image = self.gif.copy()
+        mask: Image.Image = new_frame.convert("RGBA").split()[3]
+        x: int = self.gif.info.get("x", 0)
+        y: int = self.gif.info.get("y", 0)
+
+        match disposal:
+            case FrameDisposal.DO_NOT_DISPOSE:
+                if self._previous is not None:
+                    frame = self._previous.copy()
+                else:
+                    frame = Image.new("RGBA", self.size, (0, 0, 0, 0))
+                frame.paste(new_frame, (x, y), mask)
+                self._last_saved = frame.copy()
+
+            case FrameDisposal.RESTORE_TO_BACKGROUND:
+                if self._previous is not None:
+                    frame = self._previous.copy()
+                else:
+                    frame = Image.new("RGBA", self.size, (0, 0, 0, 0))
+                background: Image.Image = Image.new("RGBA", (new_frame.width, new_frame.height), self.background_color)
+                frame.paste(background, (x, y))
+                frame.paste(new_frame, (x, y), mask)
+
+            case FrameDisposal.RESTORE_TO_PREVIOUS:
+                if self._last_saved is not None:
+                    frame = self._last_saved.copy()
+                else:
+                    frame = Image.new("RGBA", self.size, (0, 0, 0, 0))
+                frame.paste(new_frame, (x, y), mask)
+
         self.label.configure(image=CTkImage(frame, size=self.size))
-
         self.label.after(duration, self.next, index+1)
+
+
+    def get_frame_disposal(self) -> Literal[1, 2, 3]:
+        disposal = getattr(self.gif, "disposal_method", None)
+        if disposal is None:
+            disposal = self.gif.info.get("disposal", FrameDisposal.UNSPECIFIED)
+        if disposal not in {FrameDisposal.UNSPECIFIED, FrameDisposal.DO_NOT_DISPOSE, FrameDisposal.RESTORE_TO_BACKGROUND, FrameDisposal.RESTORE_TO_PREVIOUS}:
+            disposal = FrameDisposal.UNSPECIFIED
+        if disposal == FrameDisposal.UNSPECIFIED:
+            disposal = FrameDisposal.DEFAULT
+        return disposal
 # endregion

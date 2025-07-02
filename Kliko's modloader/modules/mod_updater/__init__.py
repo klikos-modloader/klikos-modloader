@@ -20,18 +20,9 @@ class ModUpdater:
     _LOG_PREFIX: str = "ModUpdater"
 
 
-# region check
-    @classmethod
-    def check_for_updates(cls, mod: Path, latest_version: RobloxVersion) -> bool:
-        Logger.info(f"Checking for updates: '{mod.name}'...", prefix=cls._LOG_PREFIX)
-
-        if not (mod / "info.json").exists():  # Mod not compatible
-            return False
-        with open(mod / "info.json", "r") as file:
-            mod_info: dict[str, str | int] = json.load(file)
-
-        # 💀
-        deploy_history: DeployHistory = DeployHistory()
+# region version comparison
+    @staticmethod  # 💀
+    def _get_mod_version(deploy_history: DeployHistory, mod_info: dict) -> RobloxVersion:
         mod_file_version: int | None = mod_info.get("fileVersion")  # type: ignore
         if not isinstance(mod_file_version, int):
             mod_guid: str | None = mod_info.get("clientVersionUpload")  # type: ignore
@@ -61,7 +52,11 @@ class ModUpdater:
                     mod_version = item
                     break
             else: raise InvalidVersionError(mod_file_version)
+        return mod_version
 
+
+    @staticmethod
+    def _get_target_version(deploy_history: DeployHistory, latest_version: RobloxVersion) -> RobloxVersion:
         latest_file_version: int = latest_version.file_version.minor
         if latest_version.binary_type == "WindowsStudio64":
             target_version: RobloxVersion = latest_version
@@ -71,6 +66,23 @@ class ModUpdater:
                     target_version = item
                     break
             else: raise InvalidVersionError(latest_file_version)
+        return target_version
+# endregion
+
+
+# region check
+    @classmethod
+    def check_for_updates(cls, mod: Path, latest_version: RobloxVersion) -> bool:
+        Logger.info(f"Checking for updates: '{mod.name}'...", prefix=cls._LOG_PREFIX)
+
+        if not (mod / "info.json").exists():  # Mod not compatible
+            return False
+        with open(mod / "info.json", "r") as file:
+            mod_info: dict[str, str | int] = json.load(file)
+
+        deploy_history: DeployHistory = DeployHistory()
+        mod_version = cls._get_mod_version(deploy_history, mod_info)
+        target_version = cls._get_target_version(deploy_history, latest_version)
 
         return mod_version.file_version != target_version.file_version
 # endregion
@@ -87,45 +99,8 @@ class ModUpdater:
             mod_info: dict[str, str | int] = json.load(file)
 
         deploy_history: DeployHistory = DeployHistory()
-        mod_file_version: int | None = mod_info.get("fileVersion")  # type: ignore
-        if not isinstance(mod_file_version, int):
-            mod_guid: str | None = mod_info.get("clientVersionUpload")  # type: ignore
-            if not isinstance(mod_guid, str):
-                raise ValueError("Unknown mod verison!")
-            else:
-                for item in reversed(deploy_history.studio_deployments):
-                    if item.guid == mod_guid:
-                        mod_version: RobloxVersion = item
-                        break
-                else:
-                    for item in reversed(deploy_history.player_deployments):
-                        if item.guid == mod_guid:
-                            mod_file_version = item.file_version.minor
-                            break
-                    else:
-                        raise ValueError(f"Invalid clientVersionUpload: {mod_guid}")
-                    for item in reversed(deploy_history.studio_deployments):
-                        if item.file_version.minor == mod_file_version:
-                            mod_version = item
-                            break
-                    else:
-                        raise ValueError(f"Invalid clientVersionUpload: {mod_guid}")
-        else:
-            for item in reversed(deploy_history.studio_deployments):
-                if item.file_version.minor == mod_file_version:
-                    mod_version = item
-                    break
-            else: raise InvalidVersionError(mod_file_version)
-
-        latest_file_version: int = latest_version.file_version.minor
-        if latest_version.binary_type == "WindowsStudio64":
-            target_version: RobloxVersion = latest_version
-        else:
-            for item in reversed(deploy_history.studio_deployments):
-                if item.file_version.minor == latest_file_version:
-                    target_version = item
-                    break
-            else: raise InvalidVersionError(latest_file_version)
+        mod_version = cls._get_mod_version(deploy_history, mod_info)
+        target_version = cls._get_target_version(deploy_history, latest_version)
 
         if mod_version.file_version == target_version.file_version:
             Logger.info("Mod is not outdated. Cancelling update...", prefix=cls._LOG_PREFIX)

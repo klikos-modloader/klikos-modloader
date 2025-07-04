@@ -231,10 +231,6 @@ class Parser:
                         if (isinstance(value, int) or isinstance(value, float)) and value >= 0 and value <= 1:
                             kwargs[key] = value
 
-                    elif key in boolean_kwargs:
-                        if isinstance(value, bool):
-                            kwargs[key] = value
-
                     elif key in string_kwargs:
                         if not isinstance(value, str):
                             continue
@@ -392,6 +388,46 @@ class Parser:
 # endregion
 
 
+# region gif
+    @classmethod
+    def _parse_gif(cls, data: dict, base_directory: Path) -> dict | None:
+        path: Any = data.get("path")
+        size = data.get("size")
+        loop = data.get("loop")
+
+        gif: dict = {}
+        gif["loop"] = None
+        has_size: bool = False
+        has_gif: bool = False
+
+        if isinstance(size, int) and size >= 0:
+            size = (size, size)
+            gif["size"] = size
+            has_size = True
+
+        elif isinstance(size, list) and len(size) == 2:
+            width: Any = size[0]
+            height: Any = size[1]
+
+            if isinstance(width, int) and width >= 0 and isinstance(height, int) and height >= 0:
+                gif["size"] = (width, height)
+                has_size = True
+
+        if isinstance(path, str) and path:
+            filepath: Path = cls.parse_filepath(path, base_directory)
+            if filepath.suffix == ".gif" and filepath.is_file():
+                gif["gif"] = Image.open(filepath)
+                has_gif = True
+
+        if isinstance(loop, int) and loop >= 0:
+            gif["loop"] = loop
+
+        if has_size and has_gif:
+            return gif
+        return None
+# endregion
+
+
 # region cursor
     @classmethod
     def _parse_cursor(cls, cursor: str) -> str | None:
@@ -478,7 +514,8 @@ class Parser:
                 color_kwargs = {"fg_color", "text_color"}
                 font_kwargs = {"font"}
                 image_kwargs = {"image"}
-                valid_kwargs = int_kwargs | string_kwargs | color_kwargs | font_kwargs | image_kwargs
+                gif_kwargs = {"gif"}
+                valid_kwargs = int_kwargs | string_kwargs | color_kwargs | font_kwargs | image_kwargs | gif_kwargs
 
                 for key in valid_kwargs:
                     value = data.get(key)
@@ -527,6 +564,12 @@ class Parser:
                             image: dict | None = cls._parse_image(value, base_directory)
                             if image:
                                 kwargs[key] = image
+
+                    elif key in gif_kwargs:
+                        if isinstance(value, dict) and value:
+                            gif: dict | None = cls._parse_gif(value, base_directory)
+                            if gif:
+                                kwargs[key] = gif
 
                 kwargs["text"] = kwargs.get("text", "")
     # endregion

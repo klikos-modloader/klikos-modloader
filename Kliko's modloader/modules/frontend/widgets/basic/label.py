@@ -1,10 +1,11 @@
-from typing import Optional, Callable, Literal
+from typing import Optional, Callable, Literal, NamedTuple
 import webbrowser
 
 from .localized import LocalizedCTkLabel
 from .utils import FontStorage, WinAccentTracker
 
-from customtkinter import CTkFont  # type: ignore
+from customtkinter import CTkFont, CTkImage  # type: ignore
+from PIL import Image  # type: ignore
 import winaccent  # type: ignore
 
 
@@ -12,6 +13,8 @@ class Label(LocalizedCTkLabel):
     autowrap: bool
     _update_debounce: int = 100
     _update_id = None
+
+    _gif: Optional["GifObject"]
 
     _url: Optional[str]
     _url_color_default: tuple[str, str]
@@ -24,13 +27,19 @@ class Label(LocalizedCTkLabel):
     _url_pressed: bool = False
 
 
-    def __init__(self, master, key: Optional[str] = None, modification: Optional[Callable[[str], str]] = None, weight: Literal['normal', 'bold'] | None = None, slant: Literal['italic', 'roman'] = "roman", underline: bool = False, overstrike: bool = False, style: Optional[Literal["caption", "body", "body_strong", "subtitle", "title", "title_large", "display"]] = None, autowrap: bool = False, url: Optional[str] = None, **kwargs):
+    def __init__(self, master, key: Optional[str] = None, modification: Optional[Callable[[str], str]] = None, weight: Literal['normal', 'bold'] | None = None, slant: Literal['italic', 'roman'] = "roman", underline: bool = False, overstrike: bool = False, style: Optional[Literal["caption", "body", "body_strong", "subtitle", "title", "title_large", "display"]] = None, autowrap: bool = False, url: Optional[str] = None, gif: Optional["GifObject"] = None, **kwargs):
         if style is not None: kwargs["font"] = self._get_font_from_style(style, underline=underline, overstrike=overstrike)
         elif "font" not in kwargs: kwargs["font"] = FontStorage.get(14, weight=weight, slant=slant, underline=underline, overstrike=overstrike)
         if "text_color" not in kwargs: kwargs["text_color"] = ("#1A1A1A", "#FFFFFF")
         if "justify" not in kwargs and "anchor" not in kwargs:
             kwargs["justify"] = "left"
             kwargs["anchor"] = "w"
+        if gif is None: gif = kwargs.pop("gif", None)
+        self._gif = gif
+        if self._gif is not None:
+            kwargs.pop("image", None)
+
+        kwargs.pop("gif", None)
         super().__init__(master, key=key, modification=modification, **kwargs)
         self.autowrap = autowrap
         self.bind("<Configure>", self.update_wraplength)
@@ -50,6 +59,10 @@ class Label(LocalizedCTkLabel):
             self.bind("<Leave>", self._on_url_unhover)
             self.bind("<ButtonPress-1>", self._on_url_press)
             self.bind("<ButtonRelease-1>", self._on_url_unpress)
+
+        if self._gif is not None:
+            gif_player = GifPlayer(self, self._gif)
+            self.after(200, gif_player.start())
 
 
     def update_wraplength(self, event):
@@ -129,3 +142,122 @@ class Label(LocalizedCTkLabel):
         if self._url_pressed: self.configure(font=self._url_font_pressed, text_color=self._url_color_pressed)
         elif self._url_hovered: self.configure(font=self._url_font_hovered, text_color=self._url_color_hovered)
         else: self.configure(font=self._url_font_default, text_color=self._url_color_default)
+
+
+# region GifPlayer
+class GifObject(NamedTuple):
+    size: tuple[int, int]
+    gif: Image.Image
+    loop: Optional[int]
+
+
+class FrameDisposal:
+    UNSPECIFIED: Literal[0] = 0
+    DO_NOT_DISPOSE: Literal[1] = 1
+    RESTORE_TO_BACKGROUND: Literal[2] = 2
+    RESTORE_TO_PREVIOUS: Literal[3] = 3
+    DEFAULT = DO_NOT_DISPOSE
+
+
+class GifPlayer:
+    label: Label
+    gif: Image.Image
+    loop: int
+    size: tuple[int, int]
+    background_color: tuple[int, int, int, int]
+    _remaining: int
+
+    _previous: Image.Image | None
+    _last_saved: Image.Image | None
+
+    _LOOP_FALLBACK: int = 0
+    _DURATION_FALLBACK: int = 100
+
+    def __init__(self, label: Label, gif: GifObject) -> None:
+        self.label = label
+        self.gif = gif.gif
+        self.size = gif.size
+
+        self.loop = gif.loop
+        if self.loop is None:
+            self.loop = self.gif.info.get("loop", None)
+        if not isinstance(self.loop, int):
+            self.loop = self._LOOP_FALLBACK
+
+        background_index = self.gif.info.get("background", None)
+        palette = self.gif.getpalette()
+        if background_index is not None and palette:
+            r = palette[background_index * 3]
+            g = palette[background_index * 3 + 1]
+            b = palette[background_index * 3 + 2]
+            self.background_color = (r, g, b, 255)
+        else:
+            self.background_color = (0, 0, 0, 0)
+
+
+    def start(self) -> None:
+        self._previous = None
+        self._last_saved = None
+        self._remaining = self.loop
+        self.next(0)
+
+
+    def next(self, index: int) -> None:
+        try:
+            self.gif.seek(index)
+        except EOFError:
+            if self._remaining == 1:
+                return
+            elif self._remaining > 1:
+                self._remaining -= 1
+            self.label.after(0, self.start)
+            return
+
+        duration = self.gif.info.get("duration", self._DURATION_FALLBACK)
+        if not isinstance(duration, int): duration = self._DURATION_FALLBACK
+        disposal = self.get_frame_disposal()
+
+        new_frame: Image.Image = self.gif.copy()
+        mask: Image.Image = new_frame.convert("RGBA").split()[3]
+        x: int = self.gif.info.get("x", 0)
+        y: int = self.gif.info.get("y", 0)
+
+        match disposal:
+            case FrameDisposal.DO_NOT_DISPOSE:
+                if self._previous is not None:
+                    frame = self._previous.copy()
+                else:
+                    frame = Image.new("RGBA", self.size, (0, 0, 0, 0))
+                frame.paste(new_frame, (x, y), mask)
+                self._last_saved = frame.copy()
+
+            case FrameDisposal.RESTORE_TO_BACKGROUND:
+                if self._previous is not None:
+                    frame = self._previous.copy()
+                else:
+                    frame = Image.new("RGBA", self.size, (0, 0, 0, 0))
+                background: Image.Image = Image.new("RGBA", (new_frame.width, new_frame.height), self.background_color)
+                frame.paste(background, (x, y))
+                frame.paste(new_frame, (x, y), mask)
+
+            case FrameDisposal.RESTORE_TO_PREVIOUS:
+                if self._last_saved is not None:
+                    frame = self._last_saved.copy()
+                else:
+                    frame = Image.new("RGBA", self.size, (0, 0, 0, 0))
+                frame.paste(new_frame, (x, y), mask)
+
+        self.label.configure(image=CTkImage(frame, size=self.size))
+        self.label.after(duration, self.next, index+1)
+
+
+    def get_frame_disposal(self) -> Literal[1, 2, 3]:
+        disposal = getattr(self.gif, "disposal_method", None)
+        if disposal is None:
+            disposal = self.gif.info.get("disposal", FrameDisposal.UNSPECIFIED)
+        if disposal not in {FrameDisposal.UNSPECIFIED, FrameDisposal.DO_NOT_DISPOSE, FrameDisposal.RESTORE_TO_BACKGROUND, FrameDisposal.RESTORE_TO_PREVIOUS}:
+            disposal = FrameDisposal.UNSPECIFIED
+        if disposal == FrameDisposal.UNSPECIFIED:
+            disposal = FrameDisposal.DEFAULT
+        return disposal
+# endregion

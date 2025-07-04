@@ -159,8 +159,8 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
 
                 outdated_mods: list[Mod] = []
                 for mod in mods:
-                    if mod.archive:  # mod udpater is not compatible with archived mods
-                        continue
+                    # if mod.archive:  # mod udpater is not compatible with archived mods
+                    #     continue
 
                     if ModUpdater.check_for_updates(mod.path, latest_version):
                         outdated_mods.append(mod)
@@ -185,7 +185,12 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
                         messagebox.showwarning(ProjectData.NAME, Localizer.format(Localizer.Strings["launcher.warning.failed_mod_updates"], {"{failed_mods}": ", ".join(f"'{mod}'" for mod in failed_mod_updates)}))
             functions.update_progress_bars(MOD_UPDATER_END_PROGRESS)
 
-            # TODO: Check for font mods
+            Logger.info("Deploying mods...", prefix=LOG_PREFIX)
+            functions.set_status_label("launcher.progress.deploying_mods")
+            ModManager.deploy_mods(version_folder, mods)  # type: ignore
+            DataInterface.set_loaded_mods(mode=mode, value=mod_names)
+
+            # Font mods
             Logger.info("Checking for font mods...")
             font_dir: Path = version_folder / "content" / "fonts"
             font_families_dir: Path = font_dir / "families"
@@ -201,10 +206,6 @@ def run(mode: Literal["Player", "Studio"], deeplink: str, stop_event: Event, on_
                 else:
                     Logger.info("No custom font found!")
 
-            Logger.info("Deploying mods...", prefix=LOG_PREFIX)
-            functions.set_status_label("launcher.progress.deploying_mods")
-            ModManager.deploy_mods(version_folder, mods)  # type: ignore
-            DataInterface.set_loaded_mods(mode=mode, value=mod_names)
         functions.update_progress_bars(MOD_DEPLOY_END_PROGRESS)
         if stop_event.is_set():
             return

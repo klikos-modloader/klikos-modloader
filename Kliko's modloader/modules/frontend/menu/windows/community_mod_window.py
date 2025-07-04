@@ -177,7 +177,7 @@ class CommunityModWindow(Toplevel):
         self.progress_bar.set(self._current_progress)
         self.show_progress_bar()
 
-        target: Path = Directories.MODS / f"{self.mod.name}.zip"
+        target: Path = Directories.MODS / f"{self.mod.name}"
         stream: DownloadStream = DownloadStream(on_progress=self._on_progress, on_success=self._on_success, on_error=self._on_error, on_cancel=self._on_cancel)
         stream.download_file(self.mod.download_url, target)
 

@@ -6,7 +6,7 @@ from .frame import Frame
 from .checkbox import CheckBox
 from .radio_button import RadioButton
 from .dropdown import DropDownMenu
-from .label import Label
+from .label import Label, GifObject
 from .scrollable_frame import ScrollableFrame
 from .textbox import Textbox
 from .toggle_switch import ToggleSwitch

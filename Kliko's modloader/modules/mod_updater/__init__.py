@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 import shutil
 import json
 import numpy as np
+from zipfile import ZipFile
 
 from modules.logger import Logger
 from modules import filesystem
@@ -14,24 +15,16 @@ from .imagesets import locate_imagesets, locate_imagesetdata, ImageSetData, Imag
 from .exceptions import *
 
 from PIL import Image  # type: ignore
+from py7zr import SevenZipFile # type: ignore
 
 
 class ModUpdater:
     _LOG_PREFIX: str = "ModUpdater"
 
 
-# region check
-    @classmethod
-    def check_for_updates(cls, mod: Path, latest_version: RobloxVersion) -> bool:
-        Logger.info(f"Checking for updates: '{mod.name}'...", prefix=cls._LOG_PREFIX)
-
-        if not (mod / "info.json").exists():  # Mod not compatible
-            return False
-        with open(mod / "info.json", "r") as file:
-            mod_info: dict[str, str | int] = json.load(file)
-
-        # 💀
-        deploy_history: DeployHistory = DeployHistory()
+# region version comparison
+    @staticmethod  # 💀
+    def _get_mod_version(deploy_history: DeployHistory, mod_info: dict) -> RobloxVersion:
         mod_file_version: int | None = mod_info.get("fileVersion")  # type: ignore
         if not isinstance(mod_file_version, int):
             mod_guid: str | None = mod_info.get("clientVersionUpload")  # type: ignore
@@ -61,7 +54,11 @@ class ModUpdater:
                     mod_version = item
                     break
             else: raise InvalidVersionError(mod_file_version)
+        return mod_version
 
+
+    @staticmethod
+    def _get_target_version(deploy_history: DeployHistory, latest_version: RobloxVersion) -> RobloxVersion:
         latest_file_version: int = latest_version.file_version.minor
         if latest_version.binary_type == "WindowsStudio64":
             target_version: RobloxVersion = latest_version
@@ -71,6 +68,47 @@ class ModUpdater:
                     target_version = item
                     break
             else: raise InvalidVersionError(latest_file_version)
+        return target_version
+# endregion
+
+
+# region check
+    @classmethod
+    def check_for_updates(cls, mod: Path, latest_version: RobloxVersion) -> bool:
+        Logger.info(f"Checking for updates: '{mod.name}'...", prefix=cls._LOG_PREFIX)
+
+        # Check for info file
+        if mod.is_dir():
+            if not (mod / "info.json").exists():  # Mod not compatible
+                return False
+            with open(mod / "info.json", "r") as file:
+                mod_info: dict[str, str | int] = json.load(file)
+
+        elif mod.is_file():
+            match mod.suffix:
+                case ".zip":
+                    with ZipFile(mod, "r") as archive:
+                        if "info.json" not in archive.namelist():
+                            return False
+                        with archive.open("info.json") as file:
+                            mod_info = json.load(file)
+
+                case ".7z":
+                    with SevenZipFile(mod, "r") as archive:
+                        if "info.json" not in archive.getnames():
+                            return False
+                        extracted_data_thingy = archive.read(["info.json"])["info.json"]
+                        try: mod_info = json.load(extracted_data_thingy)
+                        finally: extracted_data_thingy.close()
+
+        # Unknown filetypes
+                case _: return False
+        else: return False
+
+        # Version comparison
+        deploy_history: DeployHistory = DeployHistory()
+        mod_version = cls._get_mod_version(deploy_history, mod_info)
+        target_version = cls._get_target_version(deploy_history, latest_version)
 
         return mod_version.file_version != target_version.file_version
 # endregion
@@ -81,51 +119,44 @@ class ModUpdater:
     def update_mod(cls, mod: Path, latest_version: RobloxVersion) -> None:
         Logger.info(f"Updating mod: '{mod.name}'...", prefix=cls._LOG_PREFIX)
 
-        if not (mod / "info.json").exists():
-            raise FileNotFoundError(str(mod / "info.json"))
-        with open(mod / "info.json", "r") as file:
-            mod_info: dict[str, str | int] = json.load(file)
+        is_archive: bool = False
+        if mod.is_dir(): pass
+        elif mod.is_file() and mod.suffix in {".zip", ".7z"}:
+            is_archive = True
+        else: raise ValueError(f"Unknown filetype for mod: {mod.name}")
 
+
+        # Get mod_info
+        if is_archive:
+            match mod.suffix:
+                case ".zip":
+                    with ZipFile(mod, "r") as archive:
+                        if "info.json" not in archive.namelist():
+                            return False
+                        with archive.open("info.json") as file:
+                            mod_info = json.load(file)
+
+                case ".7z":
+                    with SevenZipFile(mod, "r") as archive:
+                        if "info.json" not in archive.getnames():
+                            return False
+                        extracted_data_thingy = archive.read(["info.json"])["info.json"]
+                        try: mod_info = json.load(extracted_data_thingy)
+                        finally: extracted_data_thingy.close()
+
+                case _: raise ValueError(f"Unknown filetype for mod: {mod.name}")
+
+        else:
+            if not (mod / "info.json").exists():
+                raise FileNotFoundError(str(mod / "info.json"))
+            with open(mod / "info.json", "r") as file:
+                mod_info: dict[str, str | int] = json.load(file)
+
+
+        # Version comparison
         deploy_history: DeployHistory = DeployHistory()
-        mod_file_version: int | None = mod_info.get("fileVersion")  # type: ignore
-        if not isinstance(mod_file_version, int):
-            mod_guid: str | None = mod_info.get("clientVersionUpload")  # type: ignore
-            if not isinstance(mod_guid, str):
-                raise ValueError("Unknown mod verison!")
-            else:
-                for item in reversed(deploy_history.studio_deployments):
-                    if item.guid == mod_guid:
-                        mod_version: RobloxVersion = item
-                        break
-                else:
-                    for item in reversed(deploy_history.player_deployments):
-                        if item.guid == mod_guid:
-                            mod_file_version = item.file_version.minor
-                            break
-                    else:
-                        raise ValueError(f"Invalid clientVersionUpload: {mod_guid}")
-                    for item in reversed(deploy_history.studio_deployments):
-                        if item.file_version.minor == mod_file_version:
-                            mod_version = item
-                            break
-                    else:
-                        raise ValueError(f"Invalid clientVersionUpload: {mod_guid}")
-        else:
-            for item in reversed(deploy_history.studio_deployments):
-                if item.file_version.minor == mod_file_version:
-                    mod_version = item
-                    break
-            else: raise InvalidVersionError(mod_file_version)
-
-        latest_file_version: int = latest_version.file_version.minor
-        if latest_version.binary_type == "WindowsStudio64":
-            target_version: RobloxVersion = latest_version
-        else:
-            for item in reversed(deploy_history.studio_deployments):
-                if item.file_version.minor == latest_file_version:
-                    target_version = item
-                    break
-            else: raise InvalidVersionError(latest_file_version)
+        mod_version = cls._get_mod_version(deploy_history, mod_info)
+        target_version = cls._get_target_version(deploy_history, latest_version)
 
         if mod_version.file_version == target_version.file_version:
             Logger.info("Mod is not outdated. Cancelling update...", prefix=cls._LOG_PREFIX)
@@ -147,7 +178,8 @@ class ModUpdater:
 
 
             Logger.info("Copying mod...", prefix=cls._LOG_PREFIX)
-            shutil.copytree(mod, temp_target, dirs_exist_ok=True)
+            if is_archive: filesystem.extract(mod, temp_target)
+            else: shutil.copytree(mod, temp_target, dirs_exist_ok=True)
 
 
             Logger.info("Writing info.json...", prefix=cls._LOG_PREFIX)
@@ -251,17 +283,22 @@ class ModUpdater:
             # Copy new imagesets
             new_temp_target_imageset_path.mkdir(parents=True, exist_ok=True)
             shutil.copytree(new_imagesets_dir, new_temp_target_imageset_path, dirs_exist_ok=True)
+
+
             # Replace original mod, with backup to avoid deleting the original mod if something goes wrong
-            backup: Path = mod.with_name(f"{mod.name}_backup")
+            backup_suffix: str = mod.suffix if is_archive else ""
+            backup: Path = mod.with_name(f"{mod.name}_backup{backup_suffix}")
             counter: int = 0
             while backup.exists():
                 counter += 1
-                backup = mod.with_name(f"{mod.name}_backup{counter}")
+                backup = mod.with_name(f"{mod.name}_backup{counter}{backup_suffix}")
             Logger.info("Backing up original mod...", prefix=cls._LOG_PREFIX)
             mod.rename(backup)
+
             try:
                 Logger.info("Attempting rename...", prefix=cls._LOG_PREFIX)
-                temp_target.rename(mod)
+                if is_archive: filesystem.compress(temp_target, mod, format=mod.suffix)
+                else: temp_target.rename(mod)
             except Exception as e:
                 Logger.error(f"{type(e).__name__}: {e}", prefix=cls._LOG_PREFIX)
                 Logger.info("Rename failed, restoring backup...", prefix=cls._LOG_PREFIX)
@@ -269,7 +306,8 @@ class ModUpdater:
                 raise
             else:
                 Logger.info("Rename success, removing backup...", prefix=cls._LOG_PREFIX)
-                shutil.rmtree(backup)
+                if is_archive: backup.unlink()
+                else: shutil.rmtree(backup)
 
 
         Logger.info("Mod updated successfully!", prefix=cls._LOG_PREFIX)

@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> I am officially ending development for Kliko's modloader,
+> thank you all for your support ❤️
+
 <div align="center">
 
 <img src="images/banner.png" alt="banner"/>
@@ -103,5 +107,6 @@ extra features. Bloxstrap is what introduced me to the world of Roblox modding a
 
 
 <h2 id="disclaimer">Disclaimer</h2>
+
 
 Kliko’s Modloader is an independently developed project by TheKliko. It is not affiliated with, endorsed by, or associated with Kliko Groep B.V. in any way.
